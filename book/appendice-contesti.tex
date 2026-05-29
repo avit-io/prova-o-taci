@@ -1,0 +1,103 @@
+% =====================================================================
+% APPENDICE — Trattazione formale dei contesti
+% =====================================================================
+% Lo switch \appendix vive in main.tex prima dell'\input di questo file.
+
+\chapter{Trattazione formale dei contesti}\label{cap:contesti-formali}
+
+\noindent {\spacedlowsmallcaps{Per chi vuole la metateoria completa}}. Il capitolo principale (\S\ref{cap:contesti}) presenta i contesti come notazione strutturale del metalinguaggio --- definizione informale ma precisa, regola della variabile, convenzione tipografica. Bastano a leggere Parte~II-IV. Qui si formalizza tutto il resto: contesti come giudizio, regole strutturali, statuto dei lemmi ammissibili. Niente di questo \`e necessario per la lettura del compendio; tutto \`e necessario se vuoi verificare propriet\`a metateoriche del sistema.
+
+\bigskip
+
+\noindent\textbf{Sintesi degli statuti.}
+\begin{itemize}
+\item \textbf{Definizione di contesto}: notazione del metalinguaggio (nel corpo). Volendo, anche giudizio (questa appendice).
+\item \textbf{Variabile, conversione di tipo}: regole primitive del sistema --- derivano nuovi giudizi.
+\item \textbf{Indebolimento, sostituzione}: \emph{lemmi ammissibili}, conseguenze del modo in cui F-I-E-C \`e scritto (non regole primitive).
+\end{itemize}
+
+\section*{Contesti come giudizio}
+
+Volendo trattare i contesti come giudizio --- presentazione comune in letteratura --- si aggiunge una quinta forma:
+\[
+\Gamma \;\mathsf{ctx} \qquad \text{\meta{$\Gamma$ \`e un contesto ben formato}}
+\]
+\noindent Le regole di formazione sono due.
+
+\paragraph{Contesto vuoto.}
+\[
+\inferrule{ }{\cdot \;\mathsf{ctx}}
+\]
+
+\paragraph{Estensione.}
+\[
+\inferrule{\Gamma \;\mathsf{ctx} \\ \Gamma \vdash A : \Type \\ x \notin \mathrm{dom}(\Gamma)}{\Gamma, x : A \;\mathsf{ctx}}
+\]
+
+\noindent La terza premessa dice che $A$ deve essere un tipo derivabile in $\Gamma$ (non si possono estendere contesti con ipotesi su tipi mal formati). La quarta \`e la \emph{freschezza}: $x$ non deve essere gi\`a presente in $\Gamma$.
+
+\bigskip
+
+\noindent\textbf{Equivalenza con la presentazione informale.} Le due viste sono equivalenti. La ``lista ordinata di ipotesi'' del corpo principale corrisponde a una sequenza di applicazioni delle due regole sopra. Trattare $\mathsf{ctx}$ come giudizio d\`a pi\`u rigore --- ma rende il numero dei giudizi cinque, non quattro --- e questo nel corpo del libro avrebbe rovinato la coerenza pedagogica con cap.~2.
+
+\bigskip
+
+\noindent\textbf{Notazione $\Delta$.} In questa appendice usiamo $\Delta$ come metavariabile per ``il resto del contesto dopo una certa ipotesi $x$''. Cio\`e: se $\Gamma' = \Gamma, x : A, \Delta$, allora $\Gamma$ \`e il prefisso prima di $x : A$, e $\Delta$ \`e il suffisso dopo. Entrambi sono contesti (possibilmente vuoti).
+
+\section*{Regola della variabile, forma generale}
+
+Il corpo principale presenta solo la forma topmost $\Gamma, x : A \vdash x : A$. La forma generale, equivalente via indebolimento, \`e:
+\[
+\inferrule{\Gamma, x : A, \Delta \;\mathsf{ctx}}{\Gamma, x : A, \Delta \vdash x : A}
+\]
+Permette di accedere a una variabile non pi\`u recente del contesto. Le due forme sono equivalenti: la generale si deriva dalla topmost applicando indebolimento per ogni ipotesi successiva di $\Delta$.
+
+\section*{Indebolimento (\emph{weakening}) --- lemma ammissibile}
+
+\begin{regola}[Indebolimento, ammissibile]
+Se $\Gamma, \Delta \vdash \mathcal{J}$ e $\Gamma \vdash A : \Type$ con $x \notin \mathrm{dom}(\Gamma, \Delta)$, allora $\Gamma, x : A, \Delta \vdash \mathcal{J}$.
+\end{regola}
+
+\noindent ($\mathcal{J}$ \`e uno qualsiasi dei quattro giudizi di \S\ref{cap:giudizi}.) Si dimostra per induzione strutturale sulla derivazione di $\Gamma, \Delta \vdash \mathcal{J}$, scendendo per ogni regola F-I-E-C di Parte~II e verificando che l'aggiunta dell'ipotesi non rompe la derivazione.
+
+\bigskip
+
+\noindent\textbf{Significato operativo.} Aggiungere un'ipotesi non rovina ci\`o che era gi\`a derivato. Da Parte~II in poi l'indebolimento si usa tacitamente: ogni volta che si pone una variabile fresca in un contesto, le derivazioni precedenti restano valide.
+
+\bigskip
+
+\noindent\textbf{Perch\'e \`e un lemma e non una regola primitiva.} Non c'\`e bisogno di postularlo: si verifica, percorrendo le regole F-I-E-C di ciascun tipo, che la propriet\`a \`e preservata caso per caso. \`E un teorema sul sistema, non un assunto.
+
+\section*{Sostituzione --- lemma ammissibile}
+
+\begin{regola}[Sostituzione, ammissibile]
+Se $\Gamma \vdash a : A$ e $\Gamma, x : A, \Delta \vdash \mathcal{J}$, allora $\Gamma, \Delta[a/x] \vdash \mathcal{J}[a/x]$.
+\end{regola}
+
+\noindent Qui $\Delta[a/x]$ \`e il contesto $\Delta$ con ogni occorrenza libera di $x$ sostituita da $a$ (la sostituzione \`e definita ricorsivamente su termini e tipi: $(x)[a/x] = a$, $(y)[a/x] = y$ per $y \neq x$, e si propaga compositivamente su applicazioni, $\lambda$, tipi $\Pi$, ecc., con $\alpha$-rinomina dove serve per evitare cattura). Stessa cosa per $\mathcal{J}[a/x]$ sul giudizio finale (termine \emph{e} tipo).
+
+Anche questo \`e un lemma ammissibile: si dimostra per induzione sulla derivazione di $\Gamma, x : A, \Delta \vdash \mathcal{J}$, mostrando che ogni regola di Parte~II commuta con la sostituzione.
+
+\bigskip
+
+\noindent\textbf{Significato operativo.} Se esibisci un abitante concreto $a$ di $A$ in $\Gamma$, ogni derivazione fatta sotto l'ipotesi $x : A$ si pu\`o specializzare a quel concreto $a$. \`E ci\`o che chiude l'ipotesi.
+
+\section*{Conversione di tipo --- regola primitiva}
+
+A differenza di indebolimento e sostituzione, la conversione di tipo \`e una regola \textbf{primitiva} del sistema:
+\[
+\inferrule{\Gamma \vdash a : A \\ \Gamma \vdash A \definitorio B : \Type}{\Gamma \vdash a : B}
+\]
+
+\noindent Non si dimostra dall'interno: \`e ci\`o che fa lavorare l'uguaglianza definitoria \emph{dentro} il sistema dei tipi. Senza questa regola, $\definitorio$ resterebbe un'asserzione esterna senza effetto operativo sul controllo dei tipi (per esempio: con $\zero + n \definitorio n$ definitorio ma senza conversione, non potresti usare un termine di tipo $\mathrm{Vec}\,A\,n$ in una posizione che chiede $\mathrm{Vec}\,A\,(\zero + n)$, anche se i due tipi riducono allo stesso normale).
+
+\section*{Rapporto con il corpo del libro}
+
+\begin{itemize}
+\item Il corpo (Parti I-IV) usa contesti come notazione strutturale, non come giudizio. Tutto vale lo stesso.
+\item L'indebolimento \`e usato tacitamente: ogni volta che una regola di Parte~II ha pi\`u premesse con lo stesso contesto, l'omissione di $\Gamma$ presume implicitamente che il lemma sia disponibile.
+\item La sostituzione \`e usata tacitamente nel passaggio dalle regole astratte alle istanziazioni concrete --- caso paradigmatico, la $\beta$-riduzione di $\Pi$: $(\lambda x.\,b)\,a \definitorio b[a/x]$ usa la sostituzione.
+\item La conversione di tipo \`e usata operativamente ovunque l'uguaglianza definitoria fa ridurre un tipo (es.\ $\zero + n \definitorio n$ dentro $\mathrm{Vec}\,A\,(\zero + n)$, $\beta$-riduzione del tipo di $J\,(\refl, C, c)$, ecc.).
+\end{itemize}
+
+\noindent Le propriet\`a metateoriche pi\`u profonde di MLTT --- consistenza, normalizzazione, decidibilit\`a del typechecking --- vivono al livello di questa appendice (e di letteratura specialistica oltre). Qui non le dimostriamo: rimandiamo a Martin-L\"of (1984), Streicher (1993), Coquand (1996), Hofmann-Streicher (1998) per le formalizzazioni canoniche.

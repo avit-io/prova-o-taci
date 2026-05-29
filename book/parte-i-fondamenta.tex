@@ -6,7 +6,7 @@
 \noindent\itshape Cosa assumi prima di scrivere la prima regola.
 Cinque capitoli che fissano il vocabolario: il rapporto tra formalismo e materia
 (\S\ref{cap:partenza}); i quattro giudizi del metalinguaggio (\S\ref{cap:giudizi});
-la grammatica di contesti e dell'operazione $\vdash$ (\S\ref{cap:contesti});
+i contesti e l'operazione $\vdash$ (\S\ref{cap:contesti});
 il test operativo per riconoscere linguaggio e metalinguaggio
 (\S\ref{cap:test}); lo schema F-I-E-C che governa ogni tipo
 (\S\ref{cap:fiec}). Da qui in poi, nulla si introduce senza una di queste
@@ -66,50 +66,44 @@ In \S\ref{cap:identita} introdurremo un \emph{altro} $\identita$, completamente 
 % ---------------------------------------------------------------------
 \chapter{Contesti e l'operazione $\vdash$}\label{cap:contesti}
 
-\noindent {\spacedlowsmallcaps{Tutto quello che scriveremo da qui in poi vale \emph{sotto ipotesi}}}. Non c'\`e regola in MLTT --- nemmeno la formazione di $\mathbb{B}$ --- che non si svolga dentro un contesto. Era il Cero~\ref{cero:contesti}; resta da specificarne la grammatica.
+\noindent {\spacedlowsmallcaps{Tre cose, in tutto}}. Cos'\`e un contesto; come si usa via la regola della variabile; come si comporta nelle regole di Parte~II. Tutto il resto --- contesti come giudizio, indebolimento, sostituzione, conversione di tipo --- vive in appendice (\S\ref{cap:contesti-formali}) per chi vuole la metateoria. Per leggere il libro basta quello che segue.
 
 \bigskip
 
-\noindent\textbf{Il caso minimo dove serve.} Vogliamo poter scrivere la regola di formazione di $\Pi$ (\S\ref{cap:pi}):
+\noindent\textbf{Perch\'e serve.} Le funzioni dipendenti $\Pi$ (\S\ref{cap:pi}) hanno una regola di formazione che chiede di parlare di $B\,x$ \emph{nell'ipotesi che $x$ sia di tipo $A$}:
 \[
 \inferrule{A : \Type \\ x : A \vdash B\,x : \Type}{(x : A) \to B\,x : \Type}
 \]
-La seconda premessa dice ``in un contesto in cui $x : A$ \`e assunto, $B\,x$ \`e un tipo''. Senza una nozione formale di contesto e di operazione $\vdash$, quella riga \`e gergo. Con la grammatica esplicita, \`e una regola.
+La seconda premessa dice: ``in un mondo dove $x : A$ \`e assunto, $B\,x$ \`e un tipo''. Quel ``mondo di ipotesi assunte'' \`e il \emph{contesto}, e il simbolo $\vdash$ lo separa dal giudizio.
 
-\section*{Grammatica dei contesti}
+\section*{Cos'\`e un contesto}
 
-I contesti sono sequenze finite di ipotesi della forma $x : A$. Li indichiamo con $\Gamma, \Delta$, eventualmente con apici. Introduciamo un nuovo giudizio del metalinguaggio:
-\[
-\Gamma \;\mathsf{ctx} \qquad \text{\meta{$\Gamma$ \`e un contesto ben formato}}
-\]
-
-\noindent Le regole di formazione del giudizio $\mathsf{ctx}$ sono due, e generano tutti e soli i contesti legittimi.
-
-\paragraph{Contesto vuoto.}
-\[
-\inferrule{ }{\cdot \;\mathsf{ctx}}
-\]
-Il contesto vuoto, sempre ben formato.
-
-\paragraph{Estensione.}
-\[
-\inferrule{\Gamma \;\mathsf{ctx} \\ \Gamma \vdash A : \Type \\ x \notin \mathrm{dom}(\Gamma)}{\Gamma, x : A \;\mathsf{ctx}}
-\]
-Si pu\`o estendere $\Gamma$ con un'ipotesi $x : A$ \emph{a patto che} $A$ sia un tipo derivabile in $\Gamma$ (terza premessa) e $x$ sia un nome nuovo, non gi\`a presente (quarta premessa, condizione di freschezza).
+\noindent\textbf{Definizione.} Un \textbf{contesto} $\Gamma$ \`e una lista ordinata di ipotesi della forma $x : A$. Le ipotesi pi\`u a sinistra possono essere usate in quelle pi\`u a destra.
 
 \bigskip
 
-\noindent\textbf{Osservazioni meccaniche.}
+\noindent Notazione:
 \begin{itemize}
-\item Il contesto cresce \emph{a destra}: $\Gamma, x : A$ si legge ``$\Gamma$ esteso con $x : A$''. Le ipotesi pi\`u vecchie stanno a sinistra.
-\item Le ipotesi pi\`u recenti possono dipendere dalle precedenti --- il tipo $B\,x$ in $\Gamma, x : A, y : B\,x$ usa la $x$ del passo prima. Senza questa possibilit\`a non si avrebbero tipi dipendenti, ed \`e proprio questa l'apertura formale del Cero~\ref{cero:dipendenza} che vedremo in \S\ref{cap:pi}.
-\item Il giudizio $\mathsf{ctx}$ \`e del \textbf{metalinguaggio}, come gli altri quattro; vive sopra il linguaggio.
+\item Il contesto vuoto si scrive $\cdot$.
+\item L'estensione di $\Gamma$ con una nuova ipotesi $x : A$ si scrive $\Gamma, x : A$.
 \end{itemize}
 
-\section*{I quattro giudizi, riscritti sotto contesto}
+\bigskip
 
-I quattro giudizi di \S\ref{cap:giudizi} non compaiono mai \emph{nudi} nelle regole reali: portano sempre un contesto a sinistra di $\vdash$.
+\noindent\textbf{Esempio.} Costruiamo un contesto passo passo.
+\begin{align*}
+&\cdot && \text{\meta{contesto vuoto}} \\
+&\cdot,\, A : \Type && \text{\meta{assumo che $A$ sia un tipo}} \\
+&\cdot,\, A : \Type,\, x : A && \text{\meta{assumo $x$ di tipo $A$ (uso $A$ del passo prima)}} \\
+&\cdot,\, A : \Type,\, x : A,\, B : A \to \Type && \text{\meta{assumo $B$ famiglia di tipi su $A$}} \\
+&\cdot,\, A : \Type,\, x : A,\, B : A \to \Type,\, y : B\,x && \text{\meta{assumo $y : B\,x$ (uso $B$ e $x$ del prefisso)}}
+\end{align*}
 
+\noindent L'ordine conta: ogni nuova ipotesi pu\`o usare quelle precedenti.
+
+\section*{I quattro giudizi, sotto contesto}
+
+I quattro giudizi di \S\ref{cap:giudizi} non vivono nudi: portano sempre un contesto a sinistra di $\vdash$.
 \begin{equation*}
 \begin{array}{ll}
 \Gamma \vdash A : \Type & \text{\meta{nel contesto $\Gamma$, $A$ \`e un tipo}} \\
@@ -118,74 +112,70 @@ I quattro giudizi di \S\ref{cap:giudizi} non compaiono mai \emph{nudi} nelle reg
 \Gamma \vdash a \definitorio b : A & \text{\meta{$a$ e $b$ sono lo stesso termine di $A$ in $\Gamma$}}
 \end{array}
 \end{equation*}
-
-\noindent Il contesto non \`e ``parte'' del giudizio: \`e \emph{l'ambiente di ipotesi sotto cui il giudizio vale}. Contesti diversi producono giudizi diversi della stessa forma: $\cdot \vdash a : A$ (sotto vuoto) e $x : B \vdash a : A$ sono due asserzioni distinte, anche con $a$ e $A$ identici.
+\noindent Il contesto non \`e ``parte'' del giudizio: \`e \emph{l'ambiente di ipotesi sotto cui il giudizio vale}.
 
 \section*{La regola della variabile}
 
-Senza una regola che permetta di \emph{usare} le ipotesi, il contesto sarebbe decorativo. La regola che le mette in gioco \`e la pi\`u semplice possibile:
-
+Una regola, una sola idea: \emph{l'ipotesi appena assunta \`e disponibile come termine}.
 \[
-\inferrule{\Gamma, x : A, \Delta \;\mathsf{ctx}}{\Gamma, x : A, \Delta \vdash x : A}
+\inferrule{ }{\Gamma, x : A \vdash x : A}
 \]
+A voce: ``se ho appena assunto $x : A$, posso derivare $x : A$''. \`E ovvia, ma \`e quella che rende il contesto operativo --- senza, ``ho assunto $x$'' resterebbe solo un'annotazione.
 
-\noindent Letta: ``se nel contesto compare $x : A$, allora posso derivare $x : A$''. \`E ovvia; \`e quella che giustifica formalmente l'idea ``ho $x$ a disposizione perch\'e l'ho assunto''. \`E anche l'unica regola che ``guarda dentro'' il contesto --- tutte le altre lo lasciano com'\`e o lo estendono in modo prevedibile.
+\bigskip
 
-\section*{Le altre regole strutturali}
-
-Tre regole che governano \emph{come} il contesto pu\`o cambiare lungo una derivazione senza alterarne il significato. Le scriviamo nella loro forma minima; lo scope della trattazione le tiene a questo livello: \emph{The Little Typer} e \emph{Verified Functional Programming in Agda} non chiedono di pi\`u. Nessuna di esse \`e un cero: sono \emph{lemmi ammissibili}, conseguenze del modo in cui le regole specifiche dei tipi (Parte~II) saranno scritte. Si dichiarano qui perch\'e da Parte~II in poi le useremo tacitamente.
-
-\paragraph{Indebolimento (\emph{weakening}).}
+\noindent\textbf{Esempio concreto.} Voglio derivare $x : A$ nel contesto $\cdot,\, A : \Type,\, x : A$. Applico la regola della variabile con $\Gamma = (\cdot,\, A : \Type)$. La conclusione \`e:
 \[
-\inferrule{\Gamma, \Delta \vdash \mathcal{J} \\ \Gamma \vdash A : \Type \\ x \notin \mathrm{dom}(\Gamma, \Delta)}{\Gamma, x : A, \Delta \vdash \mathcal{J}}
+(\cdot,\, A : \Type),\, x : A \;\vdash\; x : A
 \]
-Aggiungere un'ipotesi non rovina ci\`o che era gi\`a derivato: se sapevi $\mathcal{J}$, lo sai ancora con un'ipotesi in pi\`u. Qui $\mathcal{J}$ sta per uno qualsiasi dei quattro giudizi --- usiamo la calligrafica $\mathcal{J}$ per non confonderla con l'eliminatore $\Jelim$ del tipo identit\`a (\S\ref{cap:identita}).
+che \`e esattamente quello che volevo. \checkmark
 
-\paragraph{Sostituzione.}
-\[
-\inferrule{\Gamma \vdash a : A \\ \Gamma, x : A, \Delta \vdash \mathcal{J}}{\Gamma, \Delta[a/x] \vdash \mathcal{J}[a/x]}
-\]
-Se in $\Gamma$ esibisci un abitante $a$ di $A$, ogni derivazione fatta \emph{sotto l'ipotesi $x : A$} si pu\`o specializzare a quel concreto $a$, sostituendolo dappertutto --- nelle ipotesi successive che dipendevano da $x$ e nel giudizio finale. \`E la regola che chiude l'ipotesi.
+\bigskip
 
-\paragraph{Conversione di tipo.}
-\[
-\inferrule{\Gamma \vdash a : A \\ \Gamma \vdash A \definitorio B : \Type}{\Gamma \vdash a : B}
-\]
-Se $A$ e $B$ sono definitoriamente uguali, abitare $A$ e abitare $B$ \`e la stessa cosa. \`E la regola che fa lavorare $\definitorio$ \emph{dentro} il sistema dei tipi: senza, l'uguaglianza definitoria si fermerebbe a essere un'asserzione esterna e non avrebbe effetto operativo sul controllo dei tipi.
+\noindent\textbf{Esempio negativo.} \emph{Non} posso usare questa regola per derivare $x : A$ nel contesto $\cdot,\, A : \Type$, perch\'e $x$ non \`e nel contesto. Le ipotesi non si materializzano dal nulla: per essere disponibili devono essere state assunte.
 
 \section*{Convenzione tipografica per il resto del libro}
 
-Da \S\ref{cap:fiec} in poi, le regole di inferenza si scrivono \emph{senza contesto in vista} quando tutte le premesse e la conclusione condividono lo stesso. Si sottintende che ce ne sia uno, lo stesso ovunque nella regola. Esempio: la regola di introduzione di $\mathbb{B}$ (\S\ref{cap:bool})
+Da \S\ref{cap:fiec} in poi, scriviamo le regole \emph{senza contesto in vista} quando \`e lo stesso ovunque. Si sottintende un $\Gamma$ implicito. Esempio: la regola di introduzione di $\mathbb{B}$ (\S\ref{cap:bool})
 \[
 \inferrule{ }{\tto : \mathbb{B}}
 \]
 sta in realt\`a per
 \[
-\inferrule{\Gamma \;\mathsf{ctx}}{\Gamma \vdash \tto : \mathbb{B}}
+\inferrule{ }{\Gamma \vdash \tto : \mathbb{B}}
 \]
-per qualunque $\Gamma$ ben formato.
+per ogni $\Gamma$.
 
 \bigskip
 
-\noindent Quando invece una premessa \emph{estende} il contesto rispetto alla conclusione --- caso paradigmatico, la $\Pi$-formazione di \S\ref{cap:pi}:
+\noindent Quando invece una premessa \emph{estende} il contesto rispetto alla conclusione, il $\vdash$ sopravvive --- ed \`e l\`i che sta succedendo il lavoro non banale. Caso paradigmatico, la $\Pi$-formazione (\S\ref{cap:pi}):
 \[
 \inferrule{A : \Type \\ x : A \vdash B\,x : \Type}{(x : A) \to B\,x : \Type}
 \]
---- il $\vdash$ sopravvive nella scrittura, perch\'e \`e l\`i che il contesto sta facendo un lavoro non banale. La regola, sotto contesto generico $\Gamma$, sarebbe per esteso:
+Per esteso, sotto $\Gamma$ generico:
 \[
 \inferrule{\Gamma \vdash A : \Type \\ \Gamma, x : A \vdash B\,x : \Type}{\Gamma \vdash (x : A) \to B\,x : \Type}
 \]
-La compressione ``ometti $\Gamma$ dove \`e ovvio, lascialo dove non lo \`e'' \`e un fatto di leggibilit\`a; sotto, la regola \`e la seconda.
+\noindent\textbf{Lettura della premessa $\Gamma, x : A \vdash B\,x : \Type$.} \emph{Estendi $\Gamma$ con l'ipotesi $x : A$; in questo contesto esteso, $B\,x$ \`e un tipo.} Tutto qui.
 
 \section*{Test diretto}
 
 \begin{oss}[$\vdash$ e ``,'' sono entrambi del metalinguaggio]
-Il ``,'' che separa le ipotesi in $\Gamma, x : A$ \`e grammatica dei contesti, non del linguaggio: non puoi passare $\Gamma, x : A$ come argomento di una funzione, perch\'e non \`e un oggetto del linguaggio. \`E un contesto, e i contesti vivono nel metalinguaggio. Stessa cosa per $\vdash$ --- gi\`a sotto test in \S\ref{cap:test}, ma ora con grammatica precisa alle spalle.
+$\Gamma \vdash A : \Type$ non \`e un \emph{oggetto} del linguaggio: \`e un'asserzione \emph{sul} sistema. Non puoi passare ``$\Gamma \vdash A : \Type$'' come argomento a una funzione, n\'e usarla come termine. Sia il $\vdash$ sia il ``,'' che separa le ipotesi nel contesto vivono nel metalinguaggio.
 \end{oss}
 
 \bigskip
 
-\noindent Con la grammatica di $\vdash$ in tasca, ogni regola del seguito ha un significato preciso e non interpretativo. Ogni volta che leggi una premessa con un nuovo $x : A$, sai cosa si sta facendo: estensione di contesto via la regola di estensione, e da quel momento $x$ \`e disponibile come variabile via la regola della variabile.
+\noindent\textbf{Domande di self-check.}
+\begin{enumerate}
+\item Nel contesto $\cdot,\, A : \Type,\, x : A$, posso derivare $x : A$ con la regola della variabile? \emph{S\`i, $x$ \`e l'ipotesi appena assunta.}
+\item Cosa cambia tra $\cdot \vdash x : A$ e $x : A \vdash x : A$? \emph{Il primo non \`e derivabile (il contesto vuoto non contiene $x$); il secondo \`e la regola della variabile applicata direttamente.}
+\item Nel contesto $\cdot,\, A : \Type$, perch\'e \emph{non posso} usare la regola della variabile per derivare $x : A$? \emph{Perch\'e $x$ non \`e nel contesto: la regola della variabile rende disponibili solo le ipotesi gi\`a assunte.}
+\end{enumerate>
+
+\bigskip
+
+\noindent\textbf{Cosa abbiamo lasciato fuori.} La trattazione formale completa --- contesti come giudizio, indebolimento, sostituzione, conversione di tipo --- vive in appendice (\S\ref{cap:contesti-formali}). Serve a chi vuole verificare la metateoria di MLTT, non a chi vuole leggere il compendio. Da qui in poi, basta sapere: \emph{i contesti sono liste ordinate di ipotesi, la regola della variabile rende disponibile l'ipotesi appena assunta, e $\Gamma, x : A \vdash \ldots$ vuol dire ``estendi $\Gamma$ con $x : A$''}.
 
 % ---------------------------------------------------------------------
 \chapter{Linguaggio e metalinguaggio --- il test}\label{cap:test}
@@ -215,7 +205,7 @@ Sezione operativa: ogni volta che sui livelli ci si perde, si torna qui.
 Separa premesse da conclusione: ``dati questi giudizi sopra, ottieni questo giudizio sotto''. \`E la grammatica con cui si scrivono le regole (Cero~1).
 
 \paragraph{(iii) Il $\vdash$ \`e metalinguaggio, ma fa una cosa diversa dalla barra.}
-Sta \emph{dentro una singola premessa}: $x : A \vdash B\,x : \Type$, ``nel contesto in cui assumo $x : A$, vale $B\,x : \Type$''. Costruisce \emph{un} giudizio dicendo sotto quali ipotesi vale (Cero~\ref{cero:contesti}; la grammatica completa di contesti e $\vdash$ \`e in \S\ref{cap:contesti}). La barra combina giudizi interi; il $\vdash$ costruisce un giudizio sotto ipotesi. Non sono lo stesso simbolo.
+Sta \emph{dentro una singola premessa}: $x : A \vdash B\,x : \Type$, ``nel contesto in cui assumo $x : A$, vale $B\,x : \Type$''. Costruisce \emph{un} giudizio dicendo sotto quali ipotesi vale (Cero~\ref{cero:contesti}; la definizione di contesti e l'uso operativo di $\vdash$ sono in \S\ref{cap:contesti}, la trattazione formale completa in appendice \S\ref{cap:contesti-formali}). La barra combina giudizi interi; il $\vdash$ costruisce un giudizio sotto ipotesi. Non sono lo stesso simbolo.
 
 \bigskip
 
