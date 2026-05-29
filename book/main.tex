@@ -32,6 +32,7 @@
 % --- nota di colore vinaccia per il numero del capitolo ---
 \definecolor{halfgray}{rgb}{0.55,0.13,0.16}
 \definecolor{cream}{RGB}{245,240,228}
+\definecolor{terra}{rgb}{0.42,0.26,0.13}  % terra d'ombra calda, per stratificazioni semi-trasparenti
 
 % --- aumenta lo spazio dopo il titolo del capitolo ---
 \usepackage{titlesec}
@@ -234,131 +235,223 @@
 \begin{tikzpicture}[remember picture, overlay]
 
   %% =========================================================
-  %% FONDO --- cream con bande nere top/bottom (Depero blocking)
+  %% SFONDO MATERICO --- cream con macchie irregolari, niente bande
   %% =========================================================
   \fill[cream] (current page.north west) rectangle (current page.south east);
 
-  %% Banda nera in alto (zona titolo)
-  \fill[black]
-    (current page.north west) rectangle
-    ($(current page.north east)+(0,-7cm)$);
+  %% Macchie semi-trasparenti, di terra d'ombra e vinaccia, sparse e ruotate
+  \foreach \x/\y/\rx/\ry/\rot/\col/\op in {%
+    3.2/-2.5/3.4/2.1/12/terra/0.22,
+    17/-6/3.8/2.8/-22/terra/0.18,
+    1.5/-9/2.0/2.6/35/halfgray/0.16,
+    14/-15/2.5/3.5/-8/terra/0.15,
+    7/-18/3.1/2.0/55/halfgray/0.13,
+    4/-22/2.7/1.9/25/terra/0.16,
+    18/-23/2.2/2.8/40/halfgray/0.15,
+    9/-25/3.0/1.7/-40/terra/0.14,
+    2/-27/2.0/1.8/30/terra/0.18%
+  } {
+    \fill[\col, opacity=\op, rotate around={\rot:($(current page.north west)+(\x cm,\y cm)$)}]
+      ($(current page.north west)+(\x cm,\y cm)$) ellipse[x radius=\rx cm, y radius=\ry cm];
+  }
 
-  %% Cuneo rosso diagonale che intrude nella banda nera dal margine destro
-  \fill[halfgray]
-    ($(current page.north east)+(0,-3.5cm)$) --
-    ($(current page.north east)+(0,-7cm)$) --
-    ($(current page.north east)+(-6cm,-7cm)$) -- cycle;
-
-  %% Banda nera in basso (zona footer)
-  \fill[black]
-    ($(current page.south west)+(0,5cm)$) rectangle
-    (current page.south east);
-
-  %% Cuneo rosso simmetrico in basso a sinistra (contrappeso Depero)
-  \fill[halfgray]
-    ($(current page.south west)+(0,5cm)$) --
-    ($(current page.south west)+(0,8.5cm)$) --
-    ($(current page.south west)+(6cm,5cm)$) -- cycle;
-
-  %% =========================================================
-  %% COMPENETRAZIONI BALLA --- fasci sottili nello sfondo cream
-  %% =========================================================
-  \begin{scope}
-    \clip ($(current page.north west)+(0,-7cm)$) rectangle
-          ($(current page.south east)+(0,5cm)$);
-    %% ventaglio dall'angolo basso-destro (rosso)
-    \foreach \a in {110,125,140,155,170} {
-      \draw[halfgray, line width=0.25pt, opacity=0.20]
-        ($(current page.south east)+(0,5.5cm)$) -- ++(\a:32cm);
-    }
-    %% ventaglio dall'angolo alto-sinistra (nero)
-    \foreach \a in {-10,-25,-40,-55,-70} {
-      \draw[black, line width=0.22pt, opacity=0.13]
-        ($(current page.north west)+(0,-6.5cm)$) -- ++(\a:32cm);
-    }
-  \end{scope}
+  %% Nuclei densi di pigmento, piccoli punti d'accento
+  \foreach \x/\y/\r/\col/\op in {%
+    4/-4/0.30/terra/0.40,
+    11/-7/0.22/halfgray/0.45,
+    17/-12/0.18/halfgray/0.50,
+    9/-20/0.25/terra/0.35,
+    13/-26/0.20/halfgray/0.45%
+  } {
+    \fill[\col, opacity=\op]
+      ($(current page.north west)+(\x cm,\y cm)$) circle[radius=\r cm];
+  }
 
   %% =========================================================
-  %% TITOLO --- Depero spaced caps nella banda nera
+  %% LINEE DI FORZA BALLA --- fasci direzionali, tagli netti
   %% =========================================================
-  \node[cream, font=\fontsize{46}{50}\selectfont\bfseries\scshape]
-    at ($(current page.north)+(0,-3.4cm)$)
+
+  %% Fascio principale dall'angolo alto-destra (vinaccia)
+  \foreach \a in {195,210,225,240,255} {
+    \draw[halfgray, line width=0.4pt, opacity=0.32, -{Stealth[length=2pt]}]
+      ($(current page.north east)+(-1,-3)$) -- ++(\a:15cm);
+  }
+
+  %% Fascio contrario dall'alto-sinistra (nero)
+  \foreach \a in {-15,-30,-45,-60} {
+    \draw[black, line width=0.32pt, opacity=0.20, -{Stealth[length=2pt]}]
+      ($(current page.north west)+(1,-2)$) -- ++(\a:13cm);
+  }
+
+  %% =========================================================
+  %% CURVA PLASTICA BOCCIONI --- forma unica di continuità nello spazio
+  %% =========================================================
+
+  %% Curva principale: spessa, vinaccia, sweep diagonale
+  \draw[halfgray, line width=2.6pt, opacity=0.55]
+    ($(current page.north west)+(-1,-9)$)
+    .. controls
+       ($(current page.north west)+(8,-12)$) and
+       ($(current page.north west)+(11,-18)$)
+    .. ($(current page.north east)+(2,-21)$);
+
+  %% Eco posteriore, sottile e in nero (traccia che insegue la forma)
+  \draw[black, line width=1.1pt, opacity=0.38]
+    ($(current page.north west)+(-1,-9.8)$)
+    .. controls
+       ($(current page.north west)+(8,-12.8)$) and
+       ($(current page.north west)+(11,-18.8)$)
+    .. ($(current page.north east)+(2,-21.8)$);
+
+  %% =========================================================
+  %% TITOLO --- asimmetrico, ruotato, GRIDATO con echi sfasati
+  %% =========================================================
+
+  %% Eco vinaccia, ruotata più in basso
+  \node[halfgray, opacity=0.42, font=\fontsize{52}{56}\selectfont\bfseries\scshape,
+        rotate=-11, anchor=west]
+    at ($(current page.north west)+(0.5,-5.4)$)
     {\spacedlowsmallcaps{Prova o taci}};
 
-  %% filo rosso decorativo sotto il titolo
-  \draw[halfgray, line width=1.8pt]
-    ($(current page.north)+(-5cm,-4.4cm)$) --
-    ($(current page.north)+(2cm,-4.4cm)$);
+  %% Eco terra, ruotata in alto
+  \node[terra, opacity=0.45, font=\fontsize{52}{56}\selectfont\bfseries\scshape,
+        rotate=-4, anchor=west]
+    at ($(current page.north west)+(1.1,-5.7)$)
+    {\spacedlowsmallcaps{Prova o taci}};
 
-  \node[cream, font=\Large\itshape, anchor=west]
-    at ($(current page.north)+(-5cm,-5.2cm)$)
+  %% Titolo in primo piano
+  \node[black, font=\fontsize{52}{56}\selectfont\bfseries\scshape,
+        rotate=-7, anchor=west]
+    at ($(current page.north west)+(0.7,-5.1)$)
+    {\spacedlowsmallcaps{Prova o taci}};
+
+  %% Filo vinaccia decorativo, anche lui ruotato
+  \draw[halfgray, line width=2.2pt,
+        rotate around={-7:($(current page.north west)+(0.7,-6.4)$)}]
+    ($(current page.north west)+(0.6,-6.4)$) --
+    ($(current page.north west)+(11.0,-6.4)$);
+
+  %% Sottotitolo
+  \node[black, font=\Large\itshape, rotate=-7, anchor=west]
+    at ($(current page.north west)+(1.6,-7.1)$)
     {appunti su Martin-L\"of Type Theory};
 
   %% =========================================================
-  %% SCENOGRAFIA DELLA REGOLA --- l'evento di derivazione
+  %% REGOLA DI INFERENZA FRANTUMATA
+  %% Premesse su piani diversi, barra a schegge, conclusione con scia
   %% =========================================================
 
-  %% --- Linee di velocità Balla, convergenti sulla barra ---
-  \foreach \x in {3.5,5.5,7.8,10.3,12.8,15.3,17.5} {
-    \draw[black!50, line width=0.6pt, -{Stealth[length=3pt]}]
-      ($(current page.north west)+(\x cm,-9.7cm)$) --
-      ++(0.4cm,-2.5cm);
-  }
+  %% --- Premesse, ciascuna su un piano differente ---
 
-  %% --- Premesse (sopra la barra), inclinate, in moto ---
-  \node[black, font=\Large\bfseries\sffamily, rotate=-5]
-    at ($(current page.north west)+(4cm,-8.8cm)$)
+  %% Piano lontano: più piccola, ruotata molto, sfumata
+  \node[black!75, font=\Large\bfseries\sffamily, rotate=-18, opacity=0.85]
+    at ($(current page.north west)+(3.2,-10.7)$)
     {$A : \mathsf{Type}$};
-  \node[halfgray!85!black, font=\Large\bfseries\sffamily, rotate=4]
-    at ($(current page.north west)+(10.3cm,-9.5cm)$)
+
+  %% Piano centrale: vinaccia, dimensione media, rotazione opposta
+  \node[halfgray!90!black, font=\huge\bfseries\sffamily, rotate=8]
+    at ($(current page.north west)+(9.5,-11.4)$)
     {$x : A$};
-  \node[black, font=\Large\bfseries\sffamily, rotate=-3]
-    at ($(current page.north west)+(16cm,-8.8cm)$)
+
+  %% Piano vicino: più grande, nero pieno, altra rotazione
+  \node[black, font=\Huge\bfseries\sffamily, rotate=-12]
+    at ($(current page.north west)+(15.2,-10.2)$)
     {$x \vdash B\,x$};
 
-  %% --- LA BARRA --- echi processuali (Balla, Whitehead)
-  %% Sette posizioni sovrapposte: la barra come evento, non oggetto
-  \foreach \dx/\dy/\op in {
-    -0.6/-0.35/0.10,
-    -0.4/-0.22/0.20,
-    -0.2/-0.10/0.40,
-     0/0/1,
-     0.2/0.10/0.40,
-     0.4/0.22/0.20,
-     0.6/0.35/0.10}
-  {
-    \draw[black, line width=5.5pt, opacity=\op]
-      ($(current page.north west)+(1.8cm+\dx cm,-13.5cm+\dy cm)$) --
-      ($(current page.north east)+(-1.8cm+\dx cm,-14cm+\dy cm)$);
-  }
+  %% --- BARRA A SCHEGGE: tre segmenti disgiunti, spessori e angoli diversi ---
 
-  %% --- Conclusione (sotto la barra) con scia Boccioni ---
-  %% Echi in discesa: il termine come "in fieri"
-  \foreach \dy/\op in {1.2/0.10, 0.8/0.20, 0.4/0.40} {
-    \node[black, font=\huge\bfseries\sffamily, rotate=-4, opacity=\op]
-      at ($(current page.north west)+(10.5cm,-15.6cm-\dy cm)$)
+  %% Segmento sinistro, spesso
+  \draw[black, line width=7pt, line cap=butt]
+    ($(current page.north west)+(1.2,-13.5)$) --
+    ($(current page.north west)+(7.6,-13.7)$);
+
+  %% Segmento centrale, più sottile, inclinato di più
+  \draw[black, line width=6pt, line cap=butt]
+    ($(current page.north west)+(8.2,-13.3)$) --
+    ($(current page.north west)+(13.0,-13.9)$);
+
+  %% Segmento destro, il più spesso
+  \draw[black, line width=8pt, line cap=butt]
+    ($(current page.north west)+(13.7,-13.8)$) --
+    ($(current page.north west)+(19.5,-14.1)$);
+
+  %% --- Schegge triangolari sparse intorno alla barra ---
+
+  \fill[halfgray]
+    ($(current page.north west)+(7.7,-13.55)$) --
+    ($(current page.north west)+(8.1,-13.4)$) --
+    ($(current page.north west)+(7.9,-12.8)$) -- cycle;
+
+  \fill[black]
+    ($(current page.north west)+(13.15,-13.7)$) --
+    ($(current page.north west)+(13.6,-13.85)$) --
+    ($(current page.north west)+(13.4,-14.55)$) -- cycle;
+
+  \fill[halfgray, opacity=0.7]
+    ($(current page.north west)+(4.8,-13.55)$) --
+    ($(current page.north west)+(5.3,-13.7)$) --
+    ($(current page.north west)+(5.0,-12.85)$) -- cycle;
+
+  \fill[black, opacity=0.6]
+    ($(current page.north west)+(16.2,-13.95)$) --
+    ($(current page.north west)+(16.7,-14.0)$) --
+    ($(current page.north west)+(16.4,-14.7)$) -- cycle;
+
+  \fill[terra, opacity=0.75]
+    ($(current page.north west)+(2.5,-13.5)$) --
+    ($(current page.north west)+(3.0,-13.6)$) --
+    ($(current page.north west)+(2.7,-12.95)$) -- cycle;
+
+  \fill[halfgray, opacity=0.6]
+    ($(current page.north west)+(11.0,-13.6)$) --
+    ($(current page.north west)+(11.4,-13.55)$) --
+    ($(current page.north west)+(11.2,-12.95)$) -- cycle;
+
+  %% Schegge a forma di linea (frammenti volanti)
+  \draw[halfgray, line width=1.4pt]
+    ($(current page.north west)+(5.6,-12.7)$) -- ++(75:0.8cm);
+  \draw[black, line width=1.2pt, opacity=0.75]
+    ($(current page.north west)+(10.4,-14.5)$) -- ++(-70:0.7cm);
+  \draw[terra, line width=1.2pt]
+    ($(current page.north west)+(17.0,-13.3)$) -- ++(60:0.6cm);
+
+  %% --- CONCLUSIONE con scia Boccioni: echi in discesa diagonale ---
+
+  %% Echi posteriori, opacità decrescente, rotazione crescente (swirl)
+  \foreach \dx/\dy/\rot/\op in {%
+    0.20/-0.50/-7/0.45,
+    0.50/-1.05/-8/0.25,
+    0.85/-1.65/-9/0.15,
+    1.25/-2.30/-10/0.08%
+  } {
+    \node[black, font=\huge\bfseries\sffamily, rotate=\rot, opacity=\op]
+      at ($(current page.north west)+(9+\dx,-16.5-\dy)$)
       {$(x : A) \to B\,x$};
   }
-  \node[black, font=\huge\bfseries\sffamily, rotate=-4]
-    at ($(current page.north west)+(10.5cm,-15.6cm)$)
+
+  %% Conclusione in primo piano
+  \node[black, font=\huge\bfseries\sffamily, rotate=-6]
+    at ($(current page.north west)+(9,-16.5)$)
     {$(x : A) \to B\,x$};
 
-  %% --- Etichetta F·I·E·C (sigillo Depero, in posizione) ---
-  \node[halfgray, font=\bfseries\scshape\Large]
-    at ($(current page.north)+(0,-21cm)$)
+  %% =========================================================
+  %% SIGILLO F·I·E·C --- ruotato e spostato a destra
+  %% =========================================================
+  \node[halfgray, font=\bfseries\scshape\Large, rotate=5]
+    at ($(current page.north west)+(13.5,-21.5)$)
     {F \;$\cdot$\; I \;$\cdot$\; E \;$\cdot$\; C};
 
   %% =========================================================
-  %% FOOTER --- sopra la banda nera in basso
+  %% FOOTER --- asimmetrico, in basso-sinistra, leggermente ruotato
   %% =========================================================
-  \node[cream, font=\itshape\large]
-    at ($(current page.south)+(0,3.4cm)$)
+  \node[black, font=\itshape\large, anchor=west, rotate=-2]
+    at ($(current page.south west)+(1.2,3.0)$)
     {compendio a \emph{Verified Functional Programming in Agda}};
-  \node[cream!75, font=\normalsize]
-    at ($(current page.south)+(0,2.5cm)$)
+  \node[halfgray, font=\normalsize, anchor=west, rotate=-2]
+    at ($(current page.south west)+(1.2,2.2)$)
     {Aaron Stump \;\textbullet\; Iowa Agda Library};
-  \node[halfgray, font=\small\bfseries\scshape]
-    at ($(current page.south)+(0,1.5cm)$)
+  \node[terra, font=\small\bfseries\scshape, anchor=west, rotate=-2]
+    at ($(current page.south west)+(1.2,1.5)$)
     {\the\year};
 
 \end{tikzpicture}
