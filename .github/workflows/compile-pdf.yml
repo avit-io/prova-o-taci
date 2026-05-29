@@ -32,12 +32,9 @@ jobs:
       - name: Compile LaTeX
         run: |
           rm -rf _build && mkdir -p _build
-          nix develop --command bash -c "cd book && pdflatex -interaction=nonstopmode -output-directory=../_build -jobname=sotto_la_barra main.tex"
-          # classicthesis applica \spacedlowsmallcapsstyle (\lowercase TeX primitivo)
-          # sui titoli \contentsline {part} nel .toc; con inputenc utf8 i byte
-          # UTF-8 dei titoli di parte rompono al secondo pass di pdflatex.
-          # Si normalizzano solo quelle righe in escape LaTeX (PDF identico).
-          python3 <<'PY'
+
+          fix_toc() {
+            python3 <<'PY'
           import re
           p='_build/sotto_la_barra.toc'
           text=open(p,encoding='utf-8').read()
@@ -52,6 +49,15 @@ jobs:
           open(p,'w',encoding='utf-8').write(
               re.sub(r'\\contentsline \{part\}[^\n]*',fix,text))
           PY
+          }
+
+          # pass 1
+          nix develop --command bash -c "cd book && pdflatex -interaction=nonstopmode -output-directory=../_build -jobname=sotto_la_barra main.tex"
+          fix_toc
+          # pass 2 — risolve riferimenti, riscrive .toc
+          nix develop --command bash -c "cd book && pdflatex -interaction=nonstopmode -output-directory=../_build -jobname=sotto_la_barra main.tex"
+          fix_toc
+          # pass 3 — classicthesis/mparhack richiedono un terzo giro
           nix develop --command bash -c "cd book && pdflatex -interaction=nonstopmode -output-directory=../_build -jobname=sotto_la_barra main.tex"
 
       - name: Upload PDF artifact
