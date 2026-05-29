@@ -36,7 +36,7 @@ jobs:
           fix_toc() {
             python3 <<'PY'
           import re
-          p='_build/sotto_la_barra.toc'
+          p='_build/prova_o_taci.toc'
           text=open(p,encoding='utf-8').read()
           ESC={'à':r"\`a",'è':r"\`e",'é':r"\'e",'ì':r"\`\i ",'í':r"\'\i ",
                'ò':r"\`o",'ó':r"\'o",'ù':r"\`u",'ú':r"\'u",
@@ -52,27 +52,27 @@ jobs:
           }
 
           # pass 1
-          nix develop --command bash -c "cd book && pdflatex -interaction=nonstopmode -output-directory=../_build -jobname=sotto_la_barra main.tex"
+          nix develop --command bash -c "cd book && pdflatex -interaction=nonstopmode -output-directory=../_build -jobname=prova_o_taci main.tex"
           fix_toc
           # pass 2 — risolve riferimenti, riscrive .toc
-          nix develop --command bash -c "cd book && pdflatex -interaction=nonstopmode -output-directory=../_build -jobname=sotto_la_barra main.tex"
+          nix develop --command bash -c "cd book && pdflatex -interaction=nonstopmode -output-directory=../_build -jobname=prova_o_taci main.tex"
           fix_toc
           # pass 3 — classicthesis/mparhack richiedono un terzo giro
-          nix develop --command bash -c "cd book && pdflatex -interaction=nonstopmode -output-directory=../_build -jobname=sotto_la_barra main.tex"
+          nix develop --command bash -c "cd book && pdflatex -interaction=nonstopmode -output-directory=../_build -jobname=prova_o_taci main.tex"
 
       - name: Upload PDF artifact
         uses: actions/upload-artifact@v4
         if: success()
         with:
-          name: sotto_la_barra
-          path: _build/sotto_la_barra.pdf
+          name: prova_o_taci
+          path: _build/prova_o_taci.pdf
           retention-days: 30
 
       - name: Create Release (on tag)
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v1
         with:
-          files: _build/sotto_la_barra.pdf
+          files: _build/prova_o_taci.pdf
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -80,7 +80,7 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v1
         with:
-          files: _build/sotto_la_barra.pdf
+          files: _build/prova_o_taci.pdf
           tag_name: latest
           prerelease: true
           generate_release_notes: false
