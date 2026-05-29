@@ -1,0 +1,445 @@
+% =====================================================================
+% PARTE II — I tipi
+% =====================================================================
+\part{I tipi}
+
+\noindent\itshape Sette capitoli, un tipo per capitolo, sempre F-I-E-C.
+$\mathbb{B}$ (\S\ref{cap:bool}) per vedere lo schema nel caso pi\`u puro, senza
+ricorsione. $\mathbb{N}$ (\S\ref{cap:nat}) per il salto all'induzione vera.
+$\Pi$ (\S\ref{cap:pi}) per la decisione fondativa di MLTT, e $\Pi$ in azione
+(\S\ref{cap:pi-azione}) per le due passate che la sintassi nasconde. $\forall$
+(\S\ref{cap:forall}) come zucchero. $\Sigma$ (\S\ref{cap:sigma}) come duale.
+Il tipo identit\`a $\_\identita\_$ (\S\ref{cap:identita}) come sezione cardine
+--- l\`i si chiude la distinzione fra le due uguaglianze.\upshape
+
+\bigskip
+
+% ---------------------------------------------------------------------
+\chapter{$\mathbb{B}$ --- il caso pi\`u puro}\label{cap:bool}
+
+Cominciamo da $\mathbb{B}$. \`E il tipo induttivo pi\`u piccolo: due costruttori, zero argomenti, zero ricorsione. L'eliminazione qui \`e \textbf{puro case-split} --- non c'\`e ipotesi induttiva, perch\'e non c'\`e ricorsione su cui ricorrere. Vederlo prima di $\mathbb{N}$ rende esplicito che la ricorsione di $\mathbb{N}$ \`e qualcosa \emph{in pi\`u}, non parte intrinseca di ``eliminare''.
+
+\section*{F --- Formazione}
+\[
+\inferrule{ }{\mathbb{B} : \Type}
+\]
+Una regola senza premesse: $\mathbb{B}$ esiste, punto.
+
+\section*{I --- Introduzione}
+\[
+\inferrule{ }{\tto : \mathbb{B}}
+\qquad
+\inferrule{ }{\ff : \mathbb{B}}
+\]
+Due costruttori, entrambi senza premesse.
+
+\section*{E --- Eliminazione (metalinguaggio)}
+\[
+\inferrule{
+b : \mathbb{B} \\
+C : \mathbb{B} \to \Type \\
+c_t : C\,\tto \\
+c_f : C\,\ff
+}{
+\indB(b, C, c_t, c_f) : C\,b
+}
+\]
+
+Letto a voce: ``per costruire qualcosa che dipende da un $b : \mathbb{B}$ generico --- cio\`e un abitante di $C\,b$ --- basta darmi il pezzo per $b = \tto$ e il pezzo per $b = \ff$; io metto tutto insieme''. $C$ si chiama \textbf{motivo} dell'eliminazione.
+
+\section*{C --- Computazione (definitorie, Cero~\ref{cero:comp})}
+\begin{align*}
+\indB(\tto, C, c_t, c_f) &\definitorio c_t \\
+\indB(\ff,  C, c_t, c_f) &\definitorio c_f
+\end{align*}
+
+Quando l'argomento \`e un costruttore concreto, l'eliminatore riduce al ramo corrispondente. Nient'altro.
+
+\begin{oss}[Punto da fissare]
+Confronta con quanto vedremo per $\mathbb{N}$ in \S\ref{cap:nat}: l\`i $c_t, c_f$ saranno sostituiti da un caso base e un \emph{passo} che riceve un'ipotesi induttiva. Qui no, perch\'e $\tto$ e $\ff$ non contengono altre $\mathbb{B}$. Eliminare = sempre case-split su tutti i costruttori. Indurre = case-split + ricorrere quando il costruttore contiene istanze del tipo stesso. $\mathbb{B}$ ha la prima cosa, non la seconda.
+\end{oss}
+
+% ---------------------------------------------------------------------
+\chapter{$\mathbb{N}$ --- l'eliminazione diventa induzione}\label{cap:nat}
+
+Stesso schema, ma ora un costruttore (\texttt{suc}) prende un argomento di tipo $\mathbb{N}$. Questo cambia l'eliminazione: nel ramo \texttt{suc k}, oltre a \texttt{k} stesso, riceverai anche $C\,k$ --- il risultato dell'eliminazione \emph{gi\`a calcolato} su \texttt{k}. \`E l'\textbf{ipotesi induttiva}.
+
+\section*{F --- Formazione}
+\[
+\inferrule{ }{\mathbb{N} : \Type}
+\]
+
+\section*{I --- Introduzione}
+\[
+\inferrule{ }{\zero : \mathbb{N}}
+\qquad
+\inferrule{n : \mathbb{N}}{\suc\,n : \mathbb{N}}
+\]
+
+Due costruttori, ma uno (\texttt{suc}) ha una premessa: prende una $\mathbb{N}$ per produrne un'altra. \`E \textbf{questa} premessa che fa la differenza con $\mathbb{B}$.
+
+\section*{E --- Eliminazione}
+\[
+\inferrule{
+n : \mathbb{N} \\
+C : \mathbb{N} \to \Type \\
+b : C\,\zero \\
+s : (k : \mathbb{N}) \to C\,k \to C\,(\suc\,k)
+}{
+\indN(n, C, b, s) : C\,n
+}
+\]
+
+Confronto riga per riga con $\indB$:
+\begin{itemize}
+\item per \texttt{zero} serve un valore $b : C\,\zero$ (come $c_t$ per \texttt{tt});
+\item per \texttt{suc k} serve $s : (k : \mathbb{N}) \to C\,k \to C\,(\suc\,k)$ --- non un valore, ma una funzione che prende \texttt{k} \emph{e l'ipotesi induttiva $C\,k$} e produce $C\,(\suc\,k)$.
+\end{itemize}
+
+Il $C\,k$ in input a $s$ \`e dove l'eliminazione di $\mathbb{N}$ diventa \textbf{ricorsione primitiva}. \`E letteralmente l'ipotesi induttiva.
+
+\section*{C --- Computazione}
+\begin{align*}
+\indN(\zero,    C, b, s) &\definitorio b \\
+\indN(\suc\,k, C, b, s) &\definitorio s\,k\,(\indN(k, C, b, s))
+\end{align*}
+
+Il caso \texttt{suc k} \`e dove appare la \textbf{ricorsione}: $\indN$ chiama s\'e stesso su \texttt{k}, strutturalmente pi\`u piccolo di \texttt{suc k}. Questo garantisce terminazione.
+
+\section*{Case-split puro \emph{vs} induzione}
+
+Per esplicitare ulteriormente la differenza con $\mathbb{B}$, ecco come sarebbe $\mathbb{N}$ con \emph{solo} case-split (l'analogo di $\indB$):
+\[
+\inferrule{
+n : \mathbb{N} \\
+C : \mathbb{N} \to \Type \\
+b : C\,\zero \\
+s : (k : \mathbb{N}) \to C\,(\suc\,k) \quad \textit{NB: $s$ non riceve $C\,k$}
+}{
+\mathsf{case\text{-}\mathbb{N}}(n, C, b, s) : C\,n
+}
+\]
+
+Con questo non si dimostra quasi niente: nel ramo \texttt{suc k} non c'\`e ipotesi su \texttt{k}. La scelta di MLTT \`e di prendere l'\textbf{eliminatore induttivo} invece del solo case-split. Decisione di design, non un'inevitabilit\`a.
+
+% ---------------------------------------------------------------------
+\chapter{$\Pi$ --- la dipendenza}\label{cap:pi}
+
+Le funzioni. Generalizzate al punto in cui il \emph{tipo di ritorno} pu\`o dipendere dal \emph{valore} in ingresso.
+
+\section*{F --- Formazione}
+\[
+\inferrule{A : \Type \\ x : A \vdash B\,x : \Type}{(x : A) \to B\,x : \Type}
+\]
+
+$x : A \vdash B\,x : \Type$ significa: \emph{nel contesto in cui ho un $x$ di tipo $A$, $B\,x$ \`e un tipo}. $x$ \`e libera fuori; la regola la chiude dentro il tipo (Cero~\ref{cero:contesti} al lavoro).
+
+Qui c'\`e la \textbf{decisione fondativa} di tutta MLTT:
+
+\begin{cero}[Un termine pu\`o apparire dentro un tipo]\label{cero:dipendenza}
+Questa \`e \textsc{la} decisione che definisce MLTT. Prima, hai i tipi semplici, dove $B$ non sa niente di $x$. Dopo, hai i tipi dipendenti.
+
+Non \`e giustificata da niente di precedente. \`E una scelta su \emph{cosa vuoi che il sistema sia}. Potresti scegliere diversamente --- tipi semplici, sistema F, tipi lineari --- e avresti un sistema \textbf{diverso, non sbagliato}. Questo cero distingue MLTT da tutto il resto.
+\end{cero}
+
+\section*{I --- Introduzione}
+\[
+\inferrule{x : A \vdash b\,x : B\,x}{\lambda x.\,b\,x : (x : A) \to B\,x}
+\]
+
+Sotto l'ipotesi $x : A$ si costruisce un $b\,x : B\,x$; la regola scarica l'ipotesi producendo la lambda.
+
+\section*{E --- Eliminazione}
+\[
+\inferrule{f : (x : A) \to B\,x \\ a : A}{f\,a : B\,a}
+\]
+
+L'applicazione. \textbf{Banale, nessuna ricorsione} --- $\Pi$ non \`e induttivo, non c'\`e struttura da srotolare in profondit\`a. Contrasto netto con $\indN$.
+
+\section*{C --- Computazione}
+\[
+(\lambda x.\,b\,x)\,a \definitorio b\,a
+\]
+
+La $\beta$-riduzione. Definitoria (Cero~\ref{cero:comp}).
+
+\section*{Nomi alternativi}
+\begin{itemize}
+\item \textbf{$\Pi$ type} --- nome formale MLTT
+\item \textbf{dependent function type} --- descrittivo
+\item \textbf{dependent product} --- nome storico, confonde
+\end{itemize}
+
+% ---------------------------------------------------------------------
+\chapter{$\Pi$ in azione --- i tipi sono termini, ma in due passate}\label{cap:pi-azione}
+
+Sezione di chiarimento sull'uso di $\Pi$. Tre cose vanno fissate, perch\'e Pie (\emph{The Little Typer}) e Agda le fondono sintatticamente.
+
+\section*{I tipi sono termini --- vero, non illusione}
+
+In MLTT esiste un universo $U$ (\agdainl{Set} in Agda) i cui abitanti sono tipi. Quindi una variabile $A : U$ \`e un termine \emph{onesto}: si passa come si passa un numero. \`E il senso vero di ``tipi di prima classe''.
+
+\section*{Ma c'\`e una doppia passata}
+
+Da \emph{The Little Typer}:
+\begin{verbatim}
+(claim elim-Pair
+  (Pi ((A U) (D U) (X U))
+      (-> (Pair A D) (-> A D X) X)))
+
+(define elim-Pair
+  (lambda (A D X)
+    (lambda (p f) (f (car p) (cdr p)))))
+\end{verbatim}
+
+Quando il typechecker incontra \verb|(elim-Pair Nat Atom Bool p f)| fa \textbf{due lavori distinti}:
+
+\begin{enumerate}
+\item \textbf{Passata 1 --- type checking} (``a compile time''). Contano $A, D, X$. Il checker istanzia $A := \mathrm{Nat}$ ecc.\ nel claim per calcolare di che tipo devono essere \texttt{p} e \texttt{f}.
+\item \textbf{Passata 2 --- computazione} (``a runtime/normalizzazione''). Contano \texttt{p} e \texttt{f}. Il corpo \verb|(f (car p) (cdr p))| srotola la coppia. Qui $A, D, X$ sono \textbf{gi\`a stati consumati} nella passata 1 --- non fanno pi\`u nulla.
+\end{enumerate}
+
+\textbf{Prima fissi i tipi, poi fai il resto.} L'illusione \emph{non} \`e che i tipi fingano di essere valori --- lo sono. L'illusione \`e che una sola sintassi \verb|(lambda (A D X) (lambda (p f) ...))| nasconde che le due $\lambda$ giocano ruoli temporalmente diversi.
+
+\begin{oss}[Segnale fisico]
+$A, D, X$ \emph{non compaiono nel corpo}. Un argomento che il calcolo non usa, ma che il checker pretende, \`e per definizione della passata-tipi.
+\end{oss}
+
+\begin{oss}[Conferma teorica --- \emph{type erasure}]
+Proprio perch\'e la passata 2 non guarda $A, D, X$, un compilatore pu\`o cancellarli dopo il type checking. Se le passate fossero la stessa cosa, non si potrebbe. Il fatto che si possa \`e la prova che sono separate. (Dove le passate si \emph{toccano} \`e \texttt{Vec A n} (\S\ref{cap:vec}): l\`i un valore \texttt{n} risale dentro un tipo. Si intrecciano, non collassano.)
+\end{oss}
+
+\section*{\texttt{elim-Pair} in Agda}
+
+Il claim Pie diventa:
+
+\begin{agda}
+-- Pair A D = Sigma A (\ _ -> D)  (prodotto NON dipendente; vedi cap. sigma)
+
+-- versione esplicita: traduzione fedele del claim Pie
+elim-Pair : (A : Set) (D : Set) (X : Set) → Pair A D → (A → D → X) → X
+elim-Pair A D X p f = f (fst p) (snd p)
+--        ^^^^^                          passata 1: tipi, NON usati nel corpo
+--              ^^^                       passata 2: valori, USATI nel corpo
+
+-- versione implicita: Agda inferisce A, D, X dal tipo di p
+elim-Pair : {A D X : Set} → Pair A D → (A → D → X) → X
+elim-Pair p f = f (fst p) (snd p)
+\end{agda}
+
+Le graffe \texttt{\{\}} \emph{sono} il riconoscimento sintattico che $A, D, X$ vivono nella passata 1. Chiamando \texttt{elim-Pair miaCoppia miaFunzione}, Agda guarda il tipo di \texttt{miaCoppia} (es. \texttt{Pair Nat Atom}), unifica e riempie $A := \mathrm{Nat}$, $D := \mathrm{Atom}$ da s\'e. La passata 1 avviene, ma invisibile.
+
+\section*{$\Pi$ \`e unario --- gli argomenti multipli sono curry}
+
+Dubbio naturale: \texttt{(A : Set)(D : Set)(X : Set) ->} sembra un $\Pi$ a tre argomenti. \textbf{Non lo \`e.} La regola di formazione di \S\ref{cap:pi} resta \textbf{unaria}. Quella scrittura \`e zucchero per $\Pi$ annidati:
+
+\begin{agda}
+(A : Set) → ((D : Set) → ((X : Set) → (Pair A D → ((A → D → X) → X))))
+\end{agda}
+
+Un solo $\Pi$ per ogni \texttt{->}, ciascuno con il contesto esteso di un'ipotesi (Cero~\ref{cero:contesti}).
+
+\begin{oss}[Prova che \`e curry e non un $\Pi$ ternario primitivo]
+Le applicazioni parziali hanno un tipo.
+\begin{agda}
+elim-Pair Nat            -- : (D : Set) (X : Set) → Pair Nat D → (Nat → D → X) → X
+elim-Pair Nat Atom       -- : (X : Set) → Pair Nat Atom → (Nat → Atom → X) → X
+elim-Pair Nat Atom Bool  -- : Pair Nat Atom → (Nat → Atom → Bool) → Bool
+\end{agda}
+
+Se fosse un $\Pi$ ternario primitivo, \texttt{elim-Pair Nat} da solo non avrebbe tipo. Il fatto che ce l'ha \`e la dimostrazione che \`e curry --- \textbf{curry dipendente}, perch\'e ogni $\Pi$ vede le variabili legate dai precedenti.
+\end{oss}
+
+\bigskip
+
+\noindent\textbf{Da fissare.} \texttt{(A : ..)(B : ..)(C : ..) -> ...} = tre $\Pi$ annidati, non una regola nuova.
+
+% ---------------------------------------------------------------------
+\chapter{Il $\forall$ di Agda}\label{cap:forall}
+
+Solo zucchero in pi\`u, ma \`e bene fissarlo perch\'e lo si vede dappertutto.
+
+\begin{agda}
+foo : ∀ (x : A) → B x       -- identico a (x : A) → B x
+foo : ∀ x → B x             -- identico, ma il tipo di x è inferito da B
+\end{agda}
+
+$\forall$ \textbf{non \`e un quantificatore primitivo distinto da $\Pi$.} \`E $\Pi$ con il permesso di omettere annotazioni di tipo (quando Agda pu\`o inferirle). Il nome viene dalla lettura logica (``per ogni $x$\ldots''), ma \`e sempre la stessa regola di \S\ref{cap:pi}. Nessuna regola nuova.
+
+% ---------------------------------------------------------------------
+\chapter{$\Sigma$ --- il duale di $\Pi$}\label{cap:sigma}
+
+Coppie dipendenti: il secondo componente ha un tipo che dipende dal primo.
+
+\section*{F --- Formazione}
+\[
+\inferrule{A : \Type \\ x : A \vdash B\,x : \Type}{\Sigma\,x \in A,\,B\,x : \Type}
+\]
+
+Stessa premessa di $\Pi$ --- eredita il Cero~\ref{cero:dipendenza}, non ne aggiunge.
+
+\section*{I --- Introduzione}
+\[
+\inferrule{a : A \\ b : B\,a}{(a, b) : \Sigma\,x \in A,\,B\,x}
+\]
+
+\section*{E --- Eliminazione}
+\[
+\inferrule{
+p : \Sigma\,x \in A,\,B\,x \\
+C : (\Sigma\,x \in A,\,B\,x) \to \Type \\
+f : (a : A) \to (b : B\,a) \to C\,(a, b)
+}{
+\indS(p, C, f) : C\,p
+}
+\]
+
+\textbf{Nessuna ricorsione} nel lato destro: una coppia ha esattamente due elementi, non c'\`e struttura da srotolare in profondit\`a. Come $\Pi$, contrasto con $\indN$.
+
+\section*{C --- Computazione}
+\[
+\indS((a, b), C, f) \definitorio f\,a\,b
+\]
+
+\section*{Caso non dipendente: il prodotto}
+
+Quando $B$ non usa $x$, si ottiene il prodotto ordinario:
+\[
+A \times B \;\;\coloneqq\;\; \Sigma\,A\,(\lambda\,\_\,.\,B)
+\]
+
+\texttt{Pair A D} di \S\ref{cap:pi-azione} era questo. Gli accessori \texttt{fst} e \texttt{snd} sono casi particolari di $\indS$ con motivo costante.
+
+\section*{La confusione prodotto/somma}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lll}
+\toprule
+\textit{Senso} & \textit{Prodotto} & \textit{Somma} \\
+\midrule
+aritmetico/insiemistico & coppie $A \times B$ & scelta $A + B$ \\
+categoriale             & $\Pi$ (funzioni indicizzate) & $\Sigma$ (coppie indicizzate) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent $\Sigma$ generalizza il prodotto \emph{aritmetico} ma si chiama \emph{somma categoriale}. Incidente storico, da ignorare. In pratica: $\Pi$ = funzioni dipendenti, $\Sigma$ = coppie dipendenti.
+
+% ---------------------------------------------------------------------
+\chapter{$\_\identita\_$ --- il tipo identit\`a}\label{cap:identita}
+
+\epigraph{Una volta capita questa sezione, MLTT smette di sembrare misterioso.}{}
+
+\noindent {\spacedlowsmallcaps{Cardine}}. Qui si chiude il cerchio: anche l'uguaglianza ha le sue quattro regole, \`e un tipo come un altro, e si distingue nettamente dall'uguaglianza definitoria del metalinguaggio.
+
+\bigskip
+
+Fino a \S\ref{cap:giudizi} e \S\ref{cap:test} abbiamo parlato di un'uguaglianza che vive \emph{nel metalinguaggio}: scritta $\equiv$, \`e un giudizio, non un tipo, non si abita, non si dimostra. \`E quella che dice ``queste due cose riducono alla stessa cosa per le regole di computazione''. La chiamiamo \textbf{uguaglianza definitoria}.
+
+Ora introduciamo un \emph{secondo} $\equiv$, completamente diverso, che vive \textbf{nel linguaggio}: \`e un tipo, lo si abita con prove, lo si manipola. Si chiama \textbf{tipo identit\`a} (o \textbf{uguaglianza proposizionale}). Si scrive uguale e questa \`e una sciagura notazionale storica, ma sono due bestie diverse.
+
+\medskip
+
+Per smarcarli scrivo:
+\begin{itemize}
+\item $a \definitorio b : A$ per l'uguaglianza \textbf{definitoria} (metalinguaggio, \S\ref{cap:giudizi});
+\item $a \identita b$ (senza il ``$: \Type$''), o $\mathsf{Id}\,A\,a\,b$ se serve esplicito, per il \textbf{tipo identit\`a} (linguaggio, questa sezione).
+\end{itemize}
+
+Quando Agda scrive \agdainl{a ≡ b} intende \textbf{il tipo identit\`a}, sempre. La cosa che gli viene dietro \`e il \emph{secondo} dei due.
+
+\section*{Le quattro regole}
+
+\paragraph{F --- Formazione.}
+\[
+\inferrule{A : \Type \\ x : A \\ y : A}{x \identita y : \Type}
+\]
+Dati due elementi di \emph{uno stesso} tipo, si ottiene un tipo: il tipo delle prove che sono uguali.
+
+\paragraph{I --- Introduzione.} (Un solo costruttore --- e questo \`e il punto.)
+\[
+\inferrule{A : \Type \\ x : A}{\refl : x \identita x}
+\]
+
+C'\`e \textbf{un solo} costruttore, $\refl$, e abita \textbf{soltanto} $x \identita x$. Cio\`e: l'unico modo canonico di costruire una prova di uguaglianza \`e quando i due lati sono \textbf{gi\`a la stessa cosa}.
+
+\bigskip
+
+\noindent\textbf{Qui salta fuori la cosa cruciale}: ``gi\`a la stessa cosa'' \emph{in che senso}? Nel senso dell'\textbf{uguaglianza definitoria del metalinguaggio}, cio\`e dopo aver applicato tutte le regole di computazione viste finora ($\indN$ su \texttt{zero}, $\beta$-riduzione di $\Pi$, ecc.).
+
+\begin{regola}[Il ponte]\label{reg:ponte}
+$\refl$ ha tipo $x \identita y$ (linguaggio) \textbf{se e solo se} $x \definitorio y : A$ (definitorio, metalinguaggio).
+\end{regola}
+
+$\refl$ \emph{colma la trincea} tra meta e linguaggio. \`E il termine che dice ``i due lati riducono allo stesso normale, e io ti porto questa informazione dentro il sistema sotto forma di prova''.
+
+Quindi le due uguaglianze non sono indipendenti: il tipo identit\`a \emph{si appoggia} alla definitoria. La definitoria sta ``sotto'' e fa il lavoro silenzioso di riduzione; il tipo identit\`a sta ``sopra'' e ne raccoglie il risultato come prova manipolabile.
+
+\paragraph{E --- Eliminazione.}
+\[
+\inferrule{
+p : x \identita y \\
+C : (y : A) \to (x \identita y) \to \Type \\
+c : C\,x\,\refl
+}{
+\Jelim(p, C, c) : C\,y\,p
+}
+\]
+
+L'eliminatore $\Jelim$ (\emph{path induction}). Per costruire qualcosa che dipende da una prova generica $p : x \identita y$, basta saperlo costruire nel caso canonico $p = \refl$ (dove necessariamente $y = x$).
+
+\paragraph{C --- Computazione.}
+\[
+\Jelim(\refl, C, c) \definitorio c
+\]
+Quando la prova \`e canonica, $\Jelim$ restituisce il caso base.
+
+\section*{Ricapitolazione della distinzione}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lll}
+\toprule
+ & \textit{Uguaglianza definitoria} & \textit{Tipo identit\`a} \\
+\midrule
+Dove vive & \textbf{metalinguaggio} & \textbf{linguaggio} \\
+Forma     & giudizio $a \definitorio b : A$ & tipo $a \identita b$ \\
+Si abita? & no, \`e un'affermazione & s\`i, con $\refl$ (e via $\Jelim$) \\
+Si scrive? & nelle regole, non in Agda & in Agda: \agdainl{a ≡ b} \\
+Viene da  & regole di computazione (Cero~\ref{cero:comp}) & regole F-I-E-C di \S\ref{cap:identita} \\
+Ponte     & \multicolumn{2}{c}{abitato da $\refl$ $\iff$ vale la definitoria (Regola~\ref{reg:ponte})} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\bigskip
+
+\noindent Quindi, quando in Agda si scrive:
+\begin{agda}
+qualcosa : x ≡ y
+qualcosa = refl
+\end{agda}
+si \emph{abita} un tipo (linguaggio); Agda accetta solo se \texttt{x} e \texttt{y} sono definitoriamente uguali (metalinguaggio). I due livelli parlano tramite $\refl$. \textbf{Questa \`e la cosa pi\`u importante da tenere chiara di tutto MLTT.}
+
+\section*{Quarto punto dove si inciampa}
+
+In \S\ref{cap:test} avevamo promesso un quarto punto, da chiudere appena introdotto il tipo identit\`a. Eccolo: i due $\equiv$ si scrivono uguale ma sono due cose diverse. Sopra c'\`e la regola per distinguerli --- guarda \emph{cosa} stai dicendo: un'affermazione sul sistema, o un tipo che vuoi abitare?
+
+\medskip
+
+Completiamo la tabella lampo di \S\ref{cap:test}:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lll}
+\toprule
+\textit{Vedi questo} & \textit{Dov'\`e} & \textit{Perch\'e} \\
+\midrule
+$\equiv$ in $(\lambda x.\,b)\,a \equiv b\,a$ (regola di computazione) & meta & uguaglianza definitoria, asserzione \\
+$\equiv$ in $x \equiv y : \Type$ (Agda: \texttt{\_$\equiv$\_}) & linguaggio & tipo identit\`a, si abita con $\refl$ \\
+$\refl$ & linguaggio & termine, abita il tipo identit\`a \\
+$\indB$, $\indN$, $\indS$, $\Jelim$ & meta & eliminatori = regole di inferenza \\
+\bottomrule
+\end{tabular}
+\end{center}

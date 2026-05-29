@@ -1,0 +1,20 @@
+# Agda build artifacts
+*.agdai
+_build/
+
+# Librerie locali gestite dal flake hook (non versionare, rigenerate da nix)
+.agda-local-work/
+
+# Nix
+result
+result-*
+
+# LaTeX build artifacts
+*.aux
+*.log
+*.toc
+*.fdb_latexmk
+*.fls
+*.out
+*.synctex.gz
+*.pdf

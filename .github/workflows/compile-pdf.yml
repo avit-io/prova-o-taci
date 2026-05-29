@@ -1,0 +1,82 @@
+name: Compile LaTeX to PDF
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'book/*.tex'
+      - 'flake.nix'
+      - 'flake.lock'
+      - '.github/workflows/compile-pdf.yml'
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/determinate-nix-action@v3.20.0
+
+      - name: Setup cache
+        uses: DeterminateSystems/magic-nix-cache-action@v13
+
+      - name: Compile LaTeX
+        run: |
+          rm -rf _build && mkdir -p _build
+          nix develop --command bash -c "cd book && pdflatex -interaction=nonstopmode -output-directory=../_build -jobname=sotto_la_barra main.tex"
+          # classicthesis applica \spacedlowsmallcapsstyle (\lowercase TeX primitivo)
+          # sui titoli \contentsline {part} nel .toc; con inputenc utf8 i byte
+          # UTF-8 dei titoli di parte rompono al secondo pass di pdflatex.
+          # Si normalizzano solo quelle righe in escape LaTeX (PDF identico).
+          python3 <<'PY'
+          import re
+          p='_build/sotto_la_barra.toc'
+          text=open(p,encoding='utf-8').read()
+          ESC={'à':r"\`a",'è':r"\`e",'é':r"\'e",'ì':r"\`\i ",'í':r"\'\i ",
+               'ò':r"\`o",'ó':r"\'o",'ù':r"\`u",'ú':r"\'u",
+               'À':r"\`A",'È':r"\`E",'É':r"\'E",'Ò':r"\`O",'Ó':r"\'O",
+               'Ù':r"\`U",'Ú':r"\'U",'Ì':r"\`\I ",'Í':r"\'\I "}
+          def fix(m):
+              s=m.group(0)
+              for k,v in ESC.items(): s=s.replace(k,v)
+              return s
+          open(p,'w',encoding='utf-8').write(
+              re.sub(r'\\contentsline \{part\}[^\n]*',fix,text))
+          PY
+          nix develop --command bash -c "cd book && pdflatex -interaction=nonstopmode -output-directory=../_build -jobname=sotto_la_barra main.tex"
+
+      - name: Upload PDF artifact
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: sotto_la_barra
+          path: _build/sotto_la_barra.pdf
+          retention-days: 30
+
+      - name: Create Release (on tag)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: _build/sotto_la_barra.pdf
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload to Release (latest)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: _build/sotto_la_barra.pdf
+          tag_name: latest
+          prerelease: true
+          generate_release_notes: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

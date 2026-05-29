@@ -1,0 +1,172 @@
+% =====================================================================
+% PARTE I — Le fondamenta
+% =====================================================================
+\part{Le fondamenta}
+
+\noindent\itshape Cosa assumi prima di scrivere la prima regola.
+Quattro capitoli che fissano il vocabolario: il rapporto tra formalismo e materia
+(\S\ref{cap:partenza}); i quattro giudizi del metalinguaggio (\S\ref{cap:giudizi});
+il test operativo per riconoscere linguaggio e metalinguaggio
+(\S\ref{cap:test}); lo schema F-I-E-C che governa ogni tipo
+(\S\ref{cap:fiec}). Da qui in poi, nulla si introduce senza una di queste
+quattro lavagne sotto.\upshape
+
+\bigskip
+
+% ---------------------------------------------------------------------
+\chapter{Il punto di partenza}\label{cap:partenza}
+
+{\spacedlowsmallcaps{Il formalismo fissa qualcosa che era gi\`a l\`i}}, non crea, cattura. Le regole non rendono vere le cose --- le cose sono vere indipendentemente dalle regole. Le regole sono uno strumento per essere espliciti su \emph{cosa si assume} e \emph{cosa si deriva}.
+
+Questa distinzione \`e l'asse di tutto il libro. Ogni volta che il terreno smette di essere derivabile e diventa assunto, il testo lo segnala con un \emph{cero}: una proposizione numerata, scritta in stile sobrio, che enuncia l'assunzione e dice perch\'e regge anche senza dimostrazione interna. I ceri sono raccolti in fondo (\S\ref{cap:ceri}) e si possono leggere in sequenza per avere il riassunto completo delle assunzioni di MLTT.
+
+\bigskip
+
+\noindent La metafora del cero votivo non \`e ornamento. Un cero si accende perch\'e qualcosa --- non importa cosa --- regga: l'atto di accenderlo non costituisce prova, e tuttavia non \`e capriccio, perch\'e ci\`o che si \`e affidato al cero ha un peso reale. Nel formalismo accade lo stesso. Certi giudizi --- l'esistenza del metalinguaggio, l'esistenza dei contesti, lo statuto delle regole di computazione, la decisione di lasciare entrare termini dentro i tipi --- non si possono dimostrare dall'interno del sistema. Si accendono come ceri: si dichiarano, si tengono in vista, e si va avanti.
+
+\bigskip
+
+\noindent\textbf{Cosa non sono i ceri.} Non sono assiomi nel senso di Hilbert (proposizioni del linguaggio scelte come punto di partenza per derivare altre proposizioni del linguaggio): vivono nel metalinguaggio, o sono scelte di design. Non sono congetture (non si tratta di affermazioni che potrebbero un giorno rivelarsi false). Non sono postulati arbitrari: sono i punti in cui la materia del sistema chiede di essere fissata, e ogni fissaggio \`e una scelta motivata ma non costretta.
+
+\bigskip
+
+\noindent\textbf{Quanti sono.} Quattro nel corpo del libro, pi\`u un quinto al limite (la coerenza del sistema, indimostrabile dall'interno per Gödel). Sono pochi perch\'e MLTT \`e parsimoniosa. Una volta accesi, le quattro regole F-I-E-C (\S\ref{cap:fiec}) generano l'intero edificio.
+
+% ---------------------------------------------------------------------
+\chapter{I quattro giudizi del metalinguaggio}\label{cap:giudizi}
+
+Tutto vive qui, fuori dal linguaggio oggetto. I quattro giudizi sono:
+
+\begin{equation*}
+\begin{array}{ll}
+A : \Type & \text{\meta{$A$ \`e un tipo}} \\
+a : A & \text{\meta{$a$ abita $A$}} \\
+A \definitorio B : \Type & \text{\meta{$A$ e $B$ sono lo stesso tipo (uguaglianza definitoria)}} \\
+a \definitorio b : A & \text{\meta{$a$ e $b$ sono lo stesso termine in $A$ (uguaglianza definitoria)}}
+\end{array}
+\end{equation*}
+
+Questi \emph{non sono} tipi o termini: sono \textbf{affermazioni sul sistema}. Vivono nel metalinguaggio. Prima ancora di scrivere una regola, stai gi\`a assumendo che questo livello esista e abbia senso.
+
+\begin{cero}[Esiste un metalinguaggio con i quattro giudizi]
+Non lo si dimostra dall'interno del sistema: \`e la lavagna su cui si scrivono le regole. Prima assunzione, quella che rende possibili tutte le altre.
+\end{cero}
+
+\begin{cero}[Esistono i contesti e l'operazione $\vdash$]\label{cero:contesti}
+``Assumere $x : A$'' \`e un'operazione legittima: i contesti si possono estendere, si pu\`o ragionare \emph{sotto} un'ipotesi. Senza, niente regole con premesse ipotetiche, niente tipi dipendenti.
+\end{cero}
+
+\begin{oss}[Sulle due uguaglianze]
+L'uguaglianza $\definitorio$ di questa sezione \`e \textbf{definitoria}: un'asserzione sul sistema, non un tipo, non si dimostra. \`E quella che dice ``queste due cose riducono alla stessa cosa per le regole di computazione''. La incontreremo costantemente da qui a tutto il libro.
+
+In \S\ref{cap:identita} introdurremo un \emph{altro} $\identita$, completamente diverso, che vive \textbf{nel linguaggio}: \`e un tipo, lo si abita con prove, lo si manipola come qualsiasi altro termine. Si scrive uguale, e questa \`e una sciagura notazionale storica. Quando il testo dovr\`a distinguere, scriver\`o $a \definitorio b : A$ per il primo e $a \identita b$ (senza il ``$: \Type$'') per il secondo, oppure $\mathsf{Id}\, A\, a\, b$ se serve massima chiarezza.
+\end{oss}
+
+% ---------------------------------------------------------------------
+\chapter{Linguaggio e metalinguaggio --- il test}\label{cap:test}
+
+Sezione operativa: ogni volta che sui livelli ci si perde, si torna qui.
+
+\section*{Il test in una riga}
+
+\noindent\itshape Questo oggetto lo posso passare come argomento a una funzione, o ci posso costruire sopra un altro termine?\upshape
+
+\medskip
+
+\noindent \textbf{S\`i} $\Rightarrow$ vive nel \textbf{linguaggio}. \`E un termine o un tipo: oggetto manipolabile.
+
+\noindent \textbf{No} --- \`e qualcosa che \emph{autorizza} a scrivere un giudizio ma non \`e esso stesso un oggetto manipolabile --- $\Rightarrow$ vive nel \textbf{metalinguaggio}. \`E una regola, un giudizio, un'affermazione \emph{sul} sistema.
+
+\bigskip
+
+\noindent In altre parole: il linguaggio \`e ci\`o di cui parli; il metalinguaggio \`e ci\`o \emph{con cui} parli. \texttt{zero} \`e una cosa di cui parli (linguaggio); ``\texttt{zero} $:\mathbb{N}$'' \`e una cosa che \emph{dici} --- un'affermazione (metalinguaggio).
+
+\section*{Tre punti dove si inciampa}
+
+\paragraph{(i) I due punti \texttt{:} non sono dentro il linguaggio.}
+\texttt{a : A} non \`e un oggetto unico. \texttt{a} e \texttt{A} vivono nel linguaggio; il \texttt{:} che li unisce \`e un'\emph{affermazione sul sistema} (``asserisco che \texttt{a} abita \texttt{A}''). Non si pu\`o passare \texttt{a : A} come argomento a niente: non \`e un oggetto, \`e un giudizio. Il \texttt{:} \`e metalinguaggio puro.
+
+\paragraph{(ii) La barra orizzontale \rule{1cm}{0.4pt} \`e metalinguaggio.}
+Separa premesse da conclusione: ``dati questi giudizi sopra, ottieni questo giudizio sotto''. \`E la grammatica con cui si scrivono le regole (Cero~1).
+
+\paragraph{(iii) Il $\vdash$ \`e metalinguaggio, ma fa una cosa diversa dalla barra.}
+Sta \emph{dentro una singola premessa}: $x : A \vdash B\,x : \Type$, ``nel contesto in cui assumo $x : A$, vale $B\,x : \Type$''. Costruisce \emph{un} giudizio dicendo sotto quali ipotesi vale (Cero~\ref{cero:contesti}). La barra combina giudizi interi; il $\vdash$ costruisce un giudizio sotto ipotesi. Non sono lo stesso simbolo.
+
+\bigskip
+
+\noindent Il quarto punto dove si inciampa --- la coppia dei due $\equiv$ --- non lo si pu\`o ancora introdurre per filo perch\'e ci manca il tipo identit\`a; lo chiuderemo in \S\ref{cap:identita}. Per ora basti la promemoria: il $\equiv$ visto in \S\ref{cap:giudizi} \`e definitorio, vive nel metalinguaggio, non si abita; il $\equiv$ che incontreremo in \S\ref{cap:identita} \`e un tipo del linguaggio, si abita con \texttt{refl}.
+
+\section*{Tabella lampo}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lll}
+\toprule
+\textit{Vedi questo} & \textit{Dov'\`e} & \textit{Perch\'e} \\
+\midrule
+\texttt{tt}, \texttt{ff}, \texttt{zero}, \texttt{suc n} & linguaggio & termini, manipolabili \\
+$\mathbb{B}$, $\mathbb{N}$, \texttt{Vec A n} & linguaggio & tipi, oggetti del sistema \\
+\texttt{:} in \texttt{a : A} & meta & giudizio, non oggetto \\
+$\equiv$ definitorio (\S\ref{cap:giudizi}) & meta & asserzione sul sistema \\
+\rule{0.9cm}{0.3pt} (la barra) & meta & combina giudizi interi (Cero~1) \\
+$\vdash$ & meta & giudizio sotto ipotesi (Cero~\ref{cero:contesti}) \\
+coerenza del sistema & meta-meta & non dall'interno --- G\"odel \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent Le righe sui tipi del linguaggio le completiamo in \S\ref{cap:identita}, quando il tipo identit\`a porter\`a con s\'e altri abitanti del linguaggio.
+
+% ---------------------------------------------------------------------
+\chapter{Lo schema F-I-E-C}\label{cap:fiec}
+
+\noindent {\spacedlowsmallcaps{Questa \`e la sezione cardine}}. Ogni tipo in MLTT \`e dato da \textbf{quattro regole}, sempre nello stesso ordine, con la stessa struttura. Non c'\`e altro modo di introdurre un tipo, e non c'\`e altro modo di lavorarci sopra. Tutto quello che si vedr\`a nella Parte~II \`e declinazione di questo schema.
+
+\bigskip
+
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{lll}
+\toprule
+\textit{Regola} & \textit{Cosa dice} & \textit{Dove vive} \\
+\midrule
+\textbf{Formazione} (F) & quando il tipo esiste & linguaggio \\
+\textbf{Introduzione} (I) & come costruisco un abitante (costruttori) & linguaggio \\
+\textbf{Eliminazione} (E) & come uso un abitante (eliminatori) & \textbf{metalinguaggio} \\
+\textbf{Computazione} (C) & come riduce (regole $\beta$, definitorie) & \textbf{metalinguaggio} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\bigskip
+
+Due cose vanno fissate subito, perch\'e ricorrono identiche per ogni tipo.
+
+\section*{Gli eliminatori non sono funzioni}
+
+Non sono funzioni che abitano un tipo: sono \emph{regole} del sistema di deduzione. Quando un testo li presenta come oggetti applicabili ($\indN(\dots)$, $\indB(\dots)$) sta facendo un'\textbf{immersione pedagogica} --- porta qualcosa dal metalinguaggio dentro il linguaggio. L'oggetto cambia natura nel farlo. Da tenere a mente ogni volta che si incontra un eliminatore scritto come se fosse un termine.
+
+\begin{oss}[Test diretto]
+\agdainl{suc} si pu\`o passare a una funzione higher-order? S\`i, dunque \`e nel linguaggio. \agdainl{ind-N} in MLTT pura si pu\`o passare? No, \`e una regola del metalinguaggio. Agda --- per ergonomia --- ti far\`a scrivere una funzione di nome \texttt{nat-rec} che si comporta come \agdainl{ind-N}; quella \`e l'immersione pedagogica resa cittadino del linguaggio. Non confondere il gesto pedagogico con la regola.
+\end{oss}
+
+\section*{Le regole di computazione sono definitorie}
+
+Non sono teoremi. Non si ha nulla per dimostrarle \emph{dall'interno} del sistema. Si scrivono perch\'e rispecchiano la struttura del tipo. Il sistema funziona perch\'e \`e allineato con quella struttura, non per decreto.
+
+\begin{cero}[Le regole di computazione sono definitorie]\label{cero:comp}
+Si assumono, e reggono perch\'e la struttura era gi\`a l\`i.
+\end{cero}
+
+\section*{Forma generale di una regola}
+
+Tutte le regole hanno la forma:
+\[
+\inferrule{\text{premessa}_1 \\ \text{premessa}_2 \\ \dots}{\text{conclusione}}
+\]
+
+Premesse e conclusione sono \emph{giudizi} del metalinguaggio (\texttt{a : A}, \texttt{A : Type}, $x : A \vdash B\,x : \Type$, ecc.). La barra dice ``se hai i giudizi sopra, puoi scrivere il giudizio sotto''. Una sequenza di regole applicate fino a un giudizio senza premesse aperte \`e una \emph{derivazione}.
+
+\bigskip
+
+\noindent Da \S\ref{cap:bool} in poi, ogni tipo riceve esattamente queste quattro regole, scritte in questo formato, in quest'ordine.

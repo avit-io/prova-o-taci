@@ -1,0 +1,44 @@
+{
+  "nodes": {
+    "ial": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1776364062,
+        "narHash": "sha256-YW4O11S3crjbi/qKzCqkAkanrnlxtnUiNf5+EEpYVdM=",
+        "owner": "cedille",
+        "repo": "ial",
+        "rev": "8eee15963451de2ed848526eada4ff5b3698d09e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "cedille",
+        "repo": "ial",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1779560665,
+        "narHash": "sha256-tpyBcxPpcQb8ukyNF7DoCwfSY3VPsxHoYwj00Cayv5o=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "64c08a7ca051951c8eae34e3e3cb1e202fe36786",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "ial": "ial",
+        "nixpkgs": "nixpkgs"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}

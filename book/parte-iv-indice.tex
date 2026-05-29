@@ -1,0 +1,87 @@
+% =====================================================================
+% PARTE IV — Indice (ceri e decisioni di design)
+% =====================================================================
+\part{Indice}
+
+\chapter{Ceri e decisioni di design}\label{cap:ceri}
+
+\noindent {\spacedlowsmallcaps{Questo \`e l'indice strutturale del libro}}. Ogni cosa che il libro assume senza dimostrarla --- ogni cosa che si \`e dovuta accendere come cero --- \`e qui. Separata da: ogni cosa che il libro \emph{decide} senza essere costretto a decidere cos\`i --- ogni scelta di design che ci sta come ci starebbe un'altra. Confondere le due cose \`e met\`a del lavoro mancato.
+
+\section*{Ceri (assunzioni)}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{p{0.5cm}p{5.2cm}p{3cm}p{4.8cm}}
+\toprule
+\textit{N.} & \textit{Assunzione} & \textit{Dove vive} & \textit{Perch\'e regge} \\
+\midrule
+1 & Esiste un metalinguaggio con i quattro giudizi & meta & \`e la lavagna su cui scrivi tutto il resto \\
+\ref{cero:contesti} & Esistono i contesti e l'operazione $\vdash$ & meta & senza, niente ragionamento sotto ipotesi n\'e tipi dipendenti \\
+\ref{cero:comp} & Le regole di computazione sono definitorie & meta & rispecchiano la struttura, non si provano dall'interno \\
+\ref{cero:dipendenza} & Un termine pu\`o apparire dentro un tipo & scelta fondativa & \`e \emph{la} decisione che definisce MLTT \\
+\midrule
+(limite) & Coerenza del sistema & meta-meta & non dimostrabile dall'interno --- G\"odel \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\bigskip
+
+\section*{Decisioni di design (scelte esplicite, non ceri)}
+
+\begin{itemize}
+\item \textbf{Eliminatore induttivo invece del solo case-split} per tipi ricorsivi --- $\indN$ vs $\mathsf{case\text{-}\mathbb{N}}$ (\S\ref{cap:bool} \emph{vs} \S\ref{cap:nat}). Potere dimostrativo: senza l'ipotesi induttiva nel passo, su $\mathbb{N}$ non si dimostra quasi niente. Si \emph{sarebbe potuto} scegliere solo case-split, e si avrebbe avuto un sistema diverso, pi\`u debole.
+
+\item \textbf{Indice invece di parametro} per $n$ in $\mathrm{Vec}\,A\,n$ (\S\ref{cap:vec}). Permette a \texttt{cons} di cambiare la lunghezza producendo $\mathrm{Vec}\,A\,(\suc\,n)$ da $\mathrm{Vec}\,A\,n$. Se $n$ fosse parametro, sarebbe fisso per tutti i costruttori e \texttt{cons} non potrebbe esistere.
+
+\item \textbf{Argomenti impliciti con \texttt{\{\}}} (\S\ref{cap:pi-azione}). Pura ergonomia, ma operativamente importante: \`e il riconoscimento sintattico che certi argomenti vivono solo nella passata 1 (type checking). L'argomento c'\`e sempre, sotto la sintassi.
+
+\item \textbf{$\forall$ come zucchero per $\Pi$} (\S\ref{cap:forall}). Leggibilit\`a. Non \`e una regola nuova; \`e $\Pi$ con il permesso di omettere annotazioni di tipo quando Agda pu\`o inferirle.
+
+\item \textbf{Parentesi raggruppate} \texttt{(a b c : A)} come zucchero per $\Pi$ annidati (\S\ref{cap:pi-azione}). Stessa famiglia di scelte: comodit\`a, sotto resta la regola di formazione unaria.
+\end{itemize}
+
+\bigskip
+
+\noindent Ogni voce sopra \`e un punto in cui \emph{avresti potuto scegliere diversamente}. Saperlo \`e l'obiettivo: non confondere mai un'assunzione con un teorema, n\'e uno zucchero con una regola primitiva.
+
+\bigskip
+\bigskip
+
+\section*{Dove vive ciascuna cosa --- la tavola finale}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{p{6cm}p{3cm}p{4cm}}
+\toprule
+\textit{Cosa} & \textit{Dove vive} & \textit{Si dimostra?} \\
+\midrule
+$\tto, \ff, \zero, \suc\,n, \refl, \nil, \cons$ & linguaggio & s\`i, sono termini (introdotti dalle regole I) \\
+$\mathbb{B}, \mathbb{N}, \Pi, \Sigma, \_\identita\_, \mathrm{Vec}\,A\,n, \bot$ & linguaggio & s\`i, sono tipi (introdotti dalle regole F) \\
+$\indB, \indN, \indS, \Jelim$, applicazione di $\Pi$ & metalinguaggio & no, sono regole (E) \\
+Regole di computazione (Cero~\ref{cero:comp}) & metalinguaggio & no, sono definitorie (C) \\
+$\equiv$ definitorio (giudizio) & metalinguaggio & no, \`e un'affermazione \\
+$\identita$ proposizionale (tipo $\_\identita\_$) & linguaggio & s\`i, si abita con $\refl$ \\
+Coerenza del sistema & meta-meta & non dall'interno (G\"odel) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\bigskip
+
+\noindent Pi\`u si scende verso le fondamenta, pi\`u il terreno diventa silenzioso. A un certo punto c'\`e sempre un cero alla madonna --- e va bene cos\`i, \emph{purch\'e sia esplicito}.
+
+\bigskip
+\bigskip
+
+\section*{Per i prossimi capitoli di Stump}
+
+Questo libro copre i prerequisiti per il capitolo~1 di \emph{Verified Functional Programming in Agda} e srotola un esercizio rappresentativo (\S\ref{cap:and-comm}). Lo schema F-I-E-C generalizza facilmente:
+
+\begin{itemize}
+\item \textbf{Capitolo 2 di Stump --- numeri naturali.} L'eliminazione di $\mathbb{N}$ (\S\ref{cap:nat}) entra in gioco con la sua \emph{ricorsione}: le prove non si chiudono pi\`u solo con $\refl$, ma richiedono di chiamare l'ipotesi induttiva. Aggiungere un capitolo che srotoli, per esempio, l'associativit\`a di \texttt{+} su $\mathbb{N}$: stesso schema di \S\ref{cap:and-comm} con $\indN$ al posto di $\indB$ e l'ipotesi induttiva esplicitamente visibile come chiamata ricorsiva.
+
+\item \textbf{Capitoli successivi --- liste, parsing, programmi verificati.} Ogni tipo che si incontra avr\`a le sue quattro regole F-I-E-C. Ogni esercizio sar\`a leggibile come intreccio di Eliminazioni (case-split / induzione), Computazioni (riduzioni definitorie) e Introduzioni (costruzione del termine finale).
+\end{itemize}
+
+\noindent Il vocabolario \`e fissato. Da qui in poi si aggiungono tipi, non strumenti.

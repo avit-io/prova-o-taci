@@ -1,0 +1,351 @@
+\documentclass[
+  oneside,
+  openany,
+  titlepage,
+  11pt,
+  a4paper,
+  italian,
+  DIV=14,
+  headinclude,
+  footinclude=true,
+  cleardoublepage=empty
+]{scrbook}
+
+% --- ClassicThesis + ArsClassica (Pantieri) ---
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{babel}
+\usepackage{lmodern}
+\usepackage{mathpazo}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{mathrsfs}
+\usepackage[
+  eulerchapternumbers,
+  beramono,
+  eulermath,
+  pdfspacing,
+  parts
+]{classicthesis}
+\usepackage{arsclassica}
+
+% --- nota di colore vinaccia per il numero del capitolo ---
+\definecolor{halfgray}{rgb}{0.55,0.13,0.16}
+\definecolor{futurered}{RGB}{180,18,18}
+\definecolor{cream}{RGB}{245,240,228}
+
+% --- aumenta lo spazio dopo il titolo del capitolo ---
+\usepackage{titlesec}
+\titlespacing*{\chapter}{0pt}{2.5\baselineskip}{4\baselineskip}
+
+% --- lingua e tolleranze ---
+\selectlanguage{italian}
+\emergencystretch=3em
+\tolerance=2000
+\hbadness=2000
+
+% --- grafica ---
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,decorations.pathmorphing,calc}
+
+% --- epigrafi (per attacchi capitolo, opzionale) ---
+\usepackage{epigraph}
+\setlength{\epigraphwidth}{0.55\textwidth}
+\renewcommand{\epigraphflush}{flushright}
+\renewcommand{\textflush}{flushright}
+\renewcommand{\epigraphsize}{\small\itshape}
+
+% --- regole di inferenza in stile naturale ---
+\usepackage{mathpartir}
+
+% --- codice Agda con listings (no shell-escape richiesto) ---
+\usepackage{listings}
+\usepackage{xcolor}
+\definecolor{agdaKw}{rgb}{0.55,0.13,0.16}   % maroon, come halfgray
+\definecolor{agdaCom}{rgb}{0.45,0.45,0.45}
+\definecolor{agdaStr}{rgb}{0.20,0.40,0.20}
+
+% --- mapping unicode per Agda (così pdflatex digerisce i simboli) ---
+\lstdefinelanguage{Agda}{
+  keywords={data, where, with, module, open, import, public, private,
+            renaming, hiding, using, let, in, do, postulate, abstract,
+            primitive, mutual, infix, infixl, infixr, syntax, pattern,
+            instance, record, field, constructor, Set, Type, Prop,
+            forall, λ, lambda},
+  sensitive=true,
+  comment=[l]{--},
+  morecomment=[s]{\{-}{-\}},
+  string=[b]",
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{agdaKw}\bfseries,
+  commentstyle=\color{agdaCom}\itshape,
+  stringstyle=\color{agdaStr},
+  columns=fullflexible,
+  keepspaces=true,
+  showstringspaces=false,
+  literate=
+    {𝔹}{{$\mathbb{B}$}}1
+    {ℕ}{{$\mathbb{N}$}}1
+    {≡}{{$\equiv$}}1
+    {∀}{{$\forall$}}1
+    {→}{{$\rightarrow$}}1
+    {⊢}{{$\vdash$}}1
+    {⊥}{{$\bot$}}1
+    {⊤}{{$\top$}}1
+    {⟦}{{$\llbracket$}}1
+    {⟧}{{$\rrbracket$}}1
+    {λ}{{$\lambda$}}1
+    {Π}{{$\Pi$}}1
+    {Σ}{{$\Sigma$}}1
+    {α}{{$\alpha$}}1
+    {β}{{$\beta$}}1
+    {δ}{{$\delta$}}1
+    {ε}{{$\varepsilon$}}1
+    {ρ}{{$\rho$}}1
+    {τ}{{$\tau$}}1
+    {φ}{{$\varphi$}}1
+    {₁}{{$_1$}}1
+    {₂}{{$_2$}}1
+    {⟨}{{$\langle$}}1
+    {⟩}{{$\rangle$}}1
+    {≢}{{$\not\equiv$}}1
+    {∎}{{$\blacksquare$}}1
+    {∷}{{$::$}}1
+    {↑}{{$\uparrow$}}1
+    {↓}{{$\downarrow$}}1
+    {ℝ}{{$\mathbb{R}$}}1
+    {ℤ}{{$\mathbb{Z}$}}1,
+}
+
+\lstnewenvironment{agda}[1][]{\lstset{language=Agda,#1}}{}
+\newcommand{\agdainl}[1]{\lstinline[language=Agda,basicstyle=\ttfamily\normalsize]{#1}}
+
+% --- ambienti teorema-like in stile ClassicThesis (identici al sorgente avit-io) ---
+\newtheoremstyle{ctplain}%
+  {0.7\baselineskip}{0.5\baselineskip}%
+  {\itshape}{}%
+  {\bfseries\scshape}{.}%
+  {.5em}{}%
+\newtheoremstyle{ctdef}%
+  {0.7\baselineskip}{0.5\baselineskip}%
+  {\normalfont}{}%
+  {\bfseries\scshape}{.}%
+  {.5em}{}%
+\newtheoremstyle{ctrem}%
+  {0.7\baselineskip}{0.5\baselineskip}%
+  {\normalfont}{}%
+  {\itshape}{.}%
+  {.5em}{}%
+
+% --- ambiente per i ceri: stesso stile sobrio dello stile def, ma con head dedicato ---
+\newtheoremstyle{ctcero}%
+  {0.9\baselineskip}{0.7\baselineskip}%
+  {\normalfont}{}%
+  {\bfseries\scshape\color{halfgray}}{.}%
+  {.5em}{}%
+
+\theoremstyle{ctplain}
+\newtheorem{regola}{Regola}[chapter]
+
+\theoremstyle{ctdef}
+\newtheorem{defn}[regola]{Definizione}
+
+\theoremstyle{ctrem}
+\newtheorem*{oss}{Osservazione}
+
+\theoremstyle{ctcero}
+\newtheorem{cero}{Cero}
+
+% --- comandi locali ---
+\newcommand{\meta}[1]{\textit{#1}}        % per il metalinguaggio in prosa
+\newcommand{\lang}[1]{\textbf{#1}}        % per il linguaggio in prosa
+\newcommand{\definitorio}{\ensuremath{\equiv}}
+\newcommand{\identita}{\ensuremath{\equiv}}
+\newcommand{\Type}{\mathsf{Type}}
+\newcommand{\Set}{\mathsf{Set}}
+\newcommand{\indB}{\mathsf{ind\text{-}\mathbb{B}}}
+\newcommand{\indN}{\mathsf{ind\text{-}\mathbb{N}}}
+\newcommand{\indS}{\mathsf{ind\text{-}\Sigma}}
+\newcommand{\indV}{\mathsf{ind\text{-}Vec}}
+\newcommand{\Jelim}{\mathsf{J}}
+\newcommand{\refl}{\mathsf{refl}}
+\newcommand{\zero}{\mathsf{zero}}
+\newcommand{\suc}{\mathsf{suc}}
+\newcommand{\tto}{\mathsf{tt}}
+\newcommand{\ff}{\mathsf{ff}}
+\newcommand{\nil}{\mathsf{nil}}
+\newcommand{\cons}{\mathsf{cons}}
+\newcommand{\andd}{\mathbin{\&\&}}
+
+% --- hyperref ---
+\hypersetup{%
+  colorlinks=true,
+  linkcolor=Maroon,
+  citecolor=Maroon,
+  urlcolor=Maroon,
+  pdftitle={Prova o taci},
+  pdfsubject={appunti di MLTT per Verified Functional Programming in Agda},
+  pdfauthor={}
+}
+
+% --- TOC ---
+\usepackage{titletoc}
+\renewcommand{\cftpartfont}{\color{CTtitle}}
+\renewcommand{\cftpartaftersnum}{}
+\renewcommand{\cftpartaftersnumb}{}
+\renewcommand{\cftchapfont}{}
+\renewcommand{\cftchappresnum}{}
+\renewcommand{\cftchapaftersnumb}{}
+
+\begin{document}
+\frenchspacing
+\raggedbottom
+\selectlanguage{italian}
+\renewcommand{\partname}{Parte}
+\renewcommand{\chaptername}{Capitolo}
+\renewcommand{\contentsname}{Indice}
+
+\pagenumbering{roman}
+\pagestyle{plain}
+
+% ----------------- frontespizio (stile Depero) -----------------
+\begin{titlepage}
+\thispagestyle{empty}
+\begin{tikzpicture}[remember picture, overlay]
+
+  %% blocco nero superiore (prime 11.5 cm dall'alto)
+  \fill[black]
+    (current page.north west)
+    rectangle
+    ($(current page.north east)+(0,-11.5cm)$);
+
+  %% fascia rossa – titolo (cm 11.5–15 dall'alto, alta 3.5 cm)
+  \fill[futurered]
+    ($(current page.north west)+(0,-11.5cm)$)
+    rectangle
+    ($(current page.north east)+(0,-15cm)$);
+
+  %% sfondo crema – corpo (cm 15–24.5 dall'alto)
+  \fill[cream]
+    ($(current page.north west)+(0,-15cm)$)
+    rectangle
+    ($(current page.north east)+(0,-24.5cm)$);
+
+  %% blocco nero inferiore (dal cm 24.5 fino in fondo)
+  \fill[black]
+    ($(current page.north west)+(0,-24.5cm)$)
+    rectangle
+    (current page.south east);
+
+  %% ---- simboli nel blocco nero superiore ----
+
+  %% Π  grande, bianco, quadrante sinistro
+  \node[white, font=\fontsize{108}{108}\selectfont]
+    at ($(current page.north west)+(4.5cm,-5.8cm)$)
+    {$\Pi$};
+
+  %% Σ  grande, rosso futurista, quadrante destro
+  \node[futurered, font=\fontsize{84}{84}\selectfont]
+    at ($(current page.north east)+(-4.2cm,-6.5cm)$)
+    {$\Sigma$};
+
+  %% →  tra i due simboli, in grigio chiaro
+  \node[white!35!black, font=\fontsize{32}{32}\selectfont]
+    at ($(current page.north)+(0,-5.2cm)$)
+    {$\to$};
+
+  %% ∀  piccolo in alto a destra, bianco
+  \node[white!50!black, font=\fontsize{22}{22}\selectfont]
+    at ($(current page.north east)+(-1.5cm,-1.2cm)$)
+    {$\forall$};
+
+  %% ---- titolo nella fascia rossa ----
+  \node[white, font=\fontsize{33}{33}\selectfont\bfseries\scshape]
+    at ($(current page.north)+(0,-13.25cm)$)
+    {\spacedallcaps{Prova o taci}};
+
+  %% ---- simboli nel corpo crema ----
+
+  %% λ  grande, nero, sinistra
+  \node[black, font=\fontsize{72}{72}\selectfont]
+    at ($(current page.north west)+(3.8cm,-20cm)$)
+    {$\lambda$};
+
+  %% ⊢  medio, rosso, destra
+  \node[futurered, font=\fontsize{52}{52}\selectfont\bfseries]
+    at ($(current page.north east)+(-4cm,-19.5cm)$)
+    {$\vdash$};
+
+  %% regola di inferenza come elemento grafico centrale
+  \node[black!75, font=\fontsize{11}{13}\selectfont]
+    at ($(current page.north)+(0,-20.5cm)$)
+    {$a : A$};
+  \draw[black!60, line width=2pt]
+    ($(current page.north)+(-3.2cm,-21.2cm)$) --
+    ($(current page.north)+(3.2cm,-21.2cm)$);
+  \node[black!75, font=\fontsize{11}{13}\selectfont]
+    at ($(current page.north)+(0,-22cm)$)
+    {$\mathsf{refl} : a \equiv a$};
+
+  %% ---- blocco nero inferiore – sottotitolo ----
+  \node[white!65!black, font=\fontsize{9}{11}\selectfont\itshape]
+    at ($(current page.south)+(0,3.8cm)$)
+    {compendio a \textit{Verified Functional Programming in Agda}};
+  \node[futurered!70!white, font=\fontsize{8}{10}\selectfont]
+    at ($(current page.south)+(0,2.2cm)$)
+    {Aaron Stump \textbullet\ Iowa Agda Library};
+
+\end{tikzpicture}
+\end{titlepage}
+\clearpage
+
+% ----------------- nota al lettore -----------------
+\chapter*{Nota al lettore}
+\addcontentsline{toc}{chapter}{Nota al lettore}
+
+\begin{center}
+{\large\bfseries\scshape\color{futurered}
+Nessuna magia.\\[2pt]
+Nessun trucco.\\[2pt]
+Il tipo esiste o non esiste.\\[2pt]
+La prova regge o crolla.\\[2pt]
+Chi non dimostra, tace.}
+\end{center}
+
+\bigskip\bigskip
+
+Quattro cose, prima di cominciare.
+
+\paragraph{Origine.} Queste note nascono per accompagnare la lettura di \emph{Verified Functional Programming in Agda} di Aaron Stump, leggendo gli esercizi come applicazioni della Martin-L\"of Type Theory pura --- cio\`e nello schema delle quattro regole F-I-E-C (Formazione, Introduzione, Eliminazione, Computazione) che sotto Agda c'\`e sempre, anche quando la sintassi la nasconde dietro lo zucchero.
+
+\paragraph{Tesi.} Tutto il gioco di MLTT \`e in quattro regole, applicate uniformemente a ogni tipo. Capire ciascun tipo significa scriverne le quattro regole e vedere come gli abitanti del linguaggio (termini, prove) vengono dalle regole di introduzione, e come gli usi (eliminazioni, riduzioni) vengono da quelle di eliminazione e computazione. Non c'\`e altro.
+
+\paragraph{Assunzioni.} Sono dichiarate ed esplicite. Le ho chiamate \emph{ceri} --- come i ceri votivi che si accendono perch\'e qualcosa regga senza averne la dimostrazione interna --- e ne incontreremo quattro nel corpo del testo. Ognuno \`e un punto in cui il sistema poggia su qualcosa che non si pu\`o derivare dall'interno: vivono nel metalinguaggio o sono scelte fondative. Confondere un cero con un teorema, o uno zucchero sintattico con una regola primitiva, \`e la fonte principale di confusione in MLTT. Renderli espliciti \`e met\`a del lavoro.
+
+\paragraph{Forma.} Dove la prosa basta, c'\`e prosa. Dove la prosa rende sfuocato qualcosa che chiede precisione, entrano le regole di inferenza in forma classica (premesse, barra, conclusione), o un frammento Agda. Nessun salto: ogni sezione usa solo cose introdotte in sezioni precedenti, e se ci si perde su un punto basta tornare indietro fino a trovarne il fondamento.
+
+\bigskip
+
+\noindent\textbf{Patto di lettura.} Niente salti in avanti. La Parte~I fissa il vocabolario (giudizi, metalinguaggio, schema F-I-E-C). La Parte~II applica F-I-E-C a sei tipi, in ordine di complessit\`a crescente: $\mathbb{B}$, $\mathbb{N}$, $\Pi$, $\Sigma$, il tipo identit\`a $\_\identita\_$, $\mathrm{Vec}$. La Parte~III mostra come questi sei tipi, combinati, governano il primo esercizio non banale del libro di Stump (commutativit\`a di \texttt{\&\&}). I ceri e le decisioni di design sono raccolti in fondo (\S\ref{cap:ceri}).
+
+\bigskip
+
+\noindent\textbf{Strumenti.} Stile tipografico Pantieri (\textsc{ClassicThesis} + \textsc{ArsClassica}); ambienti teorema \textsc{regola} (numerate per capitolo), \textsc{definizione} (sullo stesso contatore), \textsc{osservazione} (senza numero), \textsc{cero} (numerato a parte, fuori dai capitoli, per tenere le assunzioni globali leggibili come un indice). Il codice Agda \`e reso con \texttt{listings} e mappa Unicode --- quindi compila con \texttt{pdflatex} senza shell-escape.
+
+\clearpage
+
+% ----------------- indice -----------------
+{\setlength{\parskip}{0pt}\tableofcontents}
+\clearpage
+
+\pagenumbering{arabic}
+\pagestyle{scrheadings}
+
+% ----------------- corpo del libro -----------------
+\input{parte-i-fondamenta}
+\input{parte-ii-tipi}
+\input{parte-iii-prove}
+\input{parte-iv-indice}
+
+\end{document}
