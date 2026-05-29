@@ -3,16 +3,18 @@
 % =====================================================================
 \part{I tipi}
 
-\noindent\itshape Otto capitoli, sempre F-I-E-C.
-$\mathbb{B}$ (\S\ref{cap:bool}) per vedere lo schema nel caso pi\`u puro, senza
-ricorsione. $\mathbb{N}$ (\S\ref{cap:nat}) per il salto all'induzione vera.
-$\Pi$ (\S\ref{cap:pi}) per la decisione fondativa di MLTT, e $\Pi$ in azione
-(\S\ref{cap:pi-azione}) per le due passate che la sintassi nasconde. $\forall$
-(\S\ref{cap:forall}) come zucchero. $\Sigma$ (\S\ref{cap:sigma}) come duale.
-Il tipo identit\`a $\_\identita\_$ (\S\ref{cap:identita}) come sezione cardine
---- l\`i si chiude la distinzione fra le due uguaglianze. $\mathrm{Vec}\,A\,n$
-(\S\ref{cap:vec}) come capstone, dove $\mathbb{N}$, $\Pi$ e la dipendenza si
-incastrano per la prima volta su un valore numerico.\upshape
+\noindent\itshape Otto capitoli: sette di tipi F-I-E-C puri, un quadro
+d'insieme finale. $\mathbb{B}$ (\S\ref{cap:bool}) per vedere lo schema nel
+caso pi\`u puro, senza ricorsione. $\mathbb{N}$ (\S\ref{cap:nat}) per il salto
+all'induzione vera. $\Pi$ (\S\ref{cap:pi}) per la decisione fondativa di MLTT,
+e $\Pi$ in azione (\S\ref{cap:pi-azione}) per le due passate che la sintassi
+nasconde. $\forall$ (\S\ref{cap:forall}) come zucchero. $\Sigma$
+(\S\ref{cap:sigma}) come duale. Il tipo identit\`a $\_\identita\_$
+(\S\ref{cap:identita}) come sezione cardine --- l\`i si chiude la distinzione
+fra le due uguaglianze. Un quadro d'insieme (\S\ref{cap:quadro-ii}) chiude
+la traversata. $\mathrm{Vec}$, il tipo dipendente canonico, \emph{non} sta
+qui: appartiene al compendio di Stump in Parte~IV (\S\ref{cap:stump-4}),
+dove ogni costruzione dipendente ha il suo capitolo dedicato.\upshape
 
 \bigskip
 
@@ -550,99 +552,11 @@ $\indB$, $\indN$, $\indS$, $\Jelim$ & meta & eliminatori = regole di inferenza \
 \end{center}
 
 % ---------------------------------------------------------------------
-\chapter{$\mathrm{Vec}\,A\,n$ --- tutto messo insieme}\label{cap:vec}
+\chapter{Quadro d'insieme della Parte~II}\label{cap:quadro-ii}
 
-Capstone della Parte~II: primo tipo dove $\mathbb{N}$, $\Pi$ e la dipendenza Cero~\ref{cero:dipendenza} si incastrano davvero. \texttt{Vec A n} \`e il tipo delle liste di elementi di $A$ con \emph{esattamente} $n$ elementi. \textbf{$n$ vive nel tipo} --- il typechecker conosce la lunghezza a compile time. Questo \`e il Cero~\ref{cero:dipendenza} al lavoro su un valore numerico (\`e anche il punto dove le due passate di \S\ref{cap:pi-azione} si \emph{toccano}: $n$ \`e un valore che entra in un tipo).
+\noindent {\spacedlowsmallcaps{Cinque tipi, una tabella}}. I cinque tipi MLTT puri introdotti finora, allineati sulle stesse colonne. Stessa anatomia F-I-E-C; ci\`o che cambia \`e la presenza (o l'assenza) di ricorsione, e da cosa dipende il motivo $C$.
 
-\section*{F --- Formazione}
-\[
-\inferrule{A : \Type \\ n : \mathbb{N}}{\mathrm{Vec}\,A\,n : \Type}
-\]
-
-Il tipo dipende da un \emph{valore} $n : \mathbb{N}$. Non \`e \texttt{Vec A} genericamente: \`e un tipo diverso per ogni lunghezza.
-
-\section*{I --- Introduzione}
-\[
-\inferrule{ }{\nil : \mathrm{Vec}\,A\,\zero}
-\qquad
-\inferrule{a : A \\ as : \mathrm{Vec}\,A\,n}{\cons\,a\,as : \mathrm{Vec}\,A\,(\suc\,n)}
-\]
-
-\texttt{cons} incrementa $n$ nel tipo risultante. Non per calcolo a runtime, \textbf{per costruzione}.
-
-\section*{E --- Eliminazione (metalinguaggio)}
-\[
-\inferrule{
-vs : \mathrm{Vec}\,A\,n \\
-C : (n : \mathbb{N}) \to \mathrm{Vec}\,A\,n \to \Type \\
-b : C\,\zero\,\nil \\
-s : (k : \mathbb{N}) \to (a : A) \to (as : \mathrm{Vec}\,A\,k) \to C\,k\,as \to C\,(\suc\,k)\,(\cons\,a\,as)
-}{
-\indV(vs, C, b, s) : C\,n\,vs
-}
-\]
-
-Stessa struttura di $\indN$: caso base, e passo che riceve l'ipotesi induttiva $C\,k\,as$. Il motivo $C$ dipende sia dalla lunghezza che dal vettore.
-
-\section*{C --- Computazione}
-\begin{align*}
-\indV(\nil,         C, b, s) &\definitorio b \\
-\indV(\cons\,a\,as, C, b, s) &\definitorio s\,k\,a\,as\,(\indV(as, C, b, s))
-\end{align*}
-
-Ricorsione su \texttt{as}, strutturalmente pi\`u corto di \texttt{cons a as}. Stesso schema di $\indN$.
-
-\section*{Nota sintattica: parametri \emph{vs} indici}
-
-\begin{agda}
-data Vec (A : Set) : ℕ → Set where
---       ^^^^^^^^   ^^^^^^^^^
---       parametro  indice
-\end{agda}
-
-\begin{itemize}
-\item \textbf{Parametro} \texttt{(A : Set)}: prima dei \texttt{:}, fisso per tutti i costruttori.
-\item \textbf{Indice} \texttt{: $\mathbb{N}$ -> Set}: dopo i \texttt{:}, pu\`o cambiare costruttore per costruttore (\texttt{nil} lo fissa a \texttt{zero}, \texttt{cons} lo porta da $n$ a $\suc\,n$).
-\end{itemize}
-
-Se $n$ fosse un parametro, \texttt{cons} non potrebbe cambiarlo. Questa \`e una decisione di design (\S\ref{cap:ceri}).
-
-% NUOVO: avvertimento sull'inferenza fragile per i tipi con indici
-\section*{Avvertimento --- inferenza fragile sugli indici}
-
-L'inferenza di tipo di Agda \`e completa per i \emph{parametri}, ma \textbf{non lo \`e per gli indici}. Quando un'operazione richiede che due indici risultino definitoriamente uguali e non lo sono per pura riduzione, l'unificatore si arresta e devi fornire una prova di uguaglianza (tipicamente con \texttt{rewrite} o $\mathrm{subst}$, \S\ref{cap:identita}). Tre situazioni tipiche:
-
-\begin{enumerate}
-\item \textbf{Concatenazione e lemmi di associativit\`a/commutativit\`a sugli indici}:
-\begin{agda}
-_++_ : ∀ {A m n} → Vec A m → Vec A n → Vec A (m + n)
-
--- e ora, per dimostrare l'associatività di ++ a livello di vettori,
--- serve PRIMA un lemma su ℕ (associatività di +) e POI un rewrite,
--- perché (m + n) + p non è DEFINITORIAMENTE uguale a m + (n + p):
--- lo è solo proposizionalmente, e Agda non può forzarlo da solo.
-\end{agda}
-
-\item \textbf{Funzioni con indice non-canonico in posizione di pattern}:
-\begin{agda}
-head : ∀ {A n} → Vec A (suc n) → A
-head (cons a _) = a
--- ok: l'indice è "suc n", l'unificazione vede subito che il vettore
--- non può essere nil (che vorrebbe l'indice zero). Bene.
-
--- Ma se chiami head su un Vec A m con m generico, prima devi
--- convincere Agda che m ≡ suc k per qualche k.
-\end{agda}
-
-\item \textbf{Funzioni la cui forma del risultato non si decide per riduzione}: capita spesso quando l'indice contiene una funzione bloccata su una variabile (come $n + \zero$ rispetto a $n$).
-\end{enumerate}
-
-\noindent\textbf{Da fissare.} Tipi dipendenti su indici sono potenti, ma il prezzo \`e che l'inferenza non \`e ``magica'': dove la riduzione si ferma, devi fornire tu il ponte con una prova proposizionale. Questo non \`e un difetto di Agda; \`e la conseguenza diretta della Regola~\ref{reg:ponte} --- definitorio sta sotto, proposizionale sopra.
-
-% NUOVO: tabella riassuntiva finale di tutta la Parte II
-\section*{Quadro d'insieme --- la Parte~II in una tabella}
-
-I sei tipi della Parte~II, allineati sulle stesse colonne. Stessa anatomia F-I-E-C; ci\`o che cambia \`e la presenza (o l'assenza) di ricorsione, e da cosa dipende il motivo $C$.
+\bigskip
 
 \begin{center}
 \renewcommand{\arraystretch}{1.25}
@@ -656,7 +570,6 @@ $\mathbb{N}$ & s\`i & s\`i & $n : \mathbb{N}$ & induzione e ricorsione primitiva
 $\Pi$        & s\`i & no & --- (non induttivo) & funzioni dipendenti; decisione fondativa MLTT \\
 $\Sigma$     & s\`i & no & $p : \Sigma\,x\!\in\!A,\,B\,x$ & coppie dipendenti; duale di $\Pi$ \\
 $\_\identita\_$ & s\`i & no & $y : A$ \emph{e} $p : x \identita y$ & uguaglianza interna; ponte meta--linguaggio \\
-$\mathrm{Vec}\,A\,n$ & s\`i & s\`i & $n : \mathbb{N}$ \emph{e} $vs : \mathrm{Vec}\,A\,n$ & dipendenza su un valore numerico; capstone \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -665,9 +578,15 @@ $\mathrm{Vec}\,A\,n$ & s\`i & s\`i & $n : \mathbb{N}$ \emph{e} $vs : \mathrm{Vec
 
 \noindent\textbf{Letture trasversali.}
 \begin{itemize}
-\item \emph{Ricorsione = costruttore che cita il tipo stesso.} $\mathbb{B}$ e $\Sigma$ non hanno tale costruttore; $\mathbb{N}$ ($\suc$) e $\mathrm{Vec}$ ($\cons$) s\`i. $\Pi$ e $\_\identita\_$ non sono induttivi in senso stretto.
-\item \emph{Motivo a una variabile vs.\ a due.} $\indB$, $\indN$, $\indS$ hanno motivi su una variabile (il valore eliminato). $\Jelim$ e $\indV$ ne hanno due, perch\'e il tipo dipende da pi\`u di un dato (in $\Jelim$: l'altro estremo e la prova; in $\mathrm{Vec}$: la lunghezza e il vettore).
-\item \emph{Dipendenza Cero~\ref{cero:dipendenza}.} $\Pi$ la introduce; $\Sigma$ la eredita; $\_\identita\_$ e $\mathrm{Vec}$ la sfruttano in modo essenziale (un \emph{valore} entra in un \emph{tipo}). $\mathbb{B}$ e $\mathbb{N}$ no, di per s\'e: la usano solo quando si scelgono motivi non costanti.
+\item \emph{Ricorsione = costruttore che cita il tipo stesso.} $\mathbb{B}$ e $\Sigma$ non hanno tale costruttore; $\mathbb{N}$ ($\suc$) s\`i. $\Pi$ e $\_\identita\_$ non sono induttivi in senso stretto.
+\item \emph{Motivo a una variabile vs.\ a due.} $\indB$, $\indN$, $\indS$ hanno motivi su una variabile (il valore eliminato). $\Jelim$ ne ha due, perch\'e il tipo identit\`a \`e indicizzato dall'altro estremo \emph{e} dalla prova stessa.
+\item \emph{Dipendenza Cero~\ref{cero:dipendenza}.} $\Pi$ la introduce; $\Sigma$ la eredita; $\_\identita\_$ la sfrutta in modo essenziale (un \emph{valore} entra in un \emph{tipo}). $\mathbb{B}$ e $\mathbb{N}$ no, di per s\'e: la usano solo quando si scelgono motivi non costanti.
 \end{itemize}
 
-\noindent Da qui in poi (Parte~III) tutti gli ingredienti sono pronti: le dimostrazioni saranno termini in tipi costruiti con queste sei regole F-I-E-C, niente di pi\`u.
+\bigskip
+
+\noindent\textbf{Cosa non c'\`e qui (volutamente).} \texttt{Vec A n} \`e il primo tipo \emph{induttivo dipendente} non banale e si potrebbe pensare appartenga a questo elenco. Non lo abbiamo messo qui: \texttt{Vec} appartiene al capitolo dedicato del compendio di Stump (\S\ref{cap:stump-4}), dove le sue operazioni canoniche (\texttt{head}, \texttt{tail}, \texttt{++}, \texttt{map}) trovano il loro posto naturale e dove vedremo per la prima volta il pattern matching \emph{elaborato} al lavoro su tipi dipendenti. La Parte~II resta cos\`i un quadro di sole regole F-I-E-C \emph{pure}; la prima costruzione che le mette davvero insieme su un valore numerico arriva al momento giusto in Parte~IV.
+
+\bigskip
+
+\noindent Con questi cinque tipi tutto il vocabolario MLTT che serve a Stump (e a Little Typer) \`e fissato. Parte~III ne ricava la logica intuizionista che vi affiora dietro (Curry-Howard) e un kit di costruzioni derivate. Parte~IV apre il compendio capitolo per capitolo --- e l\`i, fra le altre cose, ritroveremo \texttt{Vec} come tipo dipendente sopra $\mathbb{N}$ nel suo capitolo dedicato.
