@@ -124,6 +124,10 @@ A voce: ``se ho appena assunto $x : A$, posso derivare $x : A$''. \`E ovvia, ma 
 
 \bigskip
 
+\noindent\textbf{Questa \`e la forma \emph{topmost}.} Tratta solo l'ipotesi pi\`u recente del contesto. Se dopo $x : A$ vengono altre ipotesi (in letteratura si chiama $\Delta$ la coda del contesto dopo $x$), la forma generale --- che permette di accedere a una variabile in qualsiasi posizione --- \`e equivalente a quella sopra via indebolimento. La trattiamo in appendice (\S\ref{cap:contesti-formali}).
+
+\bigskip
+
 \noindent\textbf{Esempio concreto.} Voglio derivare $x : A$ nel contesto $\cdot,\, A : \Type,\, x : A$. Applico la regola della variabile con $\Gamma = (\cdot,\, A : \Type)$. La conclusione \`e:
 \[
 (\cdot,\, A : \Type),\, x : A \;\vdash\; x : A
