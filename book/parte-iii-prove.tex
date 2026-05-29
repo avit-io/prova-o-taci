@@ -3,13 +3,79 @@
 % =====================================================================
 \part{Lavorare nel sistema}
 
-\noindent\itshape Tre capitoli per mettere a frutto la Parte~II. La logica
-non importata ma riconosciuta dentro F-I-E-C (\S\ref{cap:logica}); $\mathrm{Vec}\,A\,n$
-come laboratorio dove tipi dipendenti, induzione e quattro regole si
-incastrano (\S\ref{cap:vec}); l'esercizio di Stump sulla commutativit\`a di
-\texttt{\&\&} letto come tre F-I-E-C intrecciati (\S\ref{cap:and-comm}).\upshape
+\noindent\itshape Quattro capitoli che chiudono la traversata. Prima un
+preambolo (\S\ref{cap:prima}) per dichiarare cosa cambia entrando in
+Parte~III: i sorgenti Agda useranno pattern matching, e questo ha un
+costo che va esplicitato (quinto cero). Poi la logica non importata ma
+riconosciuta dentro F-I-E-C, fino a osservare Curry-Howard come gesto
+finale (\S\ref{cap:logica}). Un kit di costruzioni canoniche --- i
+\emph{tipi notevoli} (\S\ref{cap:notevoli}) --- che fa da palestra
+prima delle prove vere. E infine l'esercizio di Stump sulla
+commutativit\`a di \texttt{\&\&} letto come tre F-I-E-C intrecciati
+(\S\ref{cap:and-comm}), apertura del compendio al capitolo~1 del libro
+in oggetto di studio.\upshape
 
 \bigskip
+
+% ---------------------------------------------------------------------
+\chapter{Prima del compendio}\label{cap:prima}
+
+\noindent {\spacedlowsmallcaps{Cosa cambia, entrando in Parte~III}}. In Parte~II si scrivevano regole. Da qui in poi si \emph{leggono} sorgenti, ed \`e onesto dichiarare in apertura che cosa si sta facendo quando una clausola Agda viene tradotta in F-I-E-C.
+
+\bigskip
+
+\noindent\textbf{La situazione.} \emph{Verified Functional Programming in Agda} (e qualsiasi sorgente Agda reale) usa il \emph{pattern matching} come modo standard di definire funzioni e dimostrazioni. Una clausola del tipo
+
+\begin{agda}
+f : (b : 𝔹) → C b
+f tt = ...
+f ff = ...
+\end{agda}
+
+non scrive $\indB$ da nessuna parte. Il nostro compito di lettura sar\`a riconoscere, sotto ogni clausola di questo genere, il F-I-E-C in atto: che cosa \`e l'eliminazione, che cosa la computazione, che cosa l'introduzione del risultato.
+
+Nel caso semplice di $\mathbb{B}$ la traduzione \`e meccanica. Su $\mathbb{N}$ e $\mathrm{Vec}$ comincer\`a a non esserlo: il pattern matching dipendente \emph{eccede} ci\`o che $\indN$, $\indV$ ecc.\ riescono a fare da soli. Va detto chiaramente, ed \`e il contenuto del quinto cero.
+
+\section*{Il quinto cero}
+
+\begin{cero}[Il pattern matching dipendente eccede MLTT pura]\label{cero:pm}
+Il pattern matching che vediamo in Agda non \`e zucchero per gli eliminatori di Parte~II. Nella sua forma generale o \textbf{assume l'assioma K} (\emph{uniqueness of identity proofs}, ogni prova di $x \identita x$ \`e definitoriamente $\refl$), oppure --- in modalit\`a \texttt{--without-K} --- si appoggia a un'\textbf{elaborazione non banale} (Goguen-McBride-McKinna, Cockx-Abel) basata su unificazione di indici, \emph{dot patterns}, \emph{absurd patterns}, \emph{with-abstraction}.
+
+In entrambi i casi: ci\`o che scriviamo come clausole con costruttori a sinistra \emph{non \`e} immediatamente un'applicazione di $\indB$, $\indN$, $\Jelim$ ecc. C'\`e un compilatore in mezzo. Quando in questo libro leggiamo una clausola come ``tre F-I-E-C intrecciati'' (\S\ref{cap:and-comm}) stiamo facendo un'operazione di traduzione che, fuori dai casi pi\`u semplici, non \`e meccanica.
+\end{cero}
+
+\section*{Dove morde la profondit\`a: un esempio breve}
+
+L'esempio canonico \`e il matching di $\refl$ contro una prova generica $p : x \identita y$. Vedremo la situazione completa in \S\ref{cap:notevoli} con $\mathsf{sym}$ e $\mathsf{trans}$, ma il punto \`e fissabile in poche righe.
+
+Scrivere
+
+\begin{agda}
+sym : {A : Set} {x y : A} → x ≡ y → y ≡ x
+sym refl = refl
+\end{agda}
+
+\noindent \emph{sembra} dire: ``c'\`e un solo caso, quello in cui la prova \`e $\refl$, e nel ramo $\refl$ il sistema sa che $y = x$''. Ma da dove viene quel ``il sistema sa che $y = x$''? In MLTT pura, l'unico modo di estrarre informazione da $p : x \identita y$ \`e $\Jelim$ (\S\ref{cap:identita}): si specifica il motivo $C : (y : A) \to (x \identita y) \to \Type$ e si abita il caso $C\,x\,\refl$.
+
+\medskip
+
+\textbf{Il matching di Agda fa di pi\`u}: nel ramo $\refl$ \emph{istanzia} $y := x$ nel resto del contesto. Quell'istanziazione, in piena generalit\`a, \`e l'assioma K. In \texttt{--without-K} si controlla che l'istanziazione sia legittima sul piano dell'unificazione --- e questa verifica \`e un algoritmo, non una regola di MLTT.
+
+\begin{oss}[Conseguenza pratica]
+Su tipi senza uguaglianze proposizionali non banali fra costruttori --- $\mathbb{B}$, $\mathbb{N}$ per gli esempi facili --- la traduzione clausola$\to$eliminatore \`e meccanica e non chiama in causa K. \texttt{\&\&-comm} (\S\ref{cap:and-comm}) \`e proprio uno di questi casi. Quando lavoreremo su prove che \emph{matchano} su $\refl$ in modo essenziale (\S\ref{cap:notevoli} per $\mathsf{sym}$, $\mathsf{trans}$, $\mathsf{cong}$, $\mathsf{subst}$) il cero~\ref{cero:pm} sar\`a in scena, e va saputo.
+\end{oss}
+
+\section*{Patto di lettura per Parte~III}
+
+\noindent\textbf{(i)} Ogni clausola Agda di Parte~III verr\`a accompagnata, almeno la prima volta che il pattern compare, dalla sua traduzione esplicita in F-I-E-C (eliminatore + motivo + casi base/passo).
+
+\noindent\textbf{(ii)} Quando la traduzione \`e \emph{meccanica} (nessun matching essenziale su $\refl$, nessun uso di dot pattern o absurd pattern non banale) ce lo segneremo come ``elaborazione triviale''.
+
+\noindent\textbf{(iii)} Quando \`e \emph{non meccanica} il cero~\ref{cero:pm} sar\`a in scena, lo dichiareremo, e indicheremo a quale lato (K o \texttt{--without-K}) ci stiamo appoggiando.
+
+\bigskip
+
+\noindent Con questo patto in tasca, possiamo entrare in Parte~III sapendo cosa stiamo importando e cosa no.
 
 % ---------------------------------------------------------------------
 \chapter{La logica che affiora}\label{cap:logica}
@@ -18,105 +84,542 @@ incastrano (\S\ref{cap:vec}); l'esercizio di Stump sulla commutativit\`a di
 
 \bigskip
 
-\begin{center}
-\renewcommand{\arraystretch}{1.2}
-\begin{tabular}{ll}
-\toprule
-\textit{Struttura dei tipi} & \textit{Forma logica} \\
-\midrule
-regola di inferenza & passo di dimostrazione \\
-derivazione         & dimostrazione \\
-$A \to B$ abitato   & implicazione dimostrabile \\
-eliminazione di $\Pi$ ($f\,a : B\,a$) & modus ponens \\
-introduzione di $\Pi$ ($\lambda x.\,b$) & dimostrazione per ipotesi (e scaricamento) \\
-$A \times B$ abitato & congiunzione dimostrabile \\
-$\bot$ (tipo senza costruttori) non abitato & falsit\`a \\
-$\bot \to A$ per ogni $A$ & ex falso quodlibet \\
-$x \identita y$ abitato & uguaglianza dimostrabile \\
-\bottomrule
-\end{tabular}
-\end{center}
+\noindent\textbf{Gesto del capitolo.} Non diremo ``ora decidiamo che i tipi sono proposizioni e i termini sono prove''. Quella sarebbe un'assunzione --- un cero. Diremo invece: \emph{guardiamo le regole F-I-E-C dei tipi che abbiamo costruito in Parte~II, e notiamo che hanno la forma delle regole della logica intuizionista del primo ordine}. La differenza fra le due mosse \`e tutto il capitolo. La prima impone una lettura; la seconda riconosce una struttura. Il nome di questa coincidenza --- \emph{corrispondenza di Curry-Howard} --- arriva alla fine come osservazione su quanto avr\`a gi\`a parlato da s\'e.
 
-\bigskip
+\section*{Implicazione: $\Pi$ non dipendente}
+
+Quando $B$ non dipende da $x$, la regola di formazione di $\Pi$ (\S\ref{cap:pi}) si specializza:
+\[
+\inferrule{A : \Type \\ B : \Type}{A \to B : \Type}
+\]
+
+\noindent\textbf{Lettura logica.} Premesse: $A$ \`e una proposizione, $B$ \`e una proposizione. Conclusione: $A \to B$ \`e una proposizione --- l'implicazione $A \Rightarrow B$.
+
+Le altre due regole di $\Pi$ si leggono altrettanto direttamente:
+\begin{itemize}
+\item Introduzione $\lambda x.\,b : A \to B$ sotto l'ipotesi $x : A$: \textbf{dimostrazione per ipotesi}. Si assume $A$, si deriva $B$, si chiude scaricando l'ipotesi. \`E la regola $\Rightarrow$-introduzione della deduzione naturale.
+\item Eliminazione $f\,a : B$ dati $f : A \to B$ e $a : A$: \textbf{modus ponens}. La regola $\Rightarrow$-eliminazione.
+\end{itemize}
+
+\noindent Niente \`e stato deciso. Lo scaricamento delle ipotesi --- gesto centrale della deduzione naturale --- \emph{coincide con} l'introduzione di $\Pi$, che era stata scritta per ragioni di calcolo (descrivere come si costruisce una funzione).
+
+\section*{Congiunzione: $\Sigma$ non dipendente}
+
+Quando $B$ non dipende da $x$, la formazione di $\Sigma$ (\S\ref{cap:sigma}) d\`a:
+\[
+\inferrule{A : \Type \\ B : \Type}{A \times B : \Type}
+\]
+
+\noindent\textbf{Lettura logica.} $A \times B$ \`e la proposizione $A \wedge B$.
+
+\begin{itemize}
+\item Introduzione $(a, b) : A \times B$ da $a : A$ e $b : B$: \textbf{regola $\wedge$-introduzione}.
+\item Eliminazioni $\mathsf{fst}$, $\mathsf{snd}$ (caso particolare di $\indS$ con motivo costante): \textbf{regole $\wedge$-eliminazione 1 e 2}.
+\end{itemize}
+
+\section*{Falsit\`a: $\bot$}
 
 Il tipo vuoto in Agda:
 
 \begin{agda}
 data ⊥ : Set where
   -- nessun costruttore
+\end{agda}
 
+Le sue quattro regole F-I-E-C esplicitate:
+
+\[
+\inferrule{ }{\bot : \Type}
+\qquad
+\textit{(nessuna I)}
+\qquad
+\inferrule{e : \bot \\ C : \bot \to \Type}{\mathsf{ind}\text{-}\bot(e, C) : C\,e}
+\qquad
+\textit{(nessuna C)}
+\]
+
+Una Formazione, \emph{zero} Introduzioni, un'Eliminazione, \emph{zero} Computazioni. Eliminatore di $\bot$ in Agda:
+
+\begin{agda}
 ⊥-elim : {A : Set} → ⊥ → A
 ⊥-elim ()
 \end{agda}
 
-$\bot$ rispetta lo schema F-I-E-C come tutti gli altri tipi: ha Formazione, \emph{zero} Introduzioni, un'Eliminazione (l'\emph{absurd pattern} \texttt{()} di Agda \`e la realizzazione sintattica della regola), zero Computazioni (perch\'e senza costruttori non c'\`e niente che riduca).
+L'\emph{absurd pattern} \texttt{()} \`e la realizzazione sintattica di ``zero costruttori, niente da matchare, l'esaustivit\`a si chiude da sola''.
 
-\bigskip
+\noindent\textbf{Lettura logica.}
+\begin{itemize}
+\item $\bot$ non \`e abitato (nessuna introduzione): \textbf{$\bot$ \`e la falsit\`a}.
+\item L'eliminatore d\`a $\bot \to A$ per ogni $A$: \textbf{ex falso quodlibet}.
+\end{itemize}
 
-\noindent Nessuna decisione di dire ``i tipi sono proposizioni, i termini sono prove''. Si costruiscono termini e si classificano tipi --- e la logica era gi\`a l\`i dentro, nella struttura.
+\section*{Negazione: una definizione, non una primitiva}
 
-% ---------------------------------------------------------------------
-\chapter{$\mathrm{Vec}\,A\,n$ --- tutto messo insieme}\label{cap:vec}
-
-Primo tipo dove $\mathbb{N}$, $\Pi$ e la dipendenza Cero~\ref{cero:dipendenza} si incastrano davvero. \texttt{Vec A n} \`e il tipo delle liste di elementi di $A$ con \emph{esattamente} $n$ elementi. \textbf{$n$ vive nel tipo} --- il typechecker conosce la lunghezza a compile time. Questo \`e il Cero~\ref{cero:dipendenza} al lavoro su un valore numerico (\`e anche il punto dove le due passate di \S\ref{cap:pi-azione} si \emph{toccano}: $n$ \`e un valore che entra in un tipo).
-
-\section*{F --- Formazione}
+Non c'\`e una regola F-I-E-C per la negazione. \`E una \emph{definizione}:
 \[
-\inferrule{A : \Type \\ n : \mathbb{N}}{\mathrm{Vec}\,A\,n : \Type}
+\neg A \;\;\coloneqq\;\; A \to \bot
 \]
 
-Il tipo dipende da un \emph{valore} $n : \mathbb{N}$. Non \`e \texttt{Vec A} genericamente: \`e un tipo diverso per ogni lunghezza.
+\noindent ``Negare $A$'' significa ``mostrare che da $A$ si deriverebbe l'assurdo''. Lettura intuizionista canonica della negazione, ottenuta gratis dall'avere $\to$ e $\bot$. Una prova di $\neg A$ \`e una funzione che riceve un ipotetico abitante di $A$ e produce un abitante di $\bot$ (cosa impossibile in concreto: \`e la dimostrazione di impossibilit\`a).
 
-\section*{I --- Introduzione}
+\section*{Quantificatore universale: $\Pi$ dipendente}
+
+Senza specializzare, la regola di formazione di $\Pi$ (\S\ref{cap:pi}) \`e gi\`a:
 \[
-\inferrule{ }{\nil : \mathrm{Vec}\,A\,\zero}
+\inferrule{A : \Type \\ x : A \vdash B\,x : \Type}{(x : A) \to B\,x : \Type}
+\]
+
+\noindent\textbf{Lettura logica.} ``Per ogni $x$ di tipo $A$, vale $B\,x$''. \`E $\forall x : A.\,B\,x$.
+
+L'introduzione $\lambda x.\,b\,x$ \`e: \emph{costruisci la prova di $B\,x$ uniformemente in $x$, e ottieni la prova del $\forall$}. L'eliminazione $f\,a : B\,a$ \`e: \emph{specializza il $\forall$ all'elemento $a$}.
+
+\noindent Stessa regola di $\Pi$, due letture. Non ne abbiamo aggiunta nessuna nuova.
+
+\section*{Quantificatore esistenziale: $\Sigma$ dipendente}
+
+Stesso gesto sull'altra regola (\S\ref{cap:sigma}):
+\[
+\inferrule{A : \Type \\ x : A \vdash B\,x : \Type}{\Sigma\,x \in A,\,B\,x : \Type}
+\]
+
+\noindent\textbf{Lettura logica.} ``Esiste $x$ di tipo $A$ tale che $B\,x$''. \`E $\exists x : A.\,B\,x$.
+
+L'introduzione $(a, b) : \Sigma\,x \in A,\,B\,x$ richiede un \emph{testimone} $a$ e una \emph{prova} $b : B\,a$. Questa \`e una propriet\`a forte della logica intuizionista: l'esistenza \`e \textbf{costruttiva}, una prova di $\exists x.\,P\,x$ \emph{esibisce} l'$x$ in questione. Non si pu\`o dimostrare ``esiste qualcosa con propriet\`a $P$'' senza dire \emph{cosa} ce l'ha.
+
+\begin{oss}[Confronto con la matematica classica]
+In matematica classica si dimostra spesso ``esiste $x$ tale che $\ldots$'' assumendo per assurdo la negazione e derivando una contraddizione. La prova esiste, il testimone no. In MLTT questa strategia \emph{non funziona}: per abitare $\Sigma\,x \in A,\,B\,x$ devi produrre $(a, b)$. \`E lo stesso fenomeno che vedremo a fine capitolo per la doppia negazione e LEM.
+\end{oss}
+
+\section*{Disgiunzione: il coproduct $A \uplus B$}\label{sec:coproduct}
+
+Qui c'\`e una connettiva che ci manca. Non l'abbiamo introdotta in Parte~II perch\'e non serviva per la traversata dei sei tipi fondativi. La introduciamo adesso, perch\'e la lettura logica la chiama: \emph{disgiunzione costruttiva}.
+
+\medskip
+
+\noindent F-I-E-C completa del coproduct (o \emph{somma disgiunta}):
+
+\paragraph{F --- Formazione.}
+\[
+\inferrule{A : \Type \\ B : \Type}{A \uplus B : \Type}
+\]
+
+\paragraph{I --- Introduzione.} (Due costruttori.)
+\[
+\inferrule{a : A}{\mathsf{inj}_1\,a : A \uplus B}
 \qquad
-\inferrule{a : A \\ as : \mathrm{Vec}\,A\,n}{\cons\,a\,as : \mathrm{Vec}\,A\,(\suc\,n)}
+\inferrule{b : B}{\mathsf{inj}_2\,b : A \uplus B}
 \]
 
-\texttt{cons} incrementa $n$ nel tipo risultante. Non per calcolo a runtime, \textbf{per costruzione}.
-
-\section*{E --- Eliminazione (metalinguaggio)}
+\paragraph{E --- Eliminazione.}
 \[
 \inferrule{
-vs : \mathrm{Vec}\,A\,n \\
-C : (n : \mathbb{N}) \to \mathrm{Vec}\,A\,n \to \Type \\
-b : C\,\zero\,\nil \\
-s : (k : \mathbb{N}) \to (a : A) \to (as : \mathrm{Vec}\,A\,k) \to C\,k\,as \to C\,(\suc\,k)\,(\cons\,a\,as)
+e : A \uplus B \\
+C : (A \uplus B) \to \Type \\
+f : (a : A) \to C\,(\mathsf{inj}_1\,a) \\
+g : (b : B) \to C\,(\mathsf{inj}_2\,b)
 }{
-\indV(vs, C, b, s) : C\,n\,vs
+\mathsf{ind}\text{-}\uplus(e, C, f, g) : C\,e
 }
 \]
 
-Stessa struttura di $\indN$: caso base, e passo che riceve l'ipotesi induttiva $C\,k\,as$. Il motivo $C$ dipende sia dalla lunghezza che dal vettore.
-
-\section*{C --- Computazione}
+\paragraph{C --- Computazione.}
 \begin{align*}
-\indV(\nil,         C, b, s) &\definitorio b \\
-\indV(\cons\,a\,as, C, b, s) &\definitorio s\,k\,a\,as\,(\indV(as, C, b, s))
+\mathsf{ind}\text{-}\uplus(\mathsf{inj}_1\,a, C, f, g) &\definitorio f\,a \\
+\mathsf{ind}\text{-}\uplus(\mathsf{inj}_2\,b, C, f, g) &\definitorio g\,b
 \end{align*}
 
-Ricorsione su \texttt{as}, strutturalmente pi\`u corto di \texttt{cons a as}. Stesso schema di $\indN$.
+Stesso schema visto in Parte~II: due costruttori, nessuna ricorsione (perch\'e n\'e $\mathsf{inj}_1$ n\'e $\mathsf{inj}_2$ contengono istanze di $A \uplus B$), eliminazione per casi.
 
-\section*{Nota sintattica: parametri \emph{vs} indici}
+In Agda:
 
 \begin{agda}
-data Vec (A : Set) : ℕ → Set where
---       ^^^^^^^^   ^^^^^^^^^
---       parametro  indice
+data _⊎_ (A B : Set) : Set where
+  inj₁ : A → A ⊎ B
+  inj₂ : B → A ⊎ B
 \end{agda}
 
+\noindent\textbf{Lettura logica.} $A \uplus B$ \`e la proposizione $A \vee B$.
+
 \begin{itemize}
-\item \textbf{Parametro} \texttt{(A : Set)}: prima dei \texttt{:}, fisso per tutti i costruttori.
-\item \textbf{Indice} \texttt{: $\mathbb{N}$ -> Set}: dopo i \texttt{:}, pu\`o cambiare costruttore per costruttore (\texttt{nil} lo fissa a \texttt{zero}, \texttt{cons} lo porta da $n$ a $\suc\,n$).
+\item Introduzioni: regole $\vee$-introduzione 1 e 2.
+\item Eliminazione: regola di \emph{ragionamento per casi} ($\vee$-eliminazione). Per concludere $C$ da $A \vee B$, mostra come concludere $C$ assumendo $A$, e come concludere $C$ assumendo $B$.
 \end{itemize}
 
-Se $n$ fosse un parametro, \texttt{cons} non potrebbe cambiarlo. Questa \`e una decisione di design (\S\ref{cap:ceri}).
+\textbf{Costruttivit\`a della disgiunzione.} Una prova di $A \uplus B$ ti dice \emph{quale dei due} vale. Non c'\`e modo di abitarlo senza decidere fra $\mathsf{inj}_1$ e $\mathsf{inj}_2$. \`E lo stesso fenomeno dell'esistenziale: la disgiunzione \`e \emph{informativa}.
+
+\section*{Uguaglianza}
+
+Il tipo identit\`a $\_\identita\_$ (\S\ref{cap:identita}) \`e gi\`a la lettura logica dell'uguaglianza fra termini di uno stesso tipo. $\refl$ \`e l'unica introduzione, e via $\Jelim$ si dimostrano le propriet\`a usuali (riflessivit\`a per costruzione, simmetria, transitivit\`a, sostituzione --- le faremo in \S\ref{cap:notevoli}). Niente da aggiungere qui, salvo notare che \textbf{non} \`e una connettiva: \`e una famiglia di proposizioni indicizzata da una coppia di termini.
+
+\section*{Cosa \emph{non} c'\`e: la dimensione costruttiva}
+
+Tutto quello che abbiamo letto come logica \`e \textbf{intuizionista}. Significa, in concreto:
+
+\begin{itemize}
+\item \textbf{Terzo escluso non derivabile.} Il tipo $A \uplus \neg A$, in generale, \emph{non} \`e abitato da niente che si possa costruire uniformemente in $A$. Sarebbe una funzione $(A : \Type) \to A \uplus \neg A$ --- non c'\`e modo di scriverla in MLTT senza un postulato esterno. Logicamente: $A \vee \neg A$ non \`e un teorema dello schema F-I-E-C.
+\item \textbf{Doppia negazione non eliminabile.} $\neg\neg A \to A$, in generale, non \`e abitato. Una prova di $\neg\neg A$ \`e una funzione $(A \to \bot) \to \bot$: ti dice che ``non si pu\`o produrre una funzione $A \to \bot$''. Da questa informazione \emph{non} si estrae un abitante di $A$. La differenza ``non c'\`e contro-esempio'' / ``c'\`e un esempio'' \`e costitutiva.
+\end{itemize}
+
+\noindent\textbf{Osservazione, non difetto.} La logica che affiora qui non \`e una logica \emph{mancante di qualcosa}: \`e una logica \emph{diversa}, dove la nozione di prova \`e pi\`u stringente. Una prova di $A$ \emph{esibisce} un abitante; una prova di $\exists x.\,P\,x$ \emph{esibisce} il testimone; una prova di $A \vee B$ \emph{decide} quale dei due vale. Per recuperare la matematica classica si pu\`o postulare LEM o DNE come ceri aggiuntivi (Stump lo fa esplicitamente in alcuni contesti); ma quello \`e un gesto separato, e va segnato come tale.
+
+\section*{Tabella riassuntiva}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lll}
+\toprule
+\textit{Logica intuizionista} & \textit{Tipo} & \textit{Da quale F-I-E-C} \\
+\midrule
+$A \Rightarrow B$       & $A \to B$              & $\Pi$ non dip.\ (\S\ref{cap:pi}) \\
+$A \wedge B$            & $A \times B$           & $\Sigma$ non dip.\ (\S\ref{cap:sigma}) \\
+$\bot$ (falsit\`a)      & $\bot$                 & questa sezione, $\bot$ \\
+$\neg A$                & $A \to \bot$           & definizione, $\to$ + $\bot$ \\
+$\forall x : A.\,P\,x$  & $(x : A) \to P\,x$     & $\Pi$ dip.\ (\S\ref{cap:pi}) \\
+$\exists x : A.\,P\,x$  & $\Sigma\,x \in A,\,P\,x$ & $\Sigma$ dip.\ (\S\ref{cap:sigma}) \\
+$A \vee B$              & $A \uplus B$           & questa sezione, \S\ref{sec:coproduct} \\
+$a = b$ in $A$          & $a \identita b$        & tipo identit\`a (\S\ref{cap:identita}) \\
+\midrule
+\multicolumn{3}{c}{\textit{non derivabili in generale}} \\
+\midrule
+LEM: $A \vee \neg A$    & $A \uplus (A \to \bot)$ & --- \\
+DNE: $\neg\neg A \Rightarrow A$ & $((A \to \bot) \to \bot) \to A$ & --- \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section*{Curry-Howard, come osservazione}
+
+\noindent {\spacedlowsmallcaps{Quello che abbiamo appena descritto ha un nome}}. La coincidenza fra struttura dei tipi e struttura della logica intuizionista del primo ordine si chiama \textbf{corrispondenza di Curry-Howard} (talvolta \emph{Curry-Howard-de Bruijn}, o letta come ``isomorfismo proposizioni-come-tipi''). La presentano cos\`i:
+
+\medskip
+\begin{center}
+proposizioni $\;\longleftrightarrow\;$ tipi \qquad prove $\;\longleftrightarrow\;$ termini
+\end{center}
+\medskip
+
+\noindent Nei testi di logica dei tipi questa \`e quasi sempre l'apertura: ``decidiamo che tipi sono proposizioni, e dimostrare significa abitare''. Qui no. \`E arrivata alla fine, come constatazione di una corrispondenza gi\`a \emph{verificata caso per caso} nelle sezioni precedenti, e non come postulato di partenza.
+
+\medskip
+
+\noindent\textbf{Perch\'e la differenza importa.} Dichiarare la corrispondenza in apertura sarebbe un cero: ``assumiamo che tipi e proposizioni siano la stessa cosa''. Riconoscerla in chiusura \`e un'osservazione: ``avendo costruito i tipi per ragioni di calcolo (descrivere funzioni dipendenti, induzione, coppie), ci troviamo davanti che \emph{erano gi\`a} le regole della logica intuizionista''. Il nome resta utile come riferimento bibliografico; il \emph{contenuto} \`e tutto ci\`o che abbiamo gi\`a fatto.
+
+\begin{oss}[Cero che non c'\`e]
+La corrispondenza di Curry-Howard non figura nell'elenco dei ceri (\S\ref{cap:ceri}). Non perch\'e ce ne siamo dimenticati: perch\'e non \`e un'assunzione di MLTT. \`E una propriet\`a osservabile delle regole che MLTT ha gi\`a per altri motivi.
+\end{oss}
+
+% ---------------------------------------------------------------------
+\chapter{Tipi notevoli}\label{cap:notevoli}
+
+\epigraph{Come i limiti notevoli in analisi: poche costruzioni canoniche, da imparare una volta, da riconoscere ovunque.}{}
+
+\noindent {\spacedlowsmallcaps{Un kit di attrezzi}}. Prima di entrare nella prova reale di Stump (\S\ref{cap:and-comm}), raccogliamo le costruzioni che si incontrano dappertutto nelle prove di Verified Functional Programming in Agda, scritte due volte: una alla Little Typer (con eliminatore esplicito), una in Agda (con pattern matching). \`E la palestra dove fissare l'\emph{esercizio centrale} di \S\ref{sec:stile}: leggere F-I-E-C sotto ogni clausola.
+
+\bigskip
+
+\noindent Cinque sezioni, in ordine di profondit\`a crescente: funzioni booleane (\S\ref{sec:not-funz-bool}), funzioni numeriche (\S\ref{sec:funz-nat}), propriet\`a del tipo identit\`a (\S\ref{sec:notevoli-id}), tipi piccoli di servizio (\S\ref{sec:tipi-piccoli}), operazioni su $\mathrm{Vec}$ (\S\ref{sec:notevoli-vec}). L'ultima sezione \`e il primo posto dove il cero~\ref{cero:pm} morde davvero.
+
+\section{Funzioni booleane}\label{sec:not-funz-bool}
+
+\subsection*{$\mathsf{not}$}
+
+\paragraph{Definizione (Little Typer).} Eliminatore $\indB$ con motivo costante:
+\[
+\mathsf{not}\,b \;\definitorio\; \indB(b,\;\lambda\_.\,\mathbb{B},\;\ff,\;\tto)
+\]
+
+Letto: ``per costruire un $\mathbb{B}$ a partire da $b$, da' $\ff$ se $b = \tto$, $\tto$ se $b = \ff$''.
+
+\paragraph{Definizione (Agda).}
+\begin{agda}
+not : 𝔹 → 𝔹
+not tt = ff
+not ff = tt
+\end{agda}
+
+Le due clausole \emph{sono} i due argomenti $c_t, c_f$ di $\indB$. Elaborazione triviale: niente matching su $\refl$, niente dot pattern.
+
+\subsection*{$\_\&\&\_$ e $\_||\_$}
+
+\paragraph{Definizione (Little Typer).}
+\begin{align*}
+b_1 \andd b_2 &\;\definitorio\; \indB(b_1,\;\lambda\_.\,\mathbb{B},\;b_2,\;\ff) \\
+b_1 \,\|\, b_2 &\;\definitorio\; \indB(b_1,\;\lambda\_.\,\mathbb{B},\;\tto,\;b_2)
+\end{align*}
+
+Curry sul primo argomento: $b_2$ \`e nel contesto quando $\indB$ entra in scena, quindi sopravvive ai due rami.
+
+\paragraph{Definizione (Agda).}
+\begin{agda}
+_&&_ : 𝔹 → 𝔹 → 𝔹
+tt && b = b
+ff && b = ff
+
+_||_ : 𝔹 → 𝔹 → 𝔹
+tt || b = tt
+ff || b = b
+\end{agda}
+
+\begin{oss}[Cucitura con \S\ref{cap:and-comm}]
+La definizione di \texttt{\_\&\&\_} appena vista \`e \textbf{esattamente} la stessa che useremo nel capitolo successivo per dimostrare \texttt{\&\&-comm}. Le ``regole di computazione di \texttt{\&\&}'' di cui parler\`a \S\ref{cap:and-comm} sono i due passi $\beta$ di $\indB$ applicato a $\tto$ e $\ff$.
+\end{oss}
+
+\subsection*{$\mathsf{if\_then\_else\_}$}
+
+\paragraph{Definizione (Little Typer).} Per qualsiasi tipo $A$:
+\[
+\mathsf{if}\,b\,\mathsf{then}\,x\,\mathsf{else}\,y \;\definitorio\; \indB(b,\;\lambda\_.\,A,\;x,\;y)
+\]
+
+\paragraph{Definizione (Agda).}
+\begin{agda}
+if_then_else_ : {A : Set} → 𝔹 → A → A → A
+if tt then x else y = x
+if ff then x else y = y
+\end{agda}
+
+\noindent\textbf{Da fissare.} Le quattro funzioni booleane di base sono \emph{quattro istanze} dello stesso eliminatore $\indB$, distinte solo dal motivo e dai due rami. Nessuna nuova regola.
+
+\section{Funzioni numeriche}\label{sec:funz-nat}
+
+Stesso gesto su $\mathbb{N}$, ma ora i passi induttivi ricevono l'ipotesi induttiva.
+
+\subsection*{$\_+\_$}
+
+\paragraph{Definizione (Little Typer).} Induzione sul primo argomento, motivo $\mathbb{N} \to \mathbb{N}$ (cio\`e: ``$\mathsf{add}\,n$ \`e una funzione $\mathbb{N} \to \mathbb{N}$''):
+\[
+\mathsf{add}\,n \;\definitorio\; \indN(n,\;\lambda\_.\,\mathbb{N}\to\mathbb{N},\;\lambda m.\,m,\;\lambda k.\,\lambda \mathit{rec}.\,\lambda m.\,\suc\,(\mathit{rec}\,m))
+\]
+
+\noindent\textbf{Lettura dei pezzi:}
+\begin{itemize}
+\item motivo $\lambda\_.\mathbb{N}\to\mathbb{N}$: per ogni $n$, $\mathsf{add}\,n$ \`e una funzione $\mathbb{N}\to\mathbb{N}$;
+\item caso $\zero$: $\lambda m.\,m$ --- aggiungere zero \`e l'identit\`a;
+\item passo $\suc$: ricevo $k$, l'ipotesi induttiva $\mathit{rec} : \mathbb{N}\to\mathbb{N}$ (cio\`e $\mathsf{add}\,k$), e produco $\lambda m.\,\suc\,(\mathit{rec}\,m)$.
+\end{itemize}
+
+\paragraph{Definizione (Agda).}
+\begin{agda}
+_+_ : ℕ → ℕ → ℕ
+zero  + m = m
+suc k + m = suc (k + m)
+\end{agda}
+
+La ``chiamata ricorsiva'' \texttt{k + m} nel secondo ramo \`e \textbf{esattamente} il $\mathit{rec}\,m$ del passo induttivo di sopra. Il typechecker accetta perch\'e la ricorsione \`e su \texttt{k}, strutturalmente pi\`u piccolo di \texttt{suc k} (\S\ref{cap:nat}).
+
+\subsection*{$\_*\_$}
+
+\paragraph{Definizione (Little Typer).}
+\[
+\mathsf{mul}\,n \;\definitorio\; \indN(n,\;\lambda\_.\,\mathbb{N}\to\mathbb{N},\;\lambda m.\,\zero,\;\lambda k.\,\lambda \mathit{rec}.\,\lambda m.\,m + \mathit{rec}\,m)
+\]
+
+\paragraph{Definizione (Agda).}
+\begin{agda}
+_*_ : ℕ → ℕ → ℕ
+zero  * m = zero
+suc k * m = m + (k * m)
+\end{agda}
+
+\begin{oss}[Pattern: ``funzione binaria via induzione sul primo argomento'']
+Sia \texttt{\_+\_} sia \texttt{\_*\_} usano lo stesso schema: $\indN$ sul primo argomento, motivo $\mathbb{N}\to\mathbb{N}$, caso base = funzione su $m$, passo = funzione su $m$ che usa la ricorsione. La maggior parte delle funzioni $\mathbb{N}\to\mathbb{N}\to X$ in Stump cap.~2 segue questo schema. Riconoscerlo basta a leggere mezzo capitolo del libro.
+\end{oss}
+
+\section{Propriet\`a del tipo identit\`a}\label{sec:notevoli-id}
+
+\noindent {\spacedlowsmallcaps{Qui entra in scena il cero~\ref{cero:pm}}}. Tutte e quattro le costruzioni che seguono sono casi particolari di $\Jelim$ (\S\ref{cap:identita}), e tutte e quattro le loro versioni Agda fanno matching su $\refl$.
+
+\subsection*{$\mathsf{sym}$ --- simmetria}
+
+\paragraph{Definizione (Little Typer).} Dato $p : x \identita y$, vogliamo $y \identita x$. Si applica $\Jelim$ con motivo $C\,y\,p \definitorio y \identita x$. Caso base ($p = \refl$, $y = x$): $C\,x\,\refl = x \identita x$, abitato da $\refl$.
+\[
+\mathsf{sym}\,p \;\definitorio\; \Jelim(p,\;\lambda y\,p.\,y \identita x,\;\refl)
+\]
+
+\paragraph{Definizione (Agda).}
+\begin{agda}
+sym : {A : Set} {x y : A} → x ≡ y → y ≡ x
+sym refl = refl
+\end{agda}
+
+\noindent\textbf{Cosa fa il matching di $\refl$.} Quando Agda vede la clausola \texttt{sym refl = ...}, istanzia $y := x$ nel resto del contesto. Quell'istanziazione \`e ci\`o che il cero~\ref{cero:pm} chiama in causa: in MLTT pura l'unico modo di ``sapere che $y = x$'' \`e specificare il motivo di $\Jelim$ e abitarlo nel caso $\refl$. Qui Agda lo fa da s\'e.
+
+\subsection*{$\mathsf{trans}$ --- transitivit\`a}
+
+\paragraph{Definizione (Little Typer).} Dati $p : x \identita y$, $q : y \identita z$, vogliamo $x \identita z$. Si applica $\Jelim$ su $p$ con motivo $C\,y\,p \definitorio y \identita z \to x \identita z$. Caso base: $C\,x\,\refl = x \identita z \to x \identita z$, abitato dall'identit\`a $\lambda q.\,q$.
+\[
+\mathsf{trans}\,p\,q \;\definitorio\; \Jelim(p,\;\lambda y\,p.\,y \identita z \to x \identita z,\;\lambda q.\,q)\,q
+\]
+
+\paragraph{Definizione (Agda).}
+\begin{agda}
+trans : {A : Set} {x y z : A} → x ≡ y → y ≡ z → x ≡ z
+trans refl q = q
+\end{agda}
+
+Una sola clausola: il matching su $p = \refl$ istanzia $y := x$, e il tipo da abitare diventa $x \identita z$, che \`e gi\`a $q$.
+
+\subsection*{$\mathsf{cong}$ --- congruenza}
+
+\paragraph{Definizione (Little Typer).} Data $f : A \to B$ e $p : x \identita y$, vogliamo $f\,x \identita f\,y$. Motivo: $C\,y\,p \definitorio f\,x \identita f\,y$. Caso base: $C\,x\,\refl = f\,x \identita f\,x$, abitato da $\refl$.
+\[
+\mathsf{cong}\,f\,p \;\definitorio\; \Jelim(p,\;\lambda y\,p.\,f\,x \identita f\,y,\;\refl)
+\]
+
+\paragraph{Definizione (Agda).}
+\begin{agda}
+cong : {A B : Set} {x y : A} (f : A → B) → x ≡ y → f x ≡ f y
+cong f refl = refl
+\end{agda}
+
+\subsection*{$\mathsf{subst}$ --- trasporto}
+
+\paragraph{Definizione (Little Typer).} Data una propriet\`a $P : A \to \Type$, una prova $p : x \identita y$, e $\mathit{px} : P\,x$, vogliamo $P\,y$. Motivo: $C\,y\,p \definitorio P\,x \to P\,y$. Caso base: $C\,x\,\refl = P\,x \to P\,x$, abitato da $\lambda\mathit{px}.\,\mathit{px}$.
+\[
+\mathsf{subst}\,P\,p\,\mathit{px} \;\definitorio\; \Jelim(p,\;\lambda y\,p.\,P\,x \to P\,y,\;\lambda \mathit{px}.\,\mathit{px})\,\mathit{px}
+\]
+
+\paragraph{Definizione (Agda).}
+\begin{agda}
+subst : {A : Set} (P : A → Set) {x y : A} → x ≡ y → P x → P y
+subst P refl px = px
+\end{agda}
+
+\begin{oss}[Quattro variazioni sullo stesso tema]
+$\mathsf{sym}$, $\mathsf{trans}$, $\mathsf{cong}$, $\mathsf{subst}$ sono \textbf{quattro istanze di $\Jelim$}, distinte solo dal motivo. Il fatto che in Agda si scrivano tutte come una o due clausole con $\refl$ a sinistra \`e l'effetto del cero~\ref{cero:pm}: l'elaborazione del pattern matching trova il motivo da sola. Non magia, lavoro di unificazione.
+\end{oss}
+
+\section{Tipi piccoli di servizio}\label{sec:tipi-piccoli}
+
+\subsection*{$\top$ --- il tipo unitario}
+
+F-I-E-C completa (un costruttore, nessuna ricorsione):
+
+\paragraph{F.} $\top : \Type$.
+
+\paragraph{I.} $\star : \top$ (un solo costruttore senza premesse).
+
+\paragraph{E.}
+\[
+\inferrule{u : \top \\ C : \top \to \Type \\ c : C\,\star}{\mathsf{ind}\text{-}\top(u, C, c) : C\,u}
+\]
+
+\paragraph{C.} $\mathsf{ind}\text{-}\top(\star, C, c) \definitorio c$.
+
+\medskip
+
+In Agda:
+
+\begin{agda}
+data ⊤ : Set where
+  ★ : ⊤
+\end{agda}
+
+\noindent\textbf{Usi.} $\top$ \`e il tipo che ``non porta informazione'': abita la posizione di \emph{vero} nella logica, e serve come ``riempitivo'' quando un motivo deve restituire qualcosa di banale (lo vedremo immediato in \S\ref{sec:notevoli-vec} per $\mathsf{head}$).
+
+\subsection*{$\neg$ --- negazione (richiamo)}
+
+Gi\`a vista in \S\ref{cap:logica}: $\neg A \coloneqq A \to \bot$. Niente F-I-E-C nuova, \`e una definizione. Vale la pena ricordarla qui perch\'e compare in pratica sempre quando si lavora con $\mathsf{Dec}$, che chiameremo se serve:
+\[
+\mathsf{Dec}\,A \;\coloneqq\; A \uplus \neg A
+\]
+
+\noindent ``$A$ \`e decidibile'' = c'\`e o una prova di $A$ o una refutazione di $A$, e si sa quale.
+
+\section{Operazioni su $\mathrm{Vec}\,A\,n$}\label{sec:notevoli-vec}
+
+\noindent {\spacedlowsmallcaps{Dove il pattern matching comincia a non essere zucchero}}. Le funzioni che seguono sono ancora gestibili a mano con $\indV$ (\S\ref{cap:vec}), ma una di esse --- $\mathsf{head}$ --- richiede un trucco sul motivo che il pattern matching nasconde con grazia. \`E un buon posto per vedere il cero~\ref{cero:pm} al lavoro su tipi induttivi non banali.
+
+\subsection*{$\mathsf{head}$ e $\mathsf{tail}$ --- e perch\'e il caso $\nil$ non c'\`e}
+
+\paragraph{Definizione (Agda).}
+\begin{agda}
+head : {A : Set} {n : ℕ} → Vec A (suc n) → A
+head (cons a as) = a
+
+tail : {A : Set} {n : ℕ} → Vec A (suc n) → Vec A n
+tail (cons a as) = as
+\end{agda}
+
+\noindent\textbf{La cosa che salta all'occhio.} Manca il caso $\nil$. Eppure Agda accetta come esaustivo. Perch\'e?
+
+Perch\'e l'indice $\suc\,n$ nel tipo dell'argomento \emph{esclude} $\nil$: $\nil$ ha tipo $\mathrm{Vec}\,A\,\zero$, non $\mathrm{Vec}\,A\,(\suc\,n)$ per alcun $n$. L'unificatore di Agda riconosce questo e impone esaustivit\`a sui soli costruttori compatibili con l'indice. Questo \`e \textbf{esattamente} il tipo di lavoro che il cero~\ref{cero:pm} chiama in causa.
+
+\paragraph{Versione Little Typer.} Volendo scrivere $\mathsf{head}$ con $\indV$ puro, l'unico modo \`e definire una funzione \emph{totale} su $\mathrm{Vec}\,A\,n$ qualunque $n$ sia, scegliendo un motivo che restituisca $\top$ nel caso $\zero$ e $A$ nel caso $\suc$:
+\[
+C : (n : \mathbb{N}) \to \mathrm{Vec}\,A\,n \to \Type
+\qquad
+C\,\zero\,\_ \definitorio \top
+\qquad
+C\,(\suc\,k)\,\_ \definitorio A
+\]
+
+Allora:
+\[
+\mathsf{head}'\,vs \;\definitorio\; \indV(vs,\;C,\;\star,\;\lambda k.\,\lambda a.\,\lambda \mathit{as}.\,\lambda\mathit{rec}.\,a)
+\]
+
+Per ottenere $\mathsf{head}$ ``vera'' --- quella che pretende un vettore di lunghezza $\suc\,n$ --- si specializza $\mathsf{head}'$ al caso in cui l'indice \`e $\suc\,n$, dove il motivo riduce ad $A$:
+\[
+\mathsf{head}\,(vs : \mathrm{Vec}\,A\,(\suc\,n)) \;\definitorio\; \mathsf{head}'\,vs : A
+\]
+
+\begin{oss}[Cosa abbiamo guadagnato col pattern matching]
+La versione Agda \texttt{head (cons a as) = a} \`e \emph{una riga}. La versione Little Typer richiede di inventare un motivo che usa $\top$ come ``segnaposto'' per il caso che non interessa, definire una funzione totale, e poi specializzarla. Il contenuto matematico \`e lo stesso, ma la versione Agda \`e \emph{infinitamente} pi\`u leggibile. \`E il guadagno reale del cero~\ref{cero:pm}: il prezzo (assumere K, o appoggiarsi all'unificazione di \texttt{--without-K}) compra leggibilit\`a sostanziale.
+\end{oss}
+
+\subsection*{$\_\mathbin{+\!\!+}\_$ --- concatenazione}
+
+\paragraph{Definizione (Agda).}
+\begin{agda}
+_++_ : {A : Set} {m n : ℕ} → Vec A m → Vec A n → Vec A (m + n)
+nil         ++ ys = ys
+(cons a as) ++ ys = cons a (as ++ ys)
+\end{agda}
+
+\paragraph{Definizione (Little Typer).} $\indV$ sul primo vettore, motivo che parametrizza sul vettore di destinazione:
+\[
+C : (m : \mathbb{N}) \to \mathrm{Vec}\,A\,m \to \Type
+\qquad
+C\,m\,\_ \definitorio \mathrm{Vec}\,A\,n \to \mathrm{Vec}\,A\,(m + n)
+\]
+
+\noindent\textbf{Cosa sta lavorando.} Nel caso $\nil$ ($m = \zero$): $C\,\zero\,\nil = \mathrm{Vec}\,A\,n \to \mathrm{Vec}\,A\,(\zero + n)$. Per la \emph{regola di computazione di $\_+\_$} (\S\ref{sec:funz-nat}), $\zero + n \definitorio n$, quindi il tipo \`e $\mathrm{Vec}\,A\,n \to \mathrm{Vec}\,A\,n$ --- abitato da $\lambda ys.\,ys$. Nel caso $\cons\,a\,\mathit{as}$ ($m = \suc\,k$): tipo $\mathrm{Vec}\,A\,n \to \mathrm{Vec}\,A\,(\suc\,k + n) = \mathrm{Vec}\,A\,(\suc\,(k+n))$, abitato da $\lambda ys.\,\cons\,a\,(\mathit{rec}\,ys)$.
+
+\medskip
+
+\noindent\textbf{Da fissare.} La regola di computazione di $\_+\_$ (definitoria, vista in \S\ref{sec:funz-nat}) lavora \emph{dentro il tipo}. Il typechecker la usa silenziosamente per verificare che $\mathrm{Vec}\,A\,(\zero + n)$ e $\mathrm{Vec}\,A\,n$ siano lo stesso tipo. \`E il Cero~\ref{cero:dipendenza} (un termine appare dentro un tipo) in azione operativa.
+
+\subsection*{$\mathsf{map}$}
+
+\paragraph{Definizione (Agda).}
+\begin{agda}
+map : {A B : Set} {n : ℕ} → (A → B) → Vec A n → Vec B n
+map f nil         = nil
+map f (cons a as) = cons (f a) (map f as)
+\end{agda}
+
+\paragraph{Definizione (Little Typer).} $\indV$ con motivo $C\,n\,\_ \definitorio \mathrm{Vec}\,B\,n$ (non dipende dal vettore, solo dalla lunghezza, perch\'e $\mathsf{map}$ preserva la lunghezza per costruzione):
+\[
+\mathsf{map}\,f\,vs \;\definitorio\; \indV(vs,\;\lambda n\,\_.\,\mathrm{Vec}\,B\,n,\;\nil,\;\lambda k.\,\lambda a.\,\lambda \mathit{as}.\,\lambda\mathit{rec}.\,\cons\,(f\,a)\,\mathit{rec})
+\]
+
+\begin{oss}[Il motivo costante sul vettore]
+Nei tre notevoli di Vec di sopra, il motivo dipende dalla \emph{lunghezza} ma quasi mai dal \emph{vettore} stesso. Questo \`e tipico delle funzioni che ``lavorano in parallelo'' (mappa, zip, ecc.) rispetto a quelle che ``leggono'' il vettore (head, tail, lookup). Vederlo nei motivi rende esplicito cosa una funzione fa.
+\end{oss}
+
+\section{Cosa portare nel capitolo successivo}
+
+In ordine di necessit\`a per \S\ref{cap:and-comm}:
+
+\begin{itemize}
+\item La definizione di \texttt{\_\&\&\_} come $\indB$ sul primo argomento con motivo costante (\S\ref{sec:not-funz-bool}). \`E ci\`o che render\`a meccaniche le ``riduzioni di \texttt{\&\&}'' nel quadro F-I-E-C di \texttt{\&\&-comm}.
+\item L'introduzione di $\refl$ del tipo identit\`a, $\Jelim$ in standby, e il fatto che nel capitolo successivo \emph{non} useremo $\mathsf{sym}/\mathsf{trans}/\mathsf{cong}/\mathsf{subst}$ --- la prova si chiude solo con $\refl$, senza matching essenziale su prove di uguaglianza. Significa che il cero~\ref{cero:pm} \emph{non} \`e in scena nel caso \texttt{\&\&-comm}; arriver\`a nei capitoli successivi quando entrer\`a $\mathbb{N}$.
+\end{itemize}
 
 % ---------------------------------------------------------------------
 \chapter{Anatomia di una prova: \texttt{\&\&-comm} in Iowa Agda Library}\label{cap:and-comm}
 
-\noindent {\spacedlowsmallcaps{Mettiamo a frutto tutto il libro per leggere una prova reale}}. Ogni cosa che succede qui poggia su F-I-E-C gi\`a visti.
+\noindent {\spacedlowsmallcaps{Mettiamo a frutto tutto il libro per leggere una prova reale}}. Ogni cosa che succede qui poggia su F-I-E-C gi\`a visti. \texttt{\_\&\&\_} la conosciamo dal kit dei notevoli (\S\ref{sec:not-funz-bool}); $\refl$ e il tipo identit\`a da \S\ref{cap:identita}; l'eliminatore $\indB$ da \S\ref{cap:bool}. E il \emph{patto di lettura} stabilito in \S\ref{cap:prima}: ogni clausola Agda verr\`a tradotta in F-I-E-C, segnalando se la traduzione \`e meccanica o se chiama in causa il cero~\ref{cero:pm}. \textbf{Anticipazione, per questo capitolo}: \`e meccanica. Il cero~\ref{cero:pm} non entra in scena --- entrer\`a quando faremo prove su $\mathbb{N}$ (cap.~2 di Stump).
 
 \bigskip
 
@@ -167,7 +670,7 @@ tt && b = b
 ff && b = ff
 \end{agda}
 
-Le due clausole \emph{sono regole di computazione} sotto mentite spoglie. Cio\`e, il typechecker riduce automaticamente:
+\noindent\`E lo stesso \texttt{\_\&\&\_} di \S\ref{sec:not-funz-bool}: $\indB$ sul primo argomento, motivo costante $\lambda\_.\mathbb{B}$, rami $b_2$ e $\ff$. Le due clausole \emph{sono regole di computazione} sotto mentite spoglie. Cio\`e, il typechecker riduce automaticamente:
 \begin{align*}
 \tto \andd b &\definitorio b \\
 \ff \andd b &\definitorio \ff
@@ -255,5 +758,5 @@ Cosa abbiamo fatto, in una riga: il tipo $(b_1\,b_2 : \mathbb{B}) \to b_1 \andd 
 \bigskip
 
 \begin{oss}[Cosa cambier\`a su $\mathbb{N}$]
-Le prove del cap.~1 di Stump cadono tutte in questa famiglia: case-split puro + riduzione + $\refl$. Su $\mathbb{N}$ (cap.~2 di Stump) entrer\`a in gioco il \emph{passo induttivo} vero: il caso $\suc\,k$ richieder\`a di chiamare l'ipotesi induttiva esplicitamente, cio\`e la chiamata ricorsiva nella definizione della funzione che dimostra. Tutto quello che abbiamo costruito qui rester\`a, e si aggiunger\`a un livello: l'eliminatore $\indN$ entrer\`a in scena con la sua ricorsione, non solo come case-split.
+Le prove del cap.~1 di Stump cadono tutte in questa famiglia: case-split puro + riduzione + $\refl$. Su $\mathbb{N}$ (cap.~2 di Stump) entreranno in gioco \emph{due} cose nuove. Primo: il \emph{passo induttivo} vero --- il caso $\suc\,k$ richieder\`a di chiamare l'ipotesi induttiva esplicitamente, cio\`e la chiamata ricorsiva nella definizione della funzione che dimostra. L'eliminatore $\indN$ entrer\`a in scena con la sua ricorsione, non solo come case-split. Secondo: il \emph{matching su prove di uguaglianza} (\texttt{sym refl = refl} ecc., \S\ref{sec:notevoli-id}) e il cero~\ref{cero:pm} entreranno in scena, perch\'e su $\mathbb{N}$ molte propriet\`a richiedono $\mathsf{cong}$, $\mathsf{subst}$, riscritture. Tutto quello che abbiamo costruito qui rester\`a, e si aggiungeranno questi due livelli.
 \end{oss}

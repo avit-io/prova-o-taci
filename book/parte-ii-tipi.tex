@@ -3,14 +3,16 @@
 % =====================================================================
 \part{I tipi}
 
-\noindent\itshape Sette capitoli, un tipo per capitolo, sempre F-I-E-C.
+\noindent\itshape Otto capitoli, sempre F-I-E-C.
 $\mathbb{B}$ (\S\ref{cap:bool}) per vedere lo schema nel caso pi\`u puro, senza
 ricorsione. $\mathbb{N}$ (\S\ref{cap:nat}) per il salto all'induzione vera.
 $\Pi$ (\S\ref{cap:pi}) per la decisione fondativa di MLTT, e $\Pi$ in azione
 (\S\ref{cap:pi-azione}) per le due passate che la sintassi nasconde. $\forall$
 (\S\ref{cap:forall}) come zucchero. $\Sigma$ (\S\ref{cap:sigma}) come duale.
 Il tipo identit\`a $\_\identita\_$ (\S\ref{cap:identita}) come sezione cardine
---- l\`i si chiude la distinzione fra le due uguaglianze.\upshape
+--- l\`i si chiude la distinzione fra le due uguaglianze. $\mathrm{Vec}\,A\,n$
+(\S\ref{cap:vec}) come capstone, dove $\mathbb{N}$, $\Pi$ e la dipendenza si
+incastrano per la prima volta su un valore numerico.\upshape
 
 \bigskip
 
@@ -443,3 +445,61 @@ $\indB$, $\indN$, $\indS$, $\Jelim$ & meta & eliminatori = regole di inferenza \
 \bottomrule
 \end{tabular}
 \end{center}
+
+% ---------------------------------------------------------------------
+\chapter{$\mathrm{Vec}\,A\,n$ --- tutto messo insieme}\label{cap:vec}
+
+Capstone della Parte~II: primo tipo dove $\mathbb{N}$, $\Pi$ e la dipendenza Cero~\ref{cero:dipendenza} si incastrano davvero. \texttt{Vec A n} \`e il tipo delle liste di elementi di $A$ con \emph{esattamente} $n$ elementi. \textbf{$n$ vive nel tipo} --- il typechecker conosce la lunghezza a compile time. Questo \`e il Cero~\ref{cero:dipendenza} al lavoro su un valore numerico (\`e anche il punto dove le due passate di \S\ref{cap:pi-azione} si \emph{toccano}: $n$ \`e un valore che entra in un tipo).
+
+\section*{F --- Formazione}
+\[
+\inferrule{A : \Type \\ n : \mathbb{N}}{\mathrm{Vec}\,A\,n : \Type}
+\]
+
+Il tipo dipende da un \emph{valore} $n : \mathbb{N}$. Non \`e \texttt{Vec A} genericamente: \`e un tipo diverso per ogni lunghezza.
+
+\section*{I --- Introduzione}
+\[
+\inferrule{ }{\nil : \mathrm{Vec}\,A\,\zero}
+\qquad
+\inferrule{a : A \\ as : \mathrm{Vec}\,A\,n}{\cons\,a\,as : \mathrm{Vec}\,A\,(\suc\,n)}
+\]
+
+\texttt{cons} incrementa $n$ nel tipo risultante. Non per calcolo a runtime, \textbf{per costruzione}.
+
+\section*{E --- Eliminazione (metalinguaggio)}
+\[
+\inferrule{
+vs : \mathrm{Vec}\,A\,n \\
+C : (n : \mathbb{N}) \to \mathrm{Vec}\,A\,n \to \Type \\
+b : C\,\zero\,\nil \\
+s : (k : \mathbb{N}) \to (a : A) \to (as : \mathrm{Vec}\,A\,k) \to C\,k\,as \to C\,(\suc\,k)\,(\cons\,a\,as)
+}{
+\indV(vs, C, b, s) : C\,n\,vs
+}
+\]
+
+Stessa struttura di $\indN$: caso base, e passo che riceve l'ipotesi induttiva $C\,k\,as$. Il motivo $C$ dipende sia dalla lunghezza che dal vettore.
+
+\section*{C --- Computazione}
+\begin{align*}
+\indV(\nil,         C, b, s) &\definitorio b \\
+\indV(\cons\,a\,as, C, b, s) &\definitorio s\,k\,a\,as\,(\indV(as, C, b, s))
+\end{align*}
+
+Ricorsione su \texttt{as}, strutturalmente pi\`u corto di \texttt{cons a as}. Stesso schema di $\indN$.
+
+\section*{Nota sintattica: parametri \emph{vs} indici}
+
+\begin{agda}
+data Vec (A : Set) : ℕ → Set where
+--       ^^^^^^^^   ^^^^^^^^^
+--       parametro  indice
+\end{agda}
+
+\begin{itemize}
+\item \textbf{Parametro} \texttt{(A : Set)}: prima dei \texttt{:}, fisso per tutti i costruttori.
+\item \textbf{Indice} \texttt{: $\mathbb{N}$ -> Set}: dopo i \texttt{:}, pu\`o cambiare costruttore per costruttore (\texttt{nil} lo fissa a \texttt{zero}, \texttt{cons} lo porta da $n$ a $\suc\,n$).
+\end{itemize}
+
+Se $n$ fosse un parametro, \texttt{cons} non potrebbe cambiarlo. Questa \`e una decisione di design (\S\ref{cap:ceri}).
