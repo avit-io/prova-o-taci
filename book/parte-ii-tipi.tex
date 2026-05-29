@@ -49,6 +49,20 @@ c_f : C\,\ff
 
 Letto a voce: ``per costruire qualcosa che dipende da un $b : \mathbb{B}$ generico --- cio\`e un abitante di $C\,b$ --- basta darmi il pezzo per $b = \tto$ e il pezzo per $b = \ff$; io metto tutto insieme''. $C$ si chiama \textbf{motivo} dell'eliminazione.
 
+% NUOVO: paragrafo sul motivo, valido per tutti gli eliminatori
+\begin{oss}[Il motivo $C$, una volta per tutti gli eliminatori]
+Il motivo \`e il concetto pi\`u astratto della Parte~II, e ritorner\`a identico in $\indN$, $\indS$, $\Jelim$, $\indV$. Vale la pena fissarlo subito.
+
+$C$ \`e \textbf{ci\`o che si vuole concludere}, espresso come funzione dal valore eliminato. Scriverlo come $C : \mathbb{B} \to \Type$ significa: ``per ogni $b$ possibile dir\`o cosa intendo costruire''. L'eliminatore promette di consegnare $C\,b$ per il $b$ effettivo; in cambio chiede un pezzo per ogni costruttore.
+
+Due regimi tipici:
+\begin{itemize}
+\item \textbf{Motivo costante} ($C\,b \definitorio X$ per ogni $b$): si sta solo facendo una funzione $\mathbb{B} \to X$, niente di dipendente. L'eliminatore degenera a un ``if-then-else'' usuale.
+\item \textbf{Motivo davvero dipendente} ($C\,b$ varia con $b$): si sta dimostrando una propriet\`a o costruendo un dato il cui \emph{tipo} cambia con il valore. Qui la dipendenza Cero~\ref{cero:dipendenza} viene effettivamente sfruttata.
+\end{itemize}
+Tutti gli eliminatori che seguono hanno la stessa anatomia: motivo + un caso per costruttore (pi\`u, dove c'\`e ricorsione, un'ipotesi induttiva).
+\end{oss}
+
 \section*{C --- Computazione (definitorie, Cero~\ref{cero:comp})}
 \begin{align*}
 \indB(\tto, C, c_t, c_f) &\definitorio c_t \\
@@ -94,19 +108,39 @@ s : (k : \mathbb{N}) \to C\,k \to C\,(\suc\,k)
 
 Confronto riga per riga con $\indB$:
 \begin{itemize}
-\item per \texttt{zero} serve un valore $b : C\,\zero$ (come $c_t$ per \texttt{tt});
-\item per \texttt{suc k} serve $s : (k : \mathbb{N}) \to C\,k \to C\,(\suc\,k)$ --- non un valore, ma una funzione che prende \texttt{k} \emph{e l'ipotesi induttiva $C\,k$} e produce $C\,(\suc\,k)$.
+% MODIFICATO: uniformato \texttt{tt} -> \tto per coerenza con cap. Bool
+\item per $\zero$ serve un valore $b : C\,\zero$ (come $c_t$ per $\tto$);
+\item per $\suc\,k$ serve $s : (k : \mathbb{N}) \to C\,k \to C\,(\suc\,k)$ --- non un valore, ma una funzione che prende $k$ \emph{e l'ipotesi induttiva $C\,k$} e produce $C\,(\suc\,k)$.
 \end{itemize}
 
 Il $C\,k$ in input a $s$ \`e dove l'eliminazione di $\mathbb{N}$ diventa \textbf{ricorsione primitiva}. \`E letteralmente l'ipotesi induttiva.
 
 \section*{C --- Computazione}
+% MODIFICATO: spaziatura uniforme negli argomenti di \indN
 \begin{align*}
-\indN(\zero,    C, b, s) &\definitorio b \\
-\indN(\suc\,k, C, b, s) &\definitorio s\,k\,(\indN(k, C, b, s))
+\indN(\zero,\,C, b, s)    &\definitorio b \\
+\indN(\suc\,k,\,C, b, s)  &\definitorio s\,k\,(\indN(k, C, b, s))
 \end{align*}
 
-Il caso \texttt{suc k} \`e dove appare la \textbf{ricorsione}: $\indN$ chiama s\'e stesso su \texttt{k}, strutturalmente pi\`u piccolo di \texttt{suc k}. Questo garantisce terminazione.
+Il caso $\suc\,k$ \`e dove appare la \textbf{ricorsione}: $\indN$ chiama s\'e stesso su $k$, strutturalmente pi\`u piccolo di $\suc\,k$. Questo garantisce terminazione.
+
+% NUOVO: indN in azione --- la somma come esempio concreto di ipotesi induttiva
+\section*{$\indN$ in azione --- la somma}
+
+L'addizione \`e l'esempio canonico per vedere l'ipotesi induttiva al lavoro. Definendola tramite $\indN$ con motivo costante $C \definitorio (\lambda\,\_\,.\,\mathbb{N} \to \mathbb{N})$:
+\[
+n + m \;\definitorio\; \indN\!\bigl(n,\; \lambda\,\_\,.\,\mathbb{N},\; m,\; \lambda\,k\,\mathit{rec}.\,\suc\,\mathit{rec}\bigr)
+\]
+Letta a voce: ``ricorri su $n$; al caso $\zero$ rispondi $m$; al caso $\suc\,k$ prendi il \emph{risultato gi\`a calcolato} su $k$ --- che chiamo $\mathit{rec}$, cio\`e $k + m$ --- e ne fai $\suc$''. Il parametro $\mathit{rec}$ \`e \textbf{esattamente} l'ipotesi induttiva $C\,k$; il suo essere disponibile \`e ci\`o che distingue $\indN$ dal puro case-split.
+
+In Agda, con pattern matching, lo stesso si scrive nella forma familiare:
+\begin{agda}
+_+_ : ℕ → ℕ → ℕ
+zero  + m = m
+suc n + m = suc (n + m)   -- il "(n + m)" qui dentro È l'ipotesi induttiva,
+                          --   cioè la chiamata ricorsiva su n
+\end{agda}
+Le due scritture sono equivalenti: la seconda \`e ci\`o che Agda elabora nella prima.
 
 \section*{Case-split puro \emph{vs} induzione}
 
@@ -266,7 +300,8 @@ foo : ∀ (x : A) → B x       -- identico a (x : A) → B x
 foo : ∀ x → B x             -- identico, ma il tipo di x è inferito da B
 \end{agda}
 
-$\forall$ \textbf{non \`e un quantificatore primitivo distinto da $\Pi$.} \`E $\Pi$ con il permesso di omettere annotazioni di tipo (quando Agda pu\`o inferirle). Il nome viene dalla lettura logica (``per ogni $x$\ldots''), ma \`e sempre la stessa regola di \S\ref{cap:pi}. Nessuna regola nuova.
+% MODIFICATO: esplicitato che $\forall$ NON è un quantificatore logico primitivo
+$\forall$ \textbf{non \`e un quantificatore logico primitivo, n\'e una regola distinta da $\Pi$}: \`e \emph{soltanto zucchero sintattico} per $\Pi$ con il permesso di omettere annotazioni di tipo (quando Agda pu\`o inferirle). Il nome viene dalla lettura logica (``per ogni $x$\ldots''), ma in MLTT non esiste un ``per ogni'' di prima classe separato da $\Pi$: la quantificazione universale \emph{\`e} $\Pi$, via Curry--Howard. Si applica sempre la regola di \S\ref{cap:pi}. Nessuna regola nuova.
 
 % ---------------------------------------------------------------------
 \chapter{$\Sigma$ --- il duale di $\Pi$}\label{cap:sigma}
@@ -326,7 +361,8 @@ categoriale             & $\Pi$ (funzioni indicizzate) & $\Sigma$ (coppie indici
 \end{tabular}
 \end{center}
 
-\noindent $\Sigma$ generalizza il prodotto \emph{aritmetico} ma si chiama \emph{somma categoriale}. Incidente storico, da ignorare. In pratica: $\Pi$ = funzioni dipendenti, $\Sigma$ = coppie dipendenti.
+% MODIFICATO: la confusione "Σ si chiama somma in CT" spostata in nota a pie pagina
+\noindent $\Sigma$ generalizza il prodotto \emph{aritmetico} ma si chiama \emph{somma categoriale}\footnote{In teoria delle categorie ``somma'' (o \emph{coprodotto}) \`e il duale di ``prodotto''. Il coprodotto binario \`e $A + B$, e la sua versione indicizzata \`e $\coprod_{x \in A} B\,x$, che \emph{\`e} $\Sigma\,x\!\in\!A,\,B\,x$. Quindi $\Sigma$ \`e ``somma'' nel senso categoriale di coprodotto indicizzato, anche se insiemisticamente i suoi abitanti sono coppie e ``sembra'' un prodotto. Doppia tradizione terminologica, da non confondere.}. Incidente storico, da ignorare. In pratica: $\Pi$ = funzioni dipendenti, $\Sigma$ = coppie dipendenti.
 
 % ---------------------------------------------------------------------
 \chapter{$\_\identita\_$ --- il tipo identit\`a}\label{cap:identita}
@@ -378,6 +414,36 @@ $\refl$ \emph{colma la trincea} tra meta e linguaggio. \`E il termine che dice `
 
 Quindi le due uguaglianze non sono indipendenti: il tipo identit\`a \emph{si appoggia} alla definitoria. La definitoria sta ``sotto'' e fa il lavoro silenzioso di riduzione; il tipo identit\`a sta ``sopra'' e ne raccoglie il risultato come prova manipolabile.
 
+% NUOVO: esempi Agda di refl che funziona e refl che fallisce
+\bigskip
+
+\noindent\textbf{In pratica, con $+$ definita come in \S\ref{cap:nat}}:
+\begin{agda}
+-- (1) refl funziona: entrambi i lati riducono a 4
+_ : 2 + 2 ≡ 4
+_ = refl
+
+-- (2) refl funziona ANCHE qui: 2+2 e 3+1 hanno lo stesso normale (= 4)
+_ : 2 + 2 ≡ 3 + 1
+_ = refl
+
+-- (3) refl funziona: zero + n riduce a n per la prima equazione di +
+_ : ∀ {n} → zero + n ≡ n
+_ = refl
+
+-- (4) refl FALLISCE: n + zero NON riduce, perché + ricorre sul PRIMO
+--     argomento e n è una variabile (nessuna delle equazioni si attiva).
+--     Definitoriamente non è uguale a n; serve induzione su n per dimostrarlo.
+-- _ : ∀ {n} → n + zero ≡ n
+-- _ = refl   -- errore di typecheck: n + zero != n
+\end{agda}
+
+\noindent (1)--(3) sono ``stessa normale dopo riduzione'', quindi la Regola~\ref{reg:ponte} li accetta. (4) non lo \`e: \emph{semanticamente} $n + \zero$ vale $n$, ma \emph{definitoriamente} non riduce, perch\'e la regola pertinente di $+$ \`e bloccata sulla variabile $n$. Serve $\indN$ per dimostrarlo --- e il risultato non sar\`a $\refl$, ma un termine costruito induttivamente.
+
+\medskip
+
+\noindent\textbf{Da fissare.} ``$\refl$ funziona'' $\iff$ ``i due lati riducono alla stessa forma normale per le regole di computazione''. Tutto il resto richiede prove genuine.
+
 \paragraph{E --- Eliminazione.}
 \[
 \inferrule{
@@ -396,6 +462,27 @@ L'eliminatore $\Jelim$ (\emph{path induction}). Per costruire qualcosa che dipen
 \Jelim(\refl, C, c) \definitorio c
 \]
 Quando la prova \`e canonica, $\Jelim$ restituisce il caso base.
+
+% NUOVO: subst come corollario immediato di J --- J in azione
+\subsection*{$\Jelim$ in azione --- $\mathrm{subst}$ come corollario immediato}
+
+Il principio della \emph{path induction} \`e formidabile ma astratto. Il suo primo corollario \`e una funzione che usiamo continuamente: \textbf{trasporto} di una propriet\`a lungo un'uguaglianza.
+\[
+\mathrm{subst} : \{A : \Type\}\,(P : A \to \Type)\,\{x\,y : A\} \to x \identita y \to P\,x \to P\,y
+\]
+Letta a voce: ``se $x \identita y$ e ho un abitante di $P\,x$, ne ottengo uno di $P\,y$''. Si ottiene da $\Jelim$ scegliendo come motivo $C\,y\,p \definitorio P\,y$ (cio\`e: il motivo dipende solo dall'estremo, ignora la prova):
+\begin{agda}
+subst : {A : Set} (P : A → Set) {x y : A} → x ≡ y → P x → P y
+subst P p px = J p (λ y _ → P y) px
+--                  ^^^^^^^^^^^
+--                  motivo: "non mi importa della prova,
+--                   voglio dire qualcosa su y"
+\end{agda}
+\noindent Il caso base $C\,x\,\refl \definitorio P\,x$ \`e gi\`a dato (lo \`e \texttt{px}); la computazione di $\Jelim$ su $\refl$ restituisce esattamente quel \texttt{px}. Quando invece la prova non \`e $\refl$ ma una qualunque, $\Jelim$ ``trasporta'' il dato lungo l'identit\`a.
+
+\begin{oss}[Perch\'e questo importa]
+$\mathrm{subst}$ \`e ci\`o che permette il \emph{rewriting} nelle dimostrazioni in Agda (la parola chiave \texttt{rewrite} si elabora in chiamate a $\mathrm{subst}$). Senza $\Jelim$, non ci sarebbe nessun modo di ``usare'' una prova di uguaglianza per cambiare il tipo di un termine. $\Jelim$ \`e l'astratto; $\mathrm{subst}$ \`e il primo concreto.
+\end{oss}
 
 \section*{Ricapitolazione della distinzione}
 
@@ -503,3 +590,68 @@ data Vec (A : Set) : ℕ → Set where
 \end{itemize}
 
 Se $n$ fosse un parametro, \texttt{cons} non potrebbe cambiarlo. Questa \`e una decisione di design (\S\ref{cap:ceri}).
+
+% NUOVO: avvertimento sull'inferenza fragile per i tipi con indici
+\section*{Avvertimento --- inferenza fragile sugli indici}
+
+L'inferenza di tipo di Agda \`e completa per i \emph{parametri}, ma \textbf{non lo \`e per gli indici}. Quando un'operazione richiede che due indici risultino definitoriamente uguali e non lo sono per pura riduzione, l'unificatore si arresta e devi fornire una prova di uguaglianza (tipicamente con \texttt{rewrite} o $\mathrm{subst}$, \S\ref{cap:identita}). Tre situazioni tipiche:
+
+\begin{enumerate}
+\item \textbf{Concatenazione e lemmi di associativit\`a/commutativit\`a sugli indici}:
+\begin{agda}
+_++_ : ∀ {A m n} → Vec A m → Vec A n → Vec A (m + n)
+
+-- e ora, per dimostrare l'associatività di ++ a livello di vettori,
+-- serve PRIMA un lemma su ℕ (associatività di +) e POI un rewrite,
+-- perché (m + n) + p non è DEFINITORIAMENTE uguale a m + (n + p):
+-- lo è solo proposizionalmente, e Agda non può forzarlo da solo.
+\end{agda}
+
+\item \textbf{Funzioni con indice non-canonico in posizione di pattern}:
+\begin{agda}
+head : ∀ {A n} → Vec A (suc n) → A
+head (cons a _) = a
+-- ok: l'indice è "suc n", l'unificazione vede subito che il vettore
+-- non può essere nil (che vorrebbe l'indice zero). Bene.
+
+-- Ma se chiami head su un Vec A m con m generico, prima devi
+-- convincere Agda che m ≡ suc k per qualche k.
+\end{agda}
+
+\item \textbf{Funzioni la cui forma del risultato non si decide per riduzione}: capita spesso quando l'indice contiene una funzione bloccata su una variabile (come $n + \zero$ rispetto a $n$).
+\end{enumerate}
+
+\noindent\textbf{Da fissare.} Tipi dipendenti su indici sono potenti, ma il prezzo \`e che l'inferenza non \`e ``magica'': dove la riduzione si ferma, devi fornire tu il ponte con una prova proposizionale. Questo non \`e un difetto di Agda; \`e la conseguenza diretta della Regola~\ref{reg:ponte} --- definitorio sta sotto, proposizionale sopra.
+
+% NUOVO: tabella riassuntiva finale di tutta la Parte II
+\section*{Quadro d'insieme --- la Parte~II in una tabella}
+
+I sei tipi della Parte~II, allineati sulle stesse colonne. Stessa anatomia F-I-E-C; ci\`o che cambia \`e la presenza (o l'assenza) di ricorsione, e da cosa dipende il motivo $C$.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\small
+\begin{tabular}{llllp{4.6cm}}
+\toprule
+\textit{Tipo} & \textit{F-I-E-C} & \textit{Ricorsivo} & \textit{Motivo dipende da} & \textit{Uso principale} \\
+\midrule
+$\mathbb{B}$ & s\`i & no & $b : \mathbb{B}$ & case-split puro; pi\`u piccolo induttivo possibile \\
+$\mathbb{N}$ & s\`i & s\`i & $n : \mathbb{N}$ & induzione e ricorsione primitiva \\
+$\Pi$        & s\`i & no & --- (non induttivo) & funzioni dipendenti; decisione fondativa MLTT \\
+$\Sigma$     & s\`i & no & $p : \Sigma\,x\!\in\!A,\,B\,x$ & coppie dipendenti; duale di $\Pi$ \\
+$\_\identita\_$ & s\`i & no & $y : A$ \emph{e} $p : x \identita y$ & uguaglianza interna; ponte meta--linguaggio \\
+$\mathrm{Vec}\,A\,n$ & s\`i & s\`i & $n : \mathbb{N}$ \emph{e} $vs : \mathrm{Vec}\,A\,n$ & dipendenza su un valore numerico; capstone \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip
+
+\noindent\textbf{Letture trasversali.}
+\begin{itemize}
+\item \emph{Ricorsione = costruttore che cita il tipo stesso.} $\mathbb{B}$ e $\Sigma$ non hanno tale costruttore; $\mathbb{N}$ ($\suc$) e $\mathrm{Vec}$ ($\cons$) s\`i. $\Pi$ e $\_\identita\_$ non sono induttivi in senso stretto.
+\item \emph{Motivo a una variabile vs.\ a due.} $\indB$, $\indN$, $\indS$ hanno motivi su una variabile (il valore eliminato). $\Jelim$ e $\indV$ ne hanno due, perch\'e il tipo dipende da pi\`u di un dato (in $\Jelim$: l'altro estremo e la prova; in $\mathrm{Vec}$: la lunghezza e il vettore).
+\item \emph{Dipendenza Cero~\ref{cero:dipendenza}.} $\Pi$ la introduce; $\Sigma$ la eredita; $\_\identita\_$ e $\mathrm{Vec}$ la sfruttano in modo essenziale (un \emph{valore} entra in un \emph{tipo}). $\mathbb{B}$ e $\mathbb{N}$ no, di per s\'e: la usano solo quando si scelgono motivi non costanti.
+\end{itemize}
+
+\noindent Da qui in poi (Parte~III) tutti gli ingredienti sono pronti: le dimostrazioni saranno termini in tipi costruiti con queste sei regole F-I-E-C, niente di pi\`u.
