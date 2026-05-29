@@ -221,90 +221,228 @@
 \pagenumbering{roman}
 \pagestyle{plain}
 
-% ----------------- frontespizio (stile Depero) -----------------
+% ----------------- frontespizio (stile Depero — Il Verificatore) -----------------
 \begin{titlepage}
 \thispagestyle{empty}
 \begin{tikzpicture}[remember picture, overlay]
 
-  %% blocco nero superiore (prime 11.5 cm dall'alto)
+  %% ======= ZONE DI SFONDO =======
+
   \fill[black]
-    (current page.north west)
-    rectangle
+    (current page.north west) rectangle
     ($(current page.north east)+(0,-11.5cm)$);
 
-  %% fascia rossa – titolo (cm 11.5–15 dall'alto, alta 3.5 cm)
   \fill[futurered]
-    ($(current page.north west)+(0,-11.5cm)$)
-    rectangle
+    ($(current page.north west)+(0,-11.5cm)$) rectangle
     ($(current page.north east)+(0,-15cm)$);
 
-  %% sfondo crema – corpo (cm 15–24.5 dall'alto)
   \fill[cream]
-    ($(current page.north west)+(0,-15cm)$)
-    rectangle
+    ($(current page.north west)+(0,-15cm)$) rectangle
     ($(current page.north east)+(0,-24.5cm)$);
 
-  %% blocco nero inferiore (dal cm 24.5 fino in fondo)
   \fill[black]
-    ($(current page.north west)+(0,-24.5cm)$)
-    rectangle
+    ($(current page.north west)+(0,-24.5cm)$) rectangle
     (current page.south east);
 
-  %% ---- simboli nel blocco nero superiore ----
+  %% ======= TORRE SINISTRA =======
 
-  %% Π  grande, bianco, quadrante sinistro
-  \node[white, font=\fontsize{108}{108}\selectfont]
-    at ($(current page.north west)+(4.5cm,-5.8cm)$)
-    {$\Pi$};
+  \fill[futurered!55!black]
+    ($(current page.north)+(-9.5cm,-1.5cm)$) rectangle
+    ($(current page.north)+(-6.3cm,-11.5cm)$);
+  %% finestre
+  \foreach \yw in {2.8,4.8,6.8,8.8} {
+    \fill[black!85]
+      ($(current page.north)+(-9.1cm,-\yw cm)$) rectangle +(0.75cm,-0.9cm);
+    \fill[black!85]
+      ($(current page.north)+(-7.75cm,-\yw cm)$) rectangle +(0.75cm,-0.9cm);
+  }
+  %% cornicione torre sinistra
+  \fill[cream!40!black]
+    ($(current page.north)+(-9.7cm,-1.2cm)$) rectangle
+    ($(current page.north)+(-6.1cm,-1.5cm)$);
 
-  %% Σ  grande, rosso futurista, quadrante destro
-  \node[futurered, font=\fontsize{84}{84}\selectfont]
-    at ($(current page.north east)+(-4.2cm,-6.5cm)$)
-    {$\Sigma$};
+  %% ======= TORRE DESTRA =======
 
-  %% →  tra i due simboli, in grigio chiaro
-  \node[white!35!black, font=\fontsize{32}{32}\selectfont]
-    at ($(current page.north)+(0,-5.2cm)$)
-    {$\to$};
+  \fill[cream!45!black]
+    ($(current page.north)+(6.3cm,-2cm)$) rectangle
+    ($(current page.north)+(9.5cm,-11.5cm)$);
+  %% finestre
+  \foreach \yw in {3.3,5.3,7.3,9.3} {
+    \fill[black!85]
+      ($(current page.north)+(6.7cm,-\yw cm)$) rectangle +(0.75cm,-0.9cm);
+    \fill[black!85]
+      ($(current page.north)+(8.05cm,-\yw cm)$) rectangle +(0.75cm,-0.9cm);
+  }
+  %% cornicione torre destra
+  \fill[cream!40!black]
+    ($(current page.north)+(6.1cm,-1.7cm)$) rectangle
+    ($(current page.north)+(9.7cm,-2cm)$);
 
-  %% ∀  piccolo in alto a destra, bianco
-  \node[white!50!black, font=\fontsize{22}{22}\selectfont]
-    at ($(current page.north east)+(-1.5cm,-1.2cm)$)
-    {$\forall$};
+  %% ======= IL VERIFICATORE =======
 
-  %% ---- titolo nella fascia rossa ----
+  %% -- Cappello: triangolo crema con Π --
+  \fill[cream]
+    ($(current page.north)+(-2.1cm,-1.3cm)$) --
+    ($(current page.north)+(2.1cm,-1.3cm)$) --
+    ($(current page.north)+(0cm,-3.7cm)$) -- cycle;
+  \draw[black, line width=2.5pt]
+    ($(current page.north)+(-2.1cm,-1.3cm)$) --
+    ($(current page.north)+(2.1cm,-1.3cm)$) --
+    ($(current page.north)+(0cm,-3.7cm)$) -- cycle;
+  \node[black, font=\fontsize{20}{20}\selectfont\bfseries]
+    at ($(current page.north)+(0,-3cm)$) {$\Pi$};
+
+  %% -- Testa --
+  \fill[cream]
+    ($(current page.north)+(-1.05cm,-3.7cm)$) rectangle
+    ($(current page.north)+(1.05cm,-5.45cm)$);
+  \draw[black, line width=2.5pt]
+    ($(current page.north)+(-1.05cm,-3.7cm)$) rectangle
+    ($(current page.north)+(1.05cm,-5.45cm)$);
+  %% occhi
+  \fill[futurered]
+    ($(current page.north)+(-0.42cm,-4.55cm)$) circle (0.22cm);
+  \fill[futurered]
+    ($(current page.north)+(0.42cm,-4.55cm)$) circle (0.22cm);
+  %% bocca
+  \draw[black, line width=2pt]
+    ($(current page.north)+(-0.38cm,-5.1cm)$) --
+    ($(current page.north)+(0.38cm,-5.1cm)$);
+
+  %% -- Collo --
+  \fill[black!55]
+    ($(current page.north)+(-0.32cm,-5.45cm)$) rectangle
+    ($(current page.north)+(0.32cm,-5.95cm)$);
+  \draw[black, line width=1.5pt]
+    ($(current page.north)+(-0.32cm,-5.45cm)$) rectangle
+    ($(current page.north)+(0.32cm,-5.95cm)$);
+
+  %% -- Torso sinistro (rosso futurista) --
+  \fill[futurered]
+    ($(current page.north)+(-2.3cm,-5.95cm)$) rectangle
+    ($(current page.north)+(0cm,-9.1cm)$);
+
+  %% -- Torso destro (crema) --
+  \fill[cream]
+    ($(current page.north)+(0cm,-5.95cm)$) rectangle
+    ($(current page.north)+(2.3cm,-9.1cm)$);
+
+  %% -- Bordo e divisore torso --
+  \draw[black, line width=2.5pt]
+    ($(current page.north)+(-2.3cm,-5.95cm)$) rectangle
+    ($(current page.north)+(2.3cm,-9.1cm)$);
+  \draw[black, line width=2pt]
+    ($(current page.north)+(0,-5.95cm)$) --
+    ($(current page.north)+(0,-9.1cm)$);
+
+  %% -- Simboli sul torso --
+  \node[white, font=\fontsize{22}{22}\selectfont]
+    at ($(current page.north)+(-1.15cm,-7.5cm)$) {$\Sigma$};
+  \node[futurered!60!black, font=\fontsize{18}{18}\selectfont\bfseries]
+    at ($(current page.north)+(1.15cm,-7.5cm)$) {$\equiv$};
+
+  %% -- Spallaccio sinistro --
+  \fill[futurered!70!black]
+    ($(current page.north)+(-2.3cm,-5.95cm)$) rectangle
+    ($(current page.north)+(-1.3cm,-6.55cm)$);
+
+  %% -- Spallaccio destro --
+  \fill[cream!60!black]
+    ($(current page.north)+(1.3cm,-5.95cm)$) rectangle
+    ($(current page.north)+(2.3cm,-6.55cm)$);
+
+  %% -- Braccio sinistro --
+  \fill[futurered!75!black]
+    ($(current page.north)+(-2.3cm,-6.55cm)$) rectangle
+    ($(current page.north)+(-4.7cm,-7.35cm)$);
+  \draw[black, line width=2pt]
+    ($(current page.north)+(-2.3cm,-6.55cm)$) rectangle
+    ($(current page.north)+(-4.7cm,-7.35cm)$);
+
+  %% -- Mano sinistra: cerchio con λ --
+  \fill[cream]
+    ($(current page.north)+(-5.45cm,-6.95cm)$) circle (0.75cm);
+  \draw[black, line width=2pt]
+    ($(current page.north)+(-5.45cm,-6.95cm)$) circle (0.75cm);
+  \node[black, font=\fontsize{17}{17}\selectfont]
+    at ($(current page.north)+(-5.45cm,-6.95cm)$) {$\lambda$};
+
+  %% -- Braccio destro --
+  \fill[cream!65!black]
+    ($(current page.north)+(2.3cm,-6.55cm)$) rectangle
+    ($(current page.north)+(4.7cm,-7.35cm)$);
+  \draw[black, line width=2pt]
+    ($(current page.north)+(2.3cm,-6.55cm)$) rectangle
+    ($(current page.north)+(4.7cm,-7.35cm)$);
+
+  %% -- Mano destra: cerchio con ⊢ --
+  \fill[futurered]
+    ($(current page.north)+(5.45cm,-6.95cm)$) circle (0.75cm);
+  \draw[black, line width=2pt]
+    ($(current page.north)+(5.45cm,-6.95cm)$) circle (0.75cm);
+  \node[white, font=\fontsize{17}{17}\selectfont\bfseries]
+    at ($(current page.north)+(5.45cm,-6.95cm)$) {$\vdash$};
+
+  %% -- Cintura --
+  \fill[black]
+    ($(current page.north)+(-2.3cm,-9.1cm)$) rectangle
+    ($(current page.north)+(2.3cm,-9.6cm)$);
+
+  %% -- Gamba sinistra --
+  \fill[futurered]
+    ($(current page.north)+(-1.75cm,-9.6cm)$) rectangle
+    ($(current page.north)+(-0.55cm,-11.25cm)$);
+  \draw[black, line width=2pt]
+    ($(current page.north)+(-1.75cm,-9.6cm)$) rectangle
+    ($(current page.north)+(-0.55cm,-11.25cm)$);
+
+  %% -- Gamba destra --
+  \fill[cream!25!black]
+    ($(current page.north)+(0.55cm,-9.6cm)$) rectangle
+    ($(current page.north)+(1.75cm,-11.25cm)$);
+  \draw[black, line width=2pt]
+    ($(current page.north)+(0.55cm,-9.6cm)$) rectangle
+    ($(current page.north)+(1.75cm,-11.25cm)$);
+
+  %% -- Piede sinistro --
+  \fill[black]
+    ($(current page.north)+(-2.25cm,-11.25cm)$) rectangle
+    ($(current page.north)+(-0.3cm,-11.52cm)$);
+
+  %% -- Piede destro --
+  \fill[black]
+    ($(current page.north)+(0.3cm,-11.25cm)$) rectangle
+    ($(current page.north)+(2.4cm,-11.52cm)$);
+
+  %% ======= TITOLO (fascia rossa) =======
+
   \node[white, font=\fontsize{33}{33}\selectfont\bfseries\scshape]
     at ($(current page.north)+(0,-13.25cm)$)
     {\spacedallcaps{Prova o taci}};
 
-  %% ---- simboli nel corpo crema ----
+  %% ======= SEZIONE CREMA =======
 
-  %% λ  grande, nero, sinistra
-  \node[black, font=\fontsize{72}{72}\selectfont]
-    at ($(current page.north west)+(3.8cm,-20cm)$)
-    {$\lambda$};
-
-  %% ⊢  medio, rosso, destra
-  \node[futurered, font=\fontsize{52}{52}\selectfont\bfseries]
-    at ($(current page.north east)+(-4cm,-19.5cm)$)
-    {$\vdash$};
-
-  %% regola di inferenza come elemento grafico centrale
-  \node[black!75, font=\fontsize{11}{13}\selectfont]
-    at ($(current page.north)+(0,-20.5cm)$)
-    {$a : A$};
-  \draw[black!60, line width=2pt]
-    ($(current page.north)+(-3.2cm,-21.2cm)$) --
-    ($(current page.north)+(3.2cm,-21.2cm)$);
-  \node[black!75, font=\fontsize{11}{13}\selectfont]
-    at ($(current page.north)+(0,-22cm)$)
+  %% regola di inferenza
+  \node[black!68, font=\fontsize{13}{15}\selectfont]
+    at ($(current page.north)+(0,-18.8cm)$) {$a : A$};
+  \draw[black!55, line width=2.5pt]
+    ($(current page.north)+(-3.6cm,-19.7cm)$) --
+    ($(current page.north)+(3.6cm,-19.7cm)$);
+  \node[black!68, font=\fontsize{13}{15}\selectfont]
+    at ($(current page.north)+(0,-20.7cm)$)
     {$\mathsf{refl} : a \equiv a$};
 
-  %% ---- blocco nero inferiore – sottotitolo ----
-  \node[white!65!black, font=\fontsize{9}{11}\selectfont\itshape]
+  %% etichetta F·I·E·C
+  \node[futurered, font=\fontsize{11}{13}\selectfont\bfseries\scshape]
+    at ($(current page.north)+(0,-22.5cm)$)
+    {F \quad I \quad E \quad C};
+
+  %% ======= SOTTOTITOLO (fondo nero) =======
+
+  \node[white!60!black, font=\fontsize{9}{11}\selectfont\itshape]
     at ($(current page.south)+(0,3.8cm)$)
     {compendio a \textit{Verified Functional Programming in Agda}};
-  \node[futurered!70!white, font=\fontsize{8}{10}\selectfont]
+  \node[futurered!65!white, font=\fontsize{8}{10}\selectfont]
     at ($(current page.south)+(0,2.2cm)$)
     {Aaron Stump \textbullet\ Iowa Agda Library};
 
