@@ -1,7 +1,7 @@
 % =====================================================================
-% PARTE IV — Indice (ceri e decisioni di design)
+% APPENDICE — Indice (ceri e decisioni di design)
 % =====================================================================
-\part{Indice}
+% Lo switch \appendix vive in main.tex prima dell'\input di questo file.
 
 \chapter{Ceri e decisioni di design}\label{cap:ceri}
 
@@ -72,16 +72,5 @@ Coerenza del sistema & meta-meta & non dall'interno (G\"odel) \\
 \noindent Pi\`u si scende verso le fondamenta, pi\`u il terreno diventa silenzioso. A un certo punto c'\`e sempre un cero alla madonna --- e va bene cos\`i, \emph{purch\'e sia esplicito}.
 
 \bigskip
-\bigskip
 
-\section*{Per i prossimi capitoli di Stump}
-
-Questo libro copre i prerequisiti per il capitolo~1 di \emph{Verified Functional Programming in Agda} e srotola un esercizio rappresentativo (\S\ref{cap:and-comm}). Lo schema F-I-E-C generalizza facilmente:
-
-\begin{itemize}
-\item \textbf{Capitolo 2 di Stump --- numeri naturali.} L'eliminazione di $\mathbb{N}$ (\S\ref{cap:nat}) entra in gioco con la sua \emph{ricorsione}: le prove non si chiudono pi\`u solo con $\refl$, ma richiedono di chiamare l'ipotesi induttiva. Aggiungere un capitolo che srotoli, per esempio, l'associativit\`a di \texttt{+} su $\mathbb{N}$: stesso schema di \S\ref{cap:and-comm} con $\indN$ al posto di $\indB$ e l'ipotesi induttiva esplicitamente visibile come chiamata ricorsiva.
-
-\item \textbf{Capitoli successivi --- liste, parsing, programmi verificati.} Ogni tipo che si incontra avr\`a le sue quattro regole F-I-E-C. Ogni esercizio sar\`a leggibile come intreccio di Eliminazioni (case-split / induzione), Computazioni (riduzioni definitorie) e Introduzioni (costruzione del termine finale).
-\end{itemize}
-
-\noindent Il vocabolario \`e fissato. Da qui in poi si aggiungono tipi, non strumenti.
+\noindent Lo svolgimento concreto del libro di Stump --- capitolo per capitolo, F-I-E-C alla mano --- \`e in Parte~IV (\S\ref{cap:stump-1} e seguenti).
