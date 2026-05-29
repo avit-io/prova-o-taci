@@ -3,24 +3,24 @@
 % =====================================================================
 \part{Lavorare nel sistema}
 
-\noindent\itshape Quattro capitoli che chiudono la traversata. Prima un
-preambolo (\S\ref{cap:prima}) per dichiarare cosa cambia entrando in
-Parte~III: i sorgenti Agda useranno pattern matching, e questo ha un
-costo che va esplicitato (quinto cero). Poi la logica non importata ma
-riconosciuta dentro F-I-E-C, fino a osservare Curry-Howard come gesto
-finale (\S\ref{cap:logica}). Un kit di costruzioni canoniche --- i
-\emph{tipi notevoli} (\S\ref{cap:notevoli}) --- che fa da palestra
-prima delle prove vere. E infine l'esercizio di Stump sulla
-commutativit\`a di \texttt{\&\&} letto come tre F-I-E-C intrecciati
-(\S\ref{cap:and-comm}), apertura del compendio al capitolo~1 del libro
-in oggetto di studio.\upshape
+\noindent\itshape Tre capitoli che fanno da ponte verso il compendio.
+Prima un preambolo (\S\ref{cap:prima}) per dichiarare cosa cambia
+entrando in Parte~III e poi in Parte~IV: i sorgenti Agda useranno
+pattern matching, e va esplicitato cosa \`e zucchero meccanico per gli
+eliminatori e cosa \`e elaborazione che eccede l'eliminatore puro. Poi
+la logica non importata ma riconosciuta dentro F-I-E-C, fino a
+osservare Curry-Howard come gesto finale (\S\ref{cap:logica}). Un kit
+di costruzioni canoniche --- i \emph{tipi notevoli}
+(\S\ref{cap:notevoli}) --- che fa da palestra prima del compendio.
+L'esercizio di Stump sulla commutativit\`a di \texttt{\&\&} apre il
+compendio vero e proprio in Parte~IV (\S\ref{cap:stump-1}).\upshape
 
 \bigskip
 
 % ---------------------------------------------------------------------
 \chapter{Prima del compendio}\label{cap:prima}
 
-\noindent {\spacedlowsmallcaps{Cosa cambia, entrando in Parte~III}}. In Parte~II si scrivevano regole. Da qui in poi si \emph{leggono} sorgenti, ed \`e onesto dichiarare in apertura che cosa si sta facendo quando una clausola Agda viene tradotta in F-I-E-C.
+\noindent {\spacedlowsmallcaps{Cosa cambia, entrando in Parte~III e poi in Parte~IV}}. In Parte~II si scrivevano regole. Da qui in poi si \emph{leggono} sorgenti: in Parte~III leggiamo costruzioni canoniche come kit di lavoro; in Parte~IV traduciamo il libro di Stump capitolo per capitolo. Prima di entrarci, una cosa va dichiarata.
 
 \bigskip
 
@@ -32,50 +32,25 @@ f tt = ...
 f ff = ...
 \end{agda}
 
-non scrive $\indB$ da nessuna parte. Il nostro compito di lettura sar\`a riconoscere, sotto ogni clausola di questo genere, il F-I-E-C in atto: che cosa \`e l'eliminazione, che cosa la computazione, che cosa l'introduzione del risultato.
+non scrive $\indB$ da nessuna parte. Il nostro compito di lettura sar\`a riconoscere, sotto ogni clausola di questo genere, il F-I-E-C in atto: che cos'\`e l'eliminazione, che cos'\`e la computazione, che cos'\`e l'introduzione del risultato.
 
-Nel caso semplice di $\mathbb{B}$ la traduzione \`e meccanica. Su $\mathbb{N}$ e $\mathrm{Vec}$ comincer\`a a non esserlo: il pattern matching dipendente \emph{eccede} ci\`o che $\indN$, $\indV$ ecc.\ riescono a fare da soli. Va detto chiaramente, ed \`e il contenuto del quinto cero.
+\section*{Pattern matching come zucchero, con un'avvertenza}
 
-\section*{Il quinto cero}
+Nei casi pi\`u semplici --- case-split su costruttori di $\mathbb{B}$ e $\mathbb{N}$ senza matching annidato su prove di uguaglianza --- la traduzione clausola $\to$ eliminatore \`e \textbf{meccanica}: una clausola per costruttore, ricorsione sui parametri quando il costruttore \`e ricorsivo, e quello che resta sui due lati di un eventuale $\refl$ deve essere definitoriamente uguale. Lo si vede nel primo capitolo del compendio (\S\ref{cap:stump-1}, sull'esercizio \texttt{\&\&-comm}).
 
-\begin{cero}[Il pattern matching dipendente eccede MLTT pura]\label{cero:pm}
-Il pattern matching che vediamo in Agda non \`e zucchero per gli eliminatori di Parte~II. Nella sua forma generale o \textbf{assume l'assioma K} (\emph{uniqueness of identity proofs}, ogni prova di $x \identita x$ \`e definitoriamente $\refl$), oppure --- in modalit\`a \texttt{--without-K} --- si appoggia a un'\textbf{elaborazione non banale} (Goguen-McBride-McKinna, Cockx-Abel) basata su unificazione di indici, \emph{dot patterns}, \emph{absurd patterns}, \emph{with-abstraction}.
+Nei casi pi\`u sofisticati --- matching su $\refl$ in modo essenziale (es.\ \texttt{sym refl = refl}) o matching su costruttori che vincolano gli indici di un tipo dipendente (es.\ \texttt{head (cons a as) = a} su \texttt{Vec A (suc n)}) --- il pattern matching di Agda fa qualcosa in pi\`u degli eliminatori puri. C'\`e un \emph{compilatore} di pattern matching in mezzo che istanzia variabili libere usando l'informazione che il matching porta. \textbf{Non entriamo nel meccanismo}: lo scope di questo libro \`e Little Typer + Stump, non l'implementazione di Agda. Ci limitiamo a marcare ogni clausola come \textbf{meccanica} o \textbf{elaborata}, e a notare \emph{cosa} il pattern matching sta facendo in pi\`u --- istanziando una variabile, escludendo un costruttore via indice, e cos\`i via.
 
-In entrambi i casi: ci\`o che scriviamo come clausole con costruttori a sinistra \emph{non \`e} immediatamente un'applicazione di $\indB$, $\indN$, $\Jelim$ ecc. C'\`e un compilatore in mezzo. Quando in questo libro leggiamo una clausola come ``tre F-I-E-C intrecciati'' (\S\ref{cap:and-comm}) stiamo facendo un'operazione di traduzione che, fuori dai casi pi\`u semplici, non \`e meccanica.
-\end{cero}
+\section*{Patto di lettura per Parte~III e Parte~IV}
 
-\section*{Dove morde la profondit\`a: un esempio breve}
+\noindent\textbf{(i)} Ogni clausola Agda che incontreremo verr\`a accompagnata, almeno la prima volta che il pattern compare, dalla sua traduzione esplicita in F-I-E-C (eliminatore + motivo + casi base/passo).
 
-L'esempio canonico \`e il matching di $\refl$ contro una prova generica $p : x \identita y$. Vedremo la situazione completa in \S\ref{cap:notevoli} con $\mathsf{sym}$ e $\mathsf{trans}$, ma il punto \`e fissabile in poche righe.
+\noindent\textbf{(ii)} Quando la traduzione \`e \emph{meccanica} (nessun matching essenziale su $\refl$, nessun vincolo non banale sugli indici) ce lo segneremo come ``traduzione meccanica''.
 
-Scrivere
-
-\begin{agda}
-sym : {A : Set} {x y : A} → x ≡ y → y ≡ x
-sym refl = refl
-\end{agda}
-
-\noindent \emph{sembra} dire: ``c'\`e un solo caso, quello in cui la prova \`e $\refl$, e nel ramo $\refl$ il sistema sa che $y = x$''. Ma da dove viene quel ``il sistema sa che $y = x$''? In MLTT pura, l'unico modo di estrarre informazione da $p : x \identita y$ \`e $\Jelim$ (\S\ref{cap:identita}): si specifica il motivo $C : (y : A) \to (x \identita y) \to \Type$ e si abita il caso $C\,x\,\refl$.
-
-\medskip
-
-\textbf{Il matching di Agda fa di pi\`u}: nel ramo $\refl$ \emph{istanzia} $y := x$ nel resto del contesto. Quell'istanziazione, in piena generalit\`a, \`e l'assioma K. In \texttt{--without-K} si controlla che l'istanziazione sia legittima sul piano dell'unificazione --- e questa verifica \`e un algoritmo, non una regola di MLTT.
-
-\begin{oss}[Conseguenza pratica]
-Su tipi senza uguaglianze proposizionali non banali fra costruttori --- $\mathbb{B}$, $\mathbb{N}$ per gli esempi facili --- la traduzione clausola$\to$eliminatore \`e meccanica e non chiama in causa K. \texttt{\&\&-comm} (\S\ref{cap:and-comm}) \`e proprio uno di questi casi. Quando lavoreremo su prove che \emph{matchano} su $\refl$ in modo essenziale (\S\ref{cap:notevoli} per $\mathsf{sym}$, $\mathsf{trans}$, $\mathsf{cong}$, $\mathsf{subst}$) il cero~\ref{cero:pm} sar\`a in scena, e va saputo.
-\end{oss}
-
-\section*{Patto di lettura per Parte~III}
-
-\noindent\textbf{(i)} Ogni clausola Agda di Parte~III verr\`a accompagnata, almeno la prima volta che il pattern compare, dalla sua traduzione esplicita in F-I-E-C (eliminatore + motivo + casi base/passo).
-
-\noindent\textbf{(ii)} Quando la traduzione \`e \emph{meccanica} (nessun matching essenziale su $\refl$, nessun uso di dot pattern o absurd pattern non banale) ce lo segneremo come ``elaborazione triviale''.
-
-\noindent\textbf{(iii)} Quando \`e \emph{non meccanica} il cero~\ref{cero:pm} sar\`a in scena, lo dichiareremo, e indicheremo a quale lato (K o \texttt{--without-K}) ci stiamo appoggiando.
+\noindent\textbf{(iii)} Quando \`e \emph{elaborata} lo dichiareremo e indicheremo cosa il pattern matching sta facendo in pi\`u, \emph{senza} entrare nel meccanismo di unificazione che Agda usa per realizzarlo.
 
 \bigskip
 
-\noindent Con questo patto in tasca, possiamo entrare in Parte~III sapendo cosa stiamo importando e cosa no.
+\noindent Con questo patto in tasca, entriamo in Parte~III (logica e kit di costruzioni) e poi in Parte~IV (compendio di Stump) sapendo cosa stiamo importando e cosa no.
 
 % ---------------------------------------------------------------------
 \chapter{La logica che affiora}\label{cap:logica}
@@ -316,7 +291,7 @@ La corrispondenza di Curry-Howard non figura nell'elenco dei ceri (\S\ref{cap:ce
 
 \bigskip
 
-\noindent Cinque sezioni, in ordine di profondit\`a crescente: funzioni booleane (\S\ref{sec:not-funz-bool}), funzioni numeriche (\S\ref{sec:funz-nat}), propriet\`a del tipo identit\`a (\S\ref{sec:notevoli-id}), tipi piccoli di servizio (\S\ref{sec:tipi-piccoli}), operazioni su $\mathrm{Vec}$ (\S\ref{sec:notevoli-vec}). L'ultima sezione \`e il primo posto dove il cero~\ref{cero:pm} morde davvero.
+\noindent Quattro sezioni, in ordine di profondit\`a crescente: funzioni booleane (\S\ref{sec:not-funz-bool}), funzioni numeriche (\S\ref{sec:funz-nat}), propriet\`a del tipo identit\`a (\S\ref{sec:notevoli-id}), tipi piccoli di servizio (\S\ref{sec:tipi-piccoli}). Le operazioni su $\mathrm{Vec}$ (\texttt{head}, \texttt{tail}, \texttt{++}, \texttt{map}) appartengono al capitolo dedicato in Parte~IV (\S\ref{sec:notevoli-vec}). Le propriet\`a dell'identit\`a, \S\ref{sec:notevoli-id}, sono il primo posto dove la traduzione clausola $\to$ eliminatore diventa elaborata.
 
 \section{Funzioni booleane}\label{sec:not-funz-bool}
 
@@ -426,7 +401,7 @@ Sia \texttt{\_+\_} sia \texttt{\_*\_} usano lo stesso schema: $\indN$ sul primo 
 
 \section{Propriet\`a del tipo identit\`a}\label{sec:notevoli-id}
 
-\noindent {\spacedlowsmallcaps{Qui entra in scena il cero~\ref{cero:pm}}}. Tutte e quattro le costruzioni che seguono sono casi particolari di $\Jelim$ (\S\ref{cap:identita}), e tutte e quattro le loro versioni Agda fanno matching su $\refl$.
+\noindent {\spacedlowsmallcaps{Qui il pattern matching diventa elaborazione}}. Tutte e quattro le costruzioni che seguono sono casi particolari di $\Jelim$ (\S\ref{cap:identita}), e tutte e quattro le loro versioni Agda fanno matching su $\refl$ in modo essenziale.
 
 \subsection*{$\mathsf{sym}$ --- simmetria}
 
@@ -441,7 +416,7 @@ sym : {A : Set} {x y : A} → x ≡ y → y ≡ x
 sym refl = refl
 \end{agda}
 
-\noindent\textbf{Cosa fa il matching di $\refl$.} Quando Agda vede la clausola \texttt{sym refl = ...}, istanzia $y := x$ nel resto del contesto. Quell'istanziazione \`e ci\`o che il cero~\ref{cero:pm} chiama in causa: in MLTT pura l'unico modo di ``sapere che $y = x$'' \`e specificare il motivo di $\Jelim$ e abitarlo nel caso $\refl$. Qui Agda lo fa da s\'e.
+\noindent\textbf{Cosa fa il matching di $\refl$.} Quando Agda vede la clausola \texttt{sym refl = ...}, istanzia $y := x$ nel resto del contesto. Quell'istanziazione \`e ci\`o che fa l'elaboratore del pattern matching: in MLTT pura l'unico modo di ``sapere che $y = x$'' \`e specificare il motivo di $\Jelim$ e abitarlo nel caso $\refl$. Qui Agda lo fa da s\'e --- traduzione elaborata, non meccanica.
 
 \subsection*{$\mathsf{trans}$ --- transitivit\`a}
 
@@ -485,7 +460,7 @@ subst P refl px = px
 \end{agda}
 
 \begin{oss}[Quattro variazioni sullo stesso tema]
-$\mathsf{sym}$, $\mathsf{trans}$, $\mathsf{cong}$, $\mathsf{subst}$ sono \textbf{quattro istanze di $\Jelim$}, distinte solo dal motivo. Il fatto che in Agda si scrivano tutte come una o due clausole con $\refl$ a sinistra \`e l'effetto del cero~\ref{cero:pm}: l'elaborazione del pattern matching trova il motivo da sola. Non magia, lavoro di unificazione.
+$\mathsf{sym}$, $\mathsf{trans}$, $\mathsf{cong}$, $\mathsf{subst}$ sono \textbf{quattro istanze di $\Jelim$}, distinte solo dal motivo. Il fatto che in Agda si scrivano tutte come una o due clausole con $\refl$ a sinistra \`e l'effetto dell'elaboratore del pattern matching, che trova il motivo da solo. Non magia, lavoro di unificazione (\S\ref{cap:prima}).
 \end{oss}
 
 \section{Tipi piccoli di servizio}\label{sec:tipi-piccoli}
@@ -525,238 +500,11 @@ Gi\`a vista in \S\ref{cap:logica}: $\neg A \coloneqq A \to \bot$. Niente F-I-E-C
 
 \noindent ``$A$ \`e decidibile'' = c'\`e o una prova di $A$ o una refutazione di $A$, e si sa quale.
 
-\section{Operazioni su $\mathrm{Vec}\,A\,n$}\label{sec:notevoli-vec}
+\section{Cosa portare in Parte~IV}
 
-\noindent {\spacedlowsmallcaps{Dove il pattern matching comincia a non essere zucchero}}. Le funzioni che seguono sono ancora gestibili a mano con $\indV$ (\S\ref{cap:vec}), ma una di esse --- $\mathsf{head}$ --- richiede un trucco sul motivo che il pattern matching nasconde con grazia. \`E un buon posto per vedere il cero~\ref{cero:pm} al lavoro su tipi induttivi non banali.
-
-\subsection*{$\mathsf{head}$ e $\mathsf{tail}$ --- e perch\'e il caso $\nil$ non c'\`e}
-
-\paragraph{Definizione (Agda).}
-\begin{agda}
-head : {A : Set} {n : ℕ} → Vec A (suc n) → A
-head (cons a as) = a
-
-tail : {A : Set} {n : ℕ} → Vec A (suc n) → Vec A n
-tail (cons a as) = as
-\end{agda}
-
-\noindent\textbf{La cosa che salta all'occhio.} Manca il caso $\nil$. Eppure Agda accetta come esaustivo. Perch\'e?
-
-Perch\'e l'indice $\suc\,n$ nel tipo dell'argomento \emph{esclude} $\nil$: $\nil$ ha tipo $\mathrm{Vec}\,A\,\zero$, non $\mathrm{Vec}\,A\,(\suc\,n)$ per alcun $n$. L'unificatore di Agda riconosce questo e impone esaustivit\`a sui soli costruttori compatibili con l'indice. Questo \`e \textbf{esattamente} il tipo di lavoro che il cero~\ref{cero:pm} chiama in causa.
-
-\paragraph{Versione Little Typer.} Volendo scrivere $\mathsf{head}$ con $\indV$ puro, l'unico modo \`e definire una funzione \emph{totale} su $\mathrm{Vec}\,A\,n$ qualunque $n$ sia, scegliendo un motivo che restituisca $\top$ nel caso $\zero$ e $A$ nel caso $\suc$:
-\[
-C : (n : \mathbb{N}) \to \mathrm{Vec}\,A\,n \to \Type
-\qquad
-C\,\zero\,\_ \definitorio \top
-\qquad
-C\,(\suc\,k)\,\_ \definitorio A
-\]
-
-Allora:
-\[
-\mathsf{head}'\,vs \;\definitorio\; \indV(vs,\;C,\;\star,\;\lambda k.\,\lambda a.\,\lambda \mathit{as}.\,\lambda\mathit{rec}.\,a)
-\]
-
-Per ottenere $\mathsf{head}$ ``vera'' --- quella che pretende un vettore di lunghezza $\suc\,n$ --- si specializza $\mathsf{head}'$ al caso in cui l'indice \`e $\suc\,n$, dove il motivo riduce ad $A$:
-\[
-\mathsf{head}\,(vs : \mathrm{Vec}\,A\,(\suc\,n)) \;\definitorio\; \mathsf{head}'\,vs : A
-\]
-
-\begin{oss}[Cosa abbiamo guadagnato col pattern matching]
-La versione Agda \texttt{head (cons a as) = a} \`e \emph{una riga}. La versione Little Typer richiede di inventare un motivo che usa $\top$ come ``segnaposto'' per il caso che non interessa, definire una funzione totale, e poi specializzarla. Il contenuto matematico \`e lo stesso, ma la versione Agda \`e \emph{infinitamente} pi\`u leggibile. \`E il guadagno reale del cero~\ref{cero:pm}: il prezzo (assumere K, o appoggiarsi all'unificazione di \texttt{--without-K}) compra leggibilit\`a sostanziale.
-\end{oss}
-
-\subsection*{$\_\mathbin{+\!\!+}\_$ --- concatenazione}
-
-\paragraph{Definizione (Agda).}
-\begin{agda}
-_++_ : {A : Set} {m n : ℕ} → Vec A m → Vec A n → Vec A (m + n)
-nil         ++ ys = ys
-(cons a as) ++ ys = cons a (as ++ ys)
-\end{agda}
-
-\paragraph{Definizione (Little Typer).} $\indV$ sul primo vettore, motivo che parametrizza sul vettore di destinazione:
-\[
-C : (m : \mathbb{N}) \to \mathrm{Vec}\,A\,m \to \Type
-\qquad
-C\,m\,\_ \definitorio \mathrm{Vec}\,A\,n \to \mathrm{Vec}\,A\,(m + n)
-\]
-
-\noindent\textbf{Cosa sta lavorando.} Nel caso $\nil$ ($m = \zero$): $C\,\zero\,\nil = \mathrm{Vec}\,A\,n \to \mathrm{Vec}\,A\,(\zero + n)$. Per la \emph{regola di computazione di $\_+\_$} (\S\ref{sec:funz-nat}), $\zero + n \definitorio n$, quindi il tipo \`e $\mathrm{Vec}\,A\,n \to \mathrm{Vec}\,A\,n$ --- abitato da $\lambda ys.\,ys$. Nel caso $\cons\,a\,\mathit{as}$ ($m = \suc\,k$): tipo $\mathrm{Vec}\,A\,n \to \mathrm{Vec}\,A\,(\suc\,k + n) = \mathrm{Vec}\,A\,(\suc\,(k+n))$, abitato da $\lambda ys.\,\cons\,a\,(\mathit{rec}\,ys)$.
-
-\medskip
-
-\noindent\textbf{Da fissare.} La regola di computazione di $\_+\_$ (definitoria, vista in \S\ref{sec:funz-nat}) lavora \emph{dentro il tipo}. Il typechecker la usa silenziosamente per verificare che $\mathrm{Vec}\,A\,(\zero + n)$ e $\mathrm{Vec}\,A\,n$ siano lo stesso tipo. \`E il Cero~\ref{cero:dipendenza} (un termine appare dentro un tipo) in azione operativa.
-
-\subsection*{$\mathsf{map}$}
-
-\paragraph{Definizione (Agda).}
-\begin{agda}
-map : {A B : Set} {n : ℕ} → (A → B) → Vec A n → Vec B n
-map f nil         = nil
-map f (cons a as) = cons (f a) (map f as)
-\end{agda}
-
-\paragraph{Definizione (Little Typer).} $\indV$ con motivo $C\,n\,\_ \definitorio \mathrm{Vec}\,B\,n$ (non dipende dal vettore, solo dalla lunghezza, perch\'e $\mathsf{map}$ preserva la lunghezza per costruzione):
-\[
-\mathsf{map}\,f\,vs \;\definitorio\; \indV(vs,\;\lambda n\,\_.\,\mathrm{Vec}\,B\,n,\;\nil,\;\lambda k.\,\lambda a.\,\lambda \mathit{as}.\,\lambda\mathit{rec}.\,\cons\,(f\,a)\,\mathit{rec})
-\]
-
-\begin{oss}[Il motivo costante sul vettore]
-Nei tre notevoli di Vec di sopra, il motivo dipende dalla \emph{lunghezza} ma quasi mai dal \emph{vettore} stesso. Questo \`e tipico delle funzioni che ``lavorano in parallelo'' (mappa, zip, ecc.) rispetto a quelle che ``leggono'' il vettore (head, tail, lookup). Vederlo nei motivi rende esplicito cosa una funzione fa.
-\end{oss}
-
-\section{Cosa portare nel capitolo successivo}
-
-In ordine di necessit\`a per \S\ref{cap:and-comm}:
+In ordine di necessit\`a per il primo capitolo del compendio Stump (\S\ref{cap:stump-1}, sull'esercizio \texttt{\&\&-comm}):
 
 \begin{itemize}
 \item La definizione di \texttt{\_\&\&\_} come $\indB$ sul primo argomento con motivo costante (\S\ref{sec:not-funz-bool}). \`E ci\`o che render\`a meccaniche le ``riduzioni di \texttt{\&\&}'' nel quadro F-I-E-C di \texttt{\&\&-comm}.
-\item L'introduzione di $\refl$ del tipo identit\`a, $\Jelim$ in standby, e il fatto che nel capitolo successivo \emph{non} useremo $\mathsf{sym}/\mathsf{trans}/\mathsf{cong}/\mathsf{subst}$ --- la prova si chiude solo con $\refl$, senza matching essenziale su prove di uguaglianza. Significa che il cero~\ref{cero:pm} \emph{non} \`e in scena nel caso \texttt{\&\&-comm}; arriver\`a nei capitoli successivi quando entrer\`a $\mathbb{N}$.
+\item L'introduzione di $\refl$ del tipo identit\`a, $\Jelim$ in standby. In Stump~1 \emph{non} useremo $\mathsf{sym}/\mathsf{trans}/\mathsf{cong}/\mathsf{subst}$: la prova si chiude con $\refl$, senza matching essenziale su prove di uguaglianza. Quindi la traduzione clausola $\to$ F-I-E-C resta meccanica. L'elaborazione del pattern matching entrer\`a in scena solo da Stump~2 (\S\ref{cap:stump-2}), quando arriver\`a $\mathbb{N}$ e le sue propriet\`a sull'uguaglianza.
 \end{itemize}
-
-% ---------------------------------------------------------------------
-\chapter{Anatomia di una prova: \texttt{\&\&-comm} in Iowa Agda Library}\label{cap:and-comm}
-
-\noindent {\spacedlowsmallcaps{Mettiamo a frutto tutto il libro per leggere una prova reale}}. Ogni cosa che succede qui poggia su F-I-E-C gi\`a visti. \texttt{\_\&\&\_} la conosciamo dal kit dei notevoli (\S\ref{sec:not-funz-bool}); $\refl$ e il tipo identit\`a da \S\ref{cap:identita}; l'eliminatore $\indB$ da \S\ref{cap:bool}. E il \emph{patto di lettura} stabilito in \S\ref{cap:prima}: ogni clausola Agda verr\`a tradotta in F-I-E-C, segnalando se la traduzione \`e meccanica o se chiama in causa il cero~\ref{cero:pm}. \textbf{Anticipazione, per questo capitolo}: \`e meccanica. Il cero~\ref{cero:pm} non entra in scena --- entrer\`a quando faremo prove su $\mathbb{N}$ (cap.~2 di Stump).
-
-\bigskip
-
-L'esercizio del capitolo~1 di \emph{Verified Functional Programming in Agda} (Stump, libreria IAL):
-
-\begin{agda}
-module ch01.Booleans where
-open import bool         -- definisce 𝔹, _&&_
-open import bool-thms    -- teoremi precostruiti
-open import eq           -- definisce _≡_ e refl (è il tipo identità di sezione 11)
-
-&&-comm : ∀ (b1 b2 : 𝔹) → b1 && b2 ≡ b2 && b1
-&&-comm tt tt = refl
-&&-comm tt ff = refl
-&&-comm ff tt = refl
-&&-comm ff ff = refl
-\end{agda}
-
-Lo srotoliamo in tre tempi: che cos'\`e il \textbf{tipo}, che cos'\`e la \textbf{definizione di \texttt{\&\&}}, che cosa fa il \textbf{pattern matching}.
-
-\section{Il tipo, strato per strato}
-
-Il tipo \`e puro zucchero per due $\Pi$ annidati. Tolto lo zucchero:
-
-\begin{agda}
--- strato 3 (file originale): forall + parentesi raggruppate
-&&-comm : ∀ (b1 b2 : 𝔹) → b1 && b2 ≡ b2 && b1
-
--- strato 2: forall e' zucchero per Pi con tipo annotato (sez. forall)
-&&-comm :   (b1 b2 : 𝔹) → b1 && b2 ≡ b2 && b1
-
--- strato 1: parentesi raggruppate e' zucchero per Pi annidati (sez. pi-azione)
-&&-comm :   (b1 : 𝔹) → ((b2 : 𝔹) → (b1 && b2) ≡ (b2 && b1))
-
--- strato 0: MLTT puro, due applicazioni della regola di formazione di Pi (sez. pi)
---   con il tipo del risultato finale che e' un tipo identita' (sez. identita)
-\end{agda}
-
-Quindi \texttt{\&\&-comm} deve abitare \textbf{due $\Pi$ annidati}. Curry dipendente (\S\ref{cap:pi-azione}): nel secondo $\Pi$, \texttt{b1} \`e gi\`a nel contesto. Il tipo del risultato finale, \texttt{b1 \&\& b2 $\equiv$ b2 \&\& b1}, \`e il \textbf{tipo identit\`a} del linguaggio (\S\ref{cap:identita}) --- non l'uguaglianza definitoria.
-
-\section{La definizione di \texttt{\&\&} come regole di computazione}
-
-In IAL \texttt{\_\&\&\_} \`e definita:
-
-\begin{agda}
-_&&_ : 𝔹 → 𝔹 → 𝔹
-tt && b = b
-ff && b = ff
-\end{agda}
-
-\noindent\`E lo stesso \texttt{\_\&\&\_} di \S\ref{sec:not-funz-bool}: $\indB$ sul primo argomento, motivo costante $\lambda\_.\mathbb{B}$, rami $b_2$ e $\ff$. Le due clausole \emph{sono regole di computazione} sotto mentite spoglie. Cio\`e, il typechecker riduce automaticamente:
-\begin{align*}
-\tto \andd b &\definitorio b \\
-\ff \andd b &\definitorio \ff
-\end{align*}
-
-\begin{oss}[Punto cruciale]
-\texttt{\&\&} matcha \emph{solo sul primo argomento}. Se il primo \`e una variabile non istanziata, non riduce. Quindi:
-
-\smallskip
-\begin{itemize}
-\item $\tto \andd b_2$ riduce a $b_2$. \checkmark
-\item $\ff \andd b_2$ riduce a $\ff$. \checkmark
-\item $b_1 \andd b_2$ con $b_1$ variabile aperta: \textbf{non riduce}. $\times$
-\item $b_1 \andd \tto$ con $b_1$ variabile aperta: \textbf{non riduce}. $\times$
-\end{itemize}
-\end{oss}
-
-\section{Il pattern matching come tre cose insieme}\label{sec:tre-fiec}
-
-Le quattro clausole \texttt{\&\&-comm tt tt = refl} ecc.\ nascondono \textbf{tre F-I-E-C distinti} che lavorano in sequenza.
-
-\paragraph{(a) Eliminazione di $\mathbb{B}$ (\S\ref{cap:bool}), due volte annidata.}
-Il \texttt{tt}/\texttt{ff} sui due argomenti \texttt{b1, b2} \`e zucchero per $\indB$ applicato due volte. Agda impone esaustivit\`a: i quattro casi $(\tto,\tto), (\tto,\ff), (\ff,\tto), (\ff,\ff)$ non sono una scelta, sono i quattro rami obbligatori della doppia eliminazione.
-
-\paragraph{(b) Riduzione computazionale di \texttt{\&\&} (\S\ref{cap:and-comm}.2).}
-Una volta che \texttt{b1} e \texttt{b2} sono costruttori concreti, le clausole di \texttt{\&\&} riducono i due lati del tipo identit\`a a forme normali. Questo accade \emph{durante il type checking}: il tipo che si deve abitare in ciascun caso \`e quello \emph{dopo} la riduzione.
-
-\medskip
-
-Vediamolo caso per caso. In ciascun caso il tipo da abitare diventa:
-
-\begin{center}
-\renewcommand{\arraystretch}{1.2}
-\begin{tabular}{lll}
-\toprule
-\textit{Caso} & \textit{Tipo originale} & \textit{Dopo riduzione di \texttt{\&\&}} \\
-\midrule
-$(\tto,\tto)$ & $\tto \andd \tto \identita \tto \andd \tto$ & $\tto \identita \tto$ \\
-$(\tto,\ff)$  & $\tto \andd \ff \identita \ff \andd \tto$   & $\ff \identita \ff$ \\
-$(\ff,\tto)$  & $\ff \andd \tto \identita \tto \andd \ff$   & $\ff \identita \ff$ \\
-$(\ff,\ff)$   & $\ff \andd \ff \identita \ff \andd \ff$     & $\ff \identita \ff$ \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-\smallskip
-
-($\tto \andd \ff$ riduce a $\ff$ per la prima clausola di \texttt{\&\&}; $\ff \andd \tto$ riduce a $\ff$ per la seconda; ecc.)
-
-\paragraph{(c) Introduzione del tipo identit\`a (\S\ref{cap:identita}) via $\refl$.}
-In ogni caso, dopo la riduzione, i due lati sono \textbf{definitoriamente uguali}. Quindi $\refl$ li abita (Regola~\ref{reg:ponte}, il ponte). Le quattro \texttt{refl} nel codice \emph{non} sono lo stesso \texttt{refl}: sono quattro istanze diverse della regola di introduzione di \S\ref{cap:identita}, applicate in contesti diversi.
-
-\section{Perch\'e \emph{non} basta matchare solo \texttt{b1}}
-
-Sembrerebbe pulito scrivere solo due clausole:
-
-\begin{agda}
-&&-comm tt b2 = ???
-&&-comm ff b2 = ???
-\end{agda}
-
-Vediamo il caso \texttt{tt}. Il tipo da abitare \`e $\tto \andd b_2 \identita b_2 \andd \tto$.
-
-\smallskip
-\begin{itemize}
-\item $\tto \andd b_2$ riduce a $b_2$ (clausola 1 di \texttt{\&\&}). \checkmark
-\item $b_2 \andd \tto$ \textbf{non riduce}, perch\'e $b_2$ \`e una variabile. $\times$
-\end{itemize}
-\smallskip
-
-Quindi il tipo, dopo tutte le riduzioni possibili, resta $b_2 \identita b_2 \andd \tto$. Per $\refl$ servirebbero due lati definitoriamente uguali. Non lo sono. La propriet\`a ``qualcosa \texttt{\&\&} \texttt{tt} $\identita$ qualcosa'' \`e \textbf{proposizionalmente} vera (esiste una prova) ma \textbf{non definitoriamente} vera (non riduce). $\refl$ non la abita.
-
-\begin{oss}[Conclusione strutturale]
-Per ``sbloccare'' la riduzione di $b_2 \andd \tto$, serve case-split anche su $b_2$. \textbf{Quattro casi sono strutturalmente obbligatori}, non un capriccio della sintassi.
-\end{oss}
-
-\section{Il quadro completo}
-
-Cosa abbiamo fatto, in una riga: il tipo $(b_1\,b_2 : \mathbb{B}) \to b_1 \andd b_2 \identita b_2 \andd b_1$ \`e due $\Pi$ annidati (\S\ref{cap:pi}, \S\ref{cap:pi-azione}); per abitarlo servono $\lambda b_1 \to \lambda b_2 \to \text{prova}$; per costruire la prova in modo che $\refl$ (\S\ref{cap:identita}) basti, i due lati del $\identita$ devono essere definitoriamente uguali (\S\ref{cap:giudizi}); per farli ridurre, servono i costruttori concreti, ottenuti via eliminazione di $\mathbb{B}$ (\S\ref{cap:bool}) in entrambe le variabili; in ognuno dei quattro casi le regole di computazione di \texttt{\&\&} (\S\ref{cap:and-comm}.2) riducono i due lati a $\tto \identita \tto$ o $\ff \identita \ff$, e $\refl$ chiude.
-
-\bigskip
-
-\noindent\textbf{Tre F-I-E-C --- $\mathbb{B}$ (E), \texttt{\&\&} (C), $\_\identita\_$ (I) --- che si intrecciano in quattro righe.} Niente magia, niente trucchi: solo le quattro regole del libro.
-
-\bigskip
-
-\begin{oss}[Cosa cambier\`a su $\mathbb{N}$]
-Le prove del cap.~1 di Stump cadono tutte in questa famiglia: case-split puro + riduzione + $\refl$. Su $\mathbb{N}$ (cap.~2 di Stump) entreranno in gioco \emph{due} cose nuove. Primo: il \emph{passo induttivo} vero --- il caso $\suc\,k$ richieder\`a di chiamare l'ipotesi induttiva esplicitamente, cio\`e la chiamata ricorsiva nella definizione della funzione che dimostra. L'eliminatore $\indN$ entrer\`a in scena con la sua ricorsione, non solo come case-split. Secondo: il \emph{matching su prove di uguaglianza} (\texttt{sym refl = refl} ecc., \S\ref{sec:notevoli-id}) e il cero~\ref{cero:pm} entreranno in scena, perch\'e su $\mathbb{N}$ molte propriet\`a richiedono $\mathsf{cong}$, $\mathsf{subst}$, riscritture. Tutto quello che abbiamo costruito qui rester\`a, e si aggiungeranno questi due livelli.
-\end{oss}
