@@ -373,9 +373,9 @@ categoriale             & $\Pi$ (funzioni indicizzate) & $\Sigma$ (coppie indici
 
 \bigskip
 
-Fino a \S\ref{cap:giudizi} e \S\ref{cap:test} abbiamo parlato di un'uguaglianza che vive \emph{nel metalinguaggio}: scritta $\equiv$, \`e un giudizio, non un tipo, non si abita, non si dimostra. \`E quella che dice ``queste due cose riducono alla stessa cosa per le regole di computazione''. La chiamiamo \textbf{uguaglianza definitoria}.
+Fino a \S\ref{cap:giudizi} e \S\ref{cap:test} abbiamo parlato di un'uguaglianza che vive \emph{nel metalinguaggio}: scritta $\definitorio$, \`e un giudizio, non un tipo, non si abita, non si dimostra. \`E quella che dice ``queste due cose riducono alla stessa cosa per le regole di computazione''. La chiamiamo \textbf{uguaglianza definitoria}.
 
-Ora introduciamo un \emph{secondo} $\equiv$, completamente diverso, che vive \textbf{nel linguaggio}: \`e un tipo, lo si abita con prove, lo si manipola. Si chiama \textbf{tipo identit\`a} (o \textbf{uguaglianza proposizionale}). Si scrive uguale e questa \`e una sciagura notazionale storica, ma sono due bestie diverse.
+Ora introduciamo un \emph{secondo} segno, $\identita$, completamente diverso, che vive \textbf{nel linguaggio}: \`e un tipo, lo si abita con prove, lo si manipola. Si chiama \textbf{tipo identit\`a} (o \textbf{uguaglianza proposizionale}). Si scrive uguale e questa \`e una sciagura notazionale storica, ma sono due bestie diverse.
 
 \medskip
 
@@ -445,23 +445,39 @@ _ = refl
 \noindent\textbf{Da fissare.} ``$\refl$ funziona'' $\iff$ ``i due lati riducono alla stessa forma normale per le regole di computazione''. Tutto il resto richiede prove genuine.
 
 \paragraph{E --- Eliminazione.}
+
+L'eliminatore $\Jelim$ --- \emph{path induction}, o \emph{induzione sui cammini} --- \`e il principio strutturale del tipo identit\`a.
+
 \[
-\inferrule{
-p : x \identita y \\
+\inferrule{A : \Type \\ x : A \\ y : A \\ p : x \identita y \\
 C : (y : A) \to (x \identita y) \to \Type \\
-c : C\,x\,\refl
-}{
-\Jelim(p, C, c) : C\,y\,p
-}
+c : C\,x\,\refl}{\Jelim(p, C, c) : C\,y\,p}
 \]
 
-L'eliminatore $\Jelim$ (\emph{path induction}). Per costruire qualcosa che dipende da una prova generica $p : x \identita y$, basta saperlo costruire nel caso canonico $p = \refl$ (dove necessariamente $y = x$).
+\noindent Sei premesse e una conclusione. Riga per riga.
+
+\begin{itemize}
+\item \textbf{$A : \Type$, $x : A$.} Il tipo ambiente e l'\emph{estremo sinistro}, fissato. La $x$ \`e libera nel motivo $C$ e nel caso base $c$: la regola la tratta come parametro globale, non come una delle cose su cui ricorrere.
+\item \textbf{$y : A$, $p : x \identita y$.} L'\emph{estremo destro} e il \emph{cammino} $p$ che lo collega a $x$. Sono i due dati su cui $\Jelim$ ``elimina''.
+\item \textbf{Motivo $C : (y : A) \to (x \identita y) \to \Type$.} Una funzione di \emph{due} argomenti: l'estremo destro $y$ e la prova $p$ che $x \identita y$. \`E la prima volta che vediamo un motivo a due variabili --- gli eliminatori precedenti ($\indB$, $\indN$, $\indS$) ne avevano uno solo, il valore eliminato. Il tipo identit\`a ne richiede due perch\'e \`e indicizzato da una coppia di termini pi\`u la prova stessa: il motivo deve sapere parlare di entrambi.
+\item \textbf{Caso base $c : C\,x\,\refl$.} L'unico caso canonico: il cammino \`e $\refl$. Il tipo di $\refl$ (regola I) \`e $x \identita x$, quindi il secondo estremo \`e forzato a coincidere con $x$. Il motivo si specializza a $C\,x\,\refl$, e questo \`e il tipo che il caso base deve abitare.
+\end{itemize}
+
+\noindent\textbf{Conclusione.} Dato un cammino generico $p : x \identita y$ e un abitante $c$ del motivo nel caso canonico, $\Jelim(p, C, c) : C\,y\,p$ estende $c$ a tutto il cammino.
 
 \paragraph{C --- Computazione.}
 \[
 \Jelim(\refl, C, c) \definitorio c
 \]
-Quando la prova \`e canonica, $\Jelim$ restituisce il caso base.
+Quando il cammino \`e canonico ($p \definitorio \refl$, dunque $y \definitorio x$), $\Jelim$ riduce al caso base. Stesso schema delle altre regole C: l'eliminatore consuma il costruttore.
+
+\medskip
+
+\noindent\textbf{Perch\'e si chiama \emph{path induction}.} Pensa a $x \identita y$ come al tipo dei \emph{cammini} che collegano $x$ a $y$ in $A$ (lettura topologica, sufficiente per l'intuizione). $\Jelim$ dice: per dimostrare una propriet\`a di tutti i cammini, basta dimostrarla per il \emph{cammino costante} $\refl$. \`E la stessa mossa dell'induzione su $\mathbb{N}$ --- caso base pi\`u passo --- ma su un costruttore senza ricorsione: non c'\`e un ``caso $\suc$'' perch\'e il tipo identit\`a non ha cammini ``pi\`u piccoli'' da cui ricostruire altri cammini. $\refl$ \`e l'unico costruttore canonico, e $\Jelim$ chiede solo che la propriet\`a valga l\`i.
+
+\medskip
+
+\noindent\textbf{La specializzazione nel caso base non \`e uno slogan.} Si rilegge il motivo: $C : (y : A) \to (x \identita y) \to \Type$ tiene $x$ fissa (parametro esterno alla regola) e lega $y$ e $p$ internamente. Il caso base chiede $C\,x\,\refl$, cio\`e il motivo con $y := x$ e $p := \refl$. La specializzazione non \`e una scelta ad hoc dell'eliminatore: \`e imposta dalla tipizzazione. $\refl$ ha tipo $x \identita x$ per regola I, quindi per applicare $C$ a $\refl$ il secondo argomento di $C$ deve essere $x$, non un $y$ generico. Lo slogan ``nel caso base $y$ diventa $x$'' \`e esattamente questo: una conseguenza della tipizzazione, non una sostituzione informale.
 
 % NUOVO: subst come corollario immediato di J --- J in azione
 \subsection*{$\Jelim$ in azione --- $\mathrm{subst}$ come corollario immediato}
@@ -513,7 +529,7 @@ si \emph{abita} un tipo (linguaggio); Agda accetta solo se \texttt{x} e \texttt{
 
 \section*{Quarto punto dove si inciampa}
 
-In \S\ref{cap:test} avevamo promesso un quarto punto, da chiudere appena introdotto il tipo identit\`a. Eccolo: i due $\equiv$ si scrivono uguale ma sono due cose diverse. Sopra c'\`e la regola per distinguerli --- guarda \emph{cosa} stai dicendo: un'affermazione sul sistema, o un tipo che vuoi abitare?
+In \S\ref{cap:test} avevamo promesso un quarto punto, da chiudere appena introdotto il tipo identit\`a. Eccolo: $\definitorio$ e $\identita$ portano nei testi classici lo stesso simbolo ($\equiv$ in entrambi i casi), e l\`i si confondono visivamente; in questo libro li separiamo tipograficamente apposta (il pedice $\beta$ marca il definitorio). La distinzione tipografica \`e solo un aiuto: la cosa importante resta concettuale --- guarda \emph{cosa} stai dicendo: un'affermazione sul sistema, o un tipo che vuoi abitare?
 
 \medskip
 
@@ -525,8 +541,8 @@ Completiamo la tabella lampo di \S\ref{cap:test}:
 \toprule
 \textit{Vedi questo} & \textit{Dov'\`e} & \textit{Perch\'e} \\
 \midrule
-$\equiv$ in $(\lambda x.\,b)\,a \equiv b\,a$ (regola di computazione) & meta & uguaglianza definitoria, asserzione \\
-$\equiv$ in $x \equiv y : \Type$ (Agda: \texttt{\_$\equiv$\_}) & linguaggio & tipo identit\`a, si abita con $\refl$ \\
+$\definitorio$ in $(\lambda x.\,b)\,a \definitorio b\,a$ (regola di computazione) & meta & uguaglianza definitoria, asserzione \\
+$\identita$ in $x \identita y : \Type$ (Agda: \texttt{\_$\equiv$\_}) & linguaggio & tipo identit\`a, si abita con $\refl$ \\
 $\refl$ & linguaggio & termine, abita il tipo identit\`a \\
 $\indB$, $\indN$, $\indS$, $\Jelim$ & meta & eliminatori = regole di inferenza \\
 \bottomrule
