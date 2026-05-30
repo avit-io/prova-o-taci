@@ -303,6 +303,7 @@ I due stili \emph{non sono equivalenti}: il secondo \`e pi\`u potente, e quanto 
 \begin{itemize}
 \item \textbf{In questo libro le regole le scriviamo alla Little Typer.} Ogni tipo riceve F, I, E, C in forma di regola di inferenza esplicita; l'eliminatore ha un nome ($\indB$, $\indN$, $\ldots$) e si presenta come regola del metalinguaggio.
 \item \textbf{Quando arrivano i sorgenti Agda} (Parte~III), useremo il pattern matching come si presenta nei libri di riferimento --- a cominciare da \emph{Verified Functional Programming in Agda} di Stump. Il nostro lavoro di lettura sar\`a sempre: \emph{quale F-I-E-C \`e in atto sotto questa clausola}?
+\item \textbf{Notazione dell'universo dei tipi.} Nel corpo del libro scriviamo $\Type$ (e $A : \Type$) per indicare l'universo dei tipi. Nei sorgenti Agda lo stesso oggetto si chiama \agdainl{Set} (e si scrive \texttt{A : Set}). \`E lo stesso universo, solo con due nomi storici diversi: $\Type$ \`e la terminologia MLTT, \texttt{Set} \`e la scelta di Agda. Nessuna differenza concettuale; usiamo le due notazioni rispettivamente nei due contesti.
 \end{itemize}
 
 \noindent\textbf{Esercizio centrale.} Una volta visti i sei tipi di Parte~II, il lettore dovrebbe essere in grado di guardare una funzione Agda definita per casi e ricostruirne meccanicamente la versione con eliminatore esplicito. La capacit\`a di fare quest'operazione --- almeno nei casi facili --- \`e il segnale che l'F-I-E-C \`e diventata vista, non solo lessico.

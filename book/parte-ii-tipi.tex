@@ -115,7 +115,12 @@ Confronto riga per riga con $\indB$:
 \item per $\suc\,k$ serve $s : (k : \mathbb{N}) \to C\,k \to C\,(\suc\,k)$ --- non un valore, ma una funzione che prende $k$ \emph{e l'ipotesi induttiva $C\,k$} e produce $C\,(\suc\,k)$.
 \end{itemize}
 
-Il $C\,k$ in input a $s$ \`e dove l'eliminazione di $\mathbb{N}$ diventa \textbf{ricorsione primitiva}. \`E letteralmente l'ipotesi induttiva.
+Il $C\,k$ in input a $s$ \`e dove l'eliminazione di $\mathbb{N}$ diventa \textbf{ricorsione primitiva}. \`E letteralmente l'\textbf{ipotesi induttiva}: il \emph{risultato del motivo $C$ gi\`a calcolato sul predecessore $k$}, che $\indN$ ti consegna a costo zero. Schema mentale:
+\begin{itemize}
+\item caso base $\zero$: nessun predecessore, basta dare un abitante di $C\,\zero$.
+\item caso passo $\suc\,k$: ricevi $k$ \emph{e} un abitante di $C\,k$ gi\`a pronto (``il lemma sul caso pi\`u piccolo''). Lo usi per costruire un abitante di $C\,(\suc\,k)$.
+\end{itemize}
+\noindent \`E il meccanismo per cui $\indN$ pu\`o chiudere prove e definire funzioni ricorsive senza loop infiniti: la chiamata ricorsiva ``all'indietro'' \`e \emph{materializzata come parametro} del passo, non lasciata da eseguire dalla regola.
 
 \section*{C --- Computazione}
 % MODIFICATO: spaziatura uniforme negli argomenti di \indN
@@ -247,6 +252,10 @@ $A, D, X$ \emph{non compaiono nel corpo}. Un argomento che il calcolo non usa, m
 Proprio perch\'e la passata 2 non guarda $A, D, X$, un compilatore pu\`o cancellarli dopo il type checking. Se le passate fossero la stessa cosa, non si potrebbe. Il fatto che si possa \`e la prova che sono separate. (Dove le passate si \emph{toccano} \`e \texttt{Vec A n} (\S\ref{cap:vec}): l\`i un valore \texttt{n} risale dentro un tipo. Si intrecciano, non collassano.)
 \end{oss}
 
+\bigskip
+
+\noindent\textbf{Sintesi.} Quando diciamo che \emph{i tipi sono di prima classe}, intendiamo: sono termini della \textbf{passata 1} --- vengono manipolati dal type-checker come qualsiasi altro termine, possono essere passati a funzioni, possono dipendere da valori. Ma non sono valori della \textbf{passata 2}: dopo il type checking $A, D, X$ sono cancellati (\emph{type erasure}) e non costano nulla a runtime. \textbf{Di prima classe a compile time, trasparenti a runtime}: \`e l'asimmetria chiave fra MLTT e i sistemi pi\`u semplici come Hindley-Milner, dove i tipi sono sempre e solo annotazioni esterne al calcolo.
+
 \section*{\texttt{elim-Pair} in Agda}
 
 Il claim Pie diventa:
@@ -316,6 +325,10 @@ Coppie dipendenti: il secondo componente ha un tipo che dipende dal primo.
 \]
 
 Stessa premessa di $\Pi$ --- eredita il Cero~\ref{cero:dipendenza}, non ne aggiunge.
+
+\bigskip
+
+\noindent\textbf{Notazione, una volta per tutte.} La forma \emph{principale} che useremo nel libro \`e $\Sigma\,x \in A,\,B\,x$ (binder notation: con $\in$ e la virgola che separa il binder dal corpo). Nei contesti applicativi --- tipicamente per il caso non dipendente, dove $B$ va scritta come lambda esplicita --- comparir\`a anche la forma $\Sigma\,A\,(\lambda\,\_\,.\,B)$. Nelle tabelle, dove lo spazio scarseggia, vedrai la variante compressa $\Sigma\,x\!\in\!A,\,B\,x$ (il $\!$ \`e solo spaziatura tipografica, non un simbolo diverso). Non sono tipi diversi: sono notazioni della stessa regola di formazione qui sopra.
 
 \section*{I --- Introduzione}
 \[

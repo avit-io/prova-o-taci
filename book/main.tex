@@ -229,295 +229,91 @@
 \pagenumbering{roman}
 \pagestyle{plain}
 
-% ----------------- frontespizio (Depero / Balla / Boccioni — la regola come evento) -----------------
+% ----------------- frontespizio (tipografico, asimmetrico) -----------------
 \begin{titlepage}
 \thispagestyle{empty}
 \begin{tikzpicture}[remember picture, overlay]
 
-  %% =========================================================
-  %% FONDO DEPERO --- blocchi geometrici netti, colore piatto
-  %% =========================================================
+  %% Sfondo: cream uniforme. Niente blocchi, niente bande.
   \fill[cream] (current page.north west) rectangle (current page.south east);
 
-  %% Banda vinaccia angolata in alto (palco superiore)
-  \fill[halfgray]
-    (current page.north west) --
-    (current page.north east) --
-    ($(current page.north east)+(0,-6)$) --
-    ($(current page.north west)+(0,-4)$) -- cycle;
-
-  %% Cuneo nero geometrico che intrude dall'angolo
-  \fill[black]
-    ($(current page.north east)+(-7,0)$) --
-    (current page.north east) --
-    ($(current page.north east)+(0,-6)$) --
-    ($(current page.north east)+(-3.5,-6)$) -- cycle;
-
-  %% Sole/disco terra al centro (backdrop del palco meccanico)
-  \fill[terra]
-    ($(current page.north west)+(10.5,-13)$) circle [radius=4.0cm];
-
-  %% Anello vinaccia attorno al disco
-  \draw[halfgray, line width=4pt]
-    ($(current page.north west)+(10.5,-13)$) circle [radius=4.15cm];
-
-  %% Banda nera in basso (fossa orchestrale)
-  \fill[black]
-    ($(current page.south west)+(0,6)$) --
-    ($(current page.south east)+(0,5)$) --
-    (current page.south east) --
-    (current page.south west) -- cycle;
-
-  %% Triangolo terra basso-sinistra (contrappeso Depero)
-  \fill[terra]
-    ($(current page.south west)+(0,7.8)$) --
-    ($(current page.south west)+(0,5.7)$) --
-    ($(current page.south west)+(4.5,5.7)$) -- cycle;
-
   %% =========================================================
-  %% TITOLO --- PROVA O TACI in stile Depero (chunky, sans bold)
+  %% Blocco TITOLO --- flush left, terzo alto.
+  %% Peso visivo: alto. Anchor compositivo top-left.
   %% =========================================================
-  \node[cream, font=\fontsize{48}{52}\selectfont\bfseries\sffamily, anchor=west]
-    at ($(current page.north west)+(1.0,-2.5)$)
-    {PROVA O TACI};
 
-  %% Eco al rovescio (omaggio: anihccam = macchina al contrario)
-  \node[cream, opacity=0.40, font=\fontsize{14}{16}\selectfont\bfseries\sffamily, anchor=west]
-    at ($(current page.north west)+(9.5,-3.7)$)
-    {ICAT O AVORP};
+  %% Titolo: spaced lowsmallcaps, vinaccia
+  \node[halfgray, anchor=base west,
+        font=\fontsize{38}{42}\selectfont\scshape]
+    at ($(current page.north west)+(4.5,-9)$)
+    {\spacedlowsmallcaps{Prova o taci}};
 
-  %% Sottotitolo
-  \node[cream, font=\Large\itshape, anchor=west]
-    at ($(current page.north west)+(1.0,-4.7)$)
+  %% Filo vinaccia sotto il titolo
+  \draw[halfgray, line width=0.6pt]
+    ($(current page.north west)+(4.5,-9.7)$) --
+    ($(current page.north west)+(13.5,-9.7)$);
+
+  %% Sottotitolo: italic, nero, sotto la rule
+  \node[black, anchor=base west,
+        font=\Large\itshape]
+    at ($(current page.north west)+(4.5,-10.5)$)
     {appunti su Martin-L\"of Type Theory};
 
   %% =========================================================
-  %% SEDIE VOLANTI (brandeggiate per aria --- La Rissa, 1926)
-  %% =========================================================
-  \begin{scope}[rotate around={35:($(current page.north west)+(6.5,-10.0)$)}, shift={($(current page.north west)+(6.5,-10.0)$)}]
-    \fill[black] (-0.35,-0.1) rectangle (0.35,0.1);
-    \fill[black] (-0.35,0.1) rectangle (-0.25,0.6);
-    \fill[black] (-0.3,-0.55) rectangle (-0.22,-0.1);
-    \fill[black] (0.22,-0.55) rectangle (0.3,-0.1);
-  \end{scope}
-  \begin{scope}[rotate around={-40:($(current page.north west)+(14.5,-9.5)$)}, shift={($(current page.north west)+(14.5,-9.5)$)}]
-    \fill[halfgray] (-0.4,-0.1) rectangle (0.4,0.1);
-    \fill[halfgray] (-0.4,0.1) rectangle (-0.3,0.65);
-    \fill[halfgray] (-0.32,-0.5) rectangle (-0.24,-0.1);
-    \fill[halfgray] (0.24,-0.5) rectangle (0.32,-0.1);
-  \end{scope}
-  \begin{scope}[rotate around={70:($(current page.north west)+(8.5,-8.8)$)}, shift={($(current page.north west)+(8.5,-8.8)$)}]
-    \fill[black] (-0.3,-0.08) rectangle (0.3,0.08);
-    \fill[black] (-0.3,0.08) rectangle (-0.2,0.5);
-    \fill[black] (-0.27,-0.45) rectangle (-0.2,-0.08);
-    \fill[black] (0.2,-0.45) rectangle (0.27,-0.08);
-  \end{scope}
-  \begin{scope}[rotate around={-15:($(current page.north west)+(18.0,-10.0)$)}, shift={($(current page.north west)+(18.0,-10.0)$)}]
-    \fill[halfgray] (-0.32,-0.1) rectangle (0.32,0.1);
-    \fill[halfgray] (-0.32,0.1) rectangle (-0.22,0.55);
-    \fill[halfgray] (-0.28,-0.5) rectangle (-0.21,-0.1);
-    \fill[halfgray] (0.21,-0.5) rectangle (0.28,-0.1);
-  \end{scope}
-  \begin{scope}[rotate around={55:($(current page.north west)+(13.0,-16.0)$)}, shift={($(current page.north west)+(13.0,-16.0)$)}]
-    \fill[black] (-0.32,-0.1) rectangle (0.32,0.1);
-    \fill[black] (-0.32,0.1) rectangle (-0.22,0.55);
-    \fill[black] (-0.28,-0.5) rectangle (-0.21,-0.1);
-    \fill[black] (0.21,-0.5) rectangle (0.28,-0.1);
-  \end{scope}
-
-  %% =========================================================
-  %% TRE ROBOT-PREMESSE in fila --- ballo meccanico
-  %% Braccia tese, signboard con i giudizi MLTT
+  %% Emblema F·I·E·C --- flush right, centro verticale.
+  %% Peso visivo: medio. Pivot della composizione.
+  %% Due fili sottili sopra e sotto, come bracket tipografico.
   %% =========================================================
 
-  %% --- Robot 1 (sinistra): A : Type ---
-  \begin{scope}[shift={($(current page.north west)+(3.5,-12.5)$)}, scale=0.72]
-    \fill[black] (-0.45,-1.6) rectangle (-0.12,-0.3);
-    \fill[black] (0.12,-1.6) rectangle (0.45,-0.3);
-    \fill[halfgray] (-0.65,-1.8) rectangle (0.05,-1.55);
-    \fill[halfgray] (-0.05,-1.8) rectangle (0.65,-1.55);
-    \fill[black] (-0.7,-0.3) rectangle (0.7,1.7);
-    \fill[halfgray] (-0.7,0.2) rectangle (0.7,0.4);
-    \fill[halfgray] (-0.7,1.0) rectangle (0.7,1.2);
-    \fill[cream] (0,0.7) circle [radius=0.14];
-    \fill[black] (-2.0,1.25) rectangle (-0.7,1.45);
-    \fill[black] (0.7,1.25) rectangle (2.0,1.45);
-    \fill[halfgray] (-2.2,1.0) rectangle (-2.0,1.7);
-    \fill[halfgray] (2.0,1.0) rectangle (2.2,1.7);
-    \fill[black] (-0.1,1.7) rectangle (0.1,1.95);
-    \fill[halfgray] (-0.5,1.95) rectangle (0.5,2.8);
-    \fill[cream] (-0.32,2.32) rectangle (-0.12,2.5);
-    \fill[cream] (0.12,2.32) rectangle (0.32,2.5);
-    \fill[black] (-0.22,2.08) rectangle (0.22,2.15);
-    \fill[black] (-0.04,2.8) rectangle (0.04,3.15);
-    \fill[cream] (0,3.2) circle [radius=0.11];
-    %% signboard sulla mano destra
-    \fill[cream] (1.75,1.8) rectangle (3.4,2.55);
-    \draw[black, line width=1.2pt] (1.75,1.8) rectangle (3.4,2.55);
-    \node[black, font=\small\bfseries] at (2.575,2.175) {$A : \mathsf{Type}$};
-  \end{scope}
+  \draw[halfgray, line width=0.4pt]
+    ($(current page.north east)+(-9.0,-16.5)$) --
+    ($(current page.north east)+(-4.5,-16.5)$);
 
-  %% --- Robot 2 (centro): x : A --- davanti al disco terra ---
-  \begin{scope}[shift={($(current page.north west)+(10.5,-12.5)$)}, scale=0.72]
-    \fill[black] (-0.45,-1.6) rectangle (-0.12,-0.3);
-    \fill[black] (0.12,-1.6) rectangle (0.45,-0.3);
-    \fill[halfgray] (-0.65,-1.8) rectangle (0.05,-1.55);
-    \fill[halfgray] (-0.05,-1.8) rectangle (0.65,-1.55);
-    \fill[black] (-0.7,-0.3) rectangle (0.7,1.7);
-    \fill[halfgray] (-0.7,0.2) rectangle (0.7,0.4);
-    \fill[halfgray] (-0.7,1.0) rectangle (0.7,1.2);
-    \fill[cream] (0,0.7) circle [radius=0.14];
-    \fill[black] (-2.0,1.25) rectangle (-0.7,1.45);
-    \fill[black] (0.7,1.25) rectangle (2.0,1.45);
-    \fill[halfgray] (-2.2,1.0) rectangle (-2.0,1.7);
-    \fill[halfgray] (2.0,1.0) rectangle (2.2,1.7);
-    \fill[black] (-0.1,1.7) rectangle (0.1,1.95);
-    \fill[halfgray] (-0.5,1.95) rectangle (0.5,2.8);
-    \fill[cream] (-0.32,2.32) rectangle (-0.12,2.5);
-    \fill[cream] (0.12,2.32) rectangle (0.32,2.5);
-    \fill[black] (-0.22,2.08) rectangle (0.22,2.15);
-    \fill[black] (-0.04,2.8) rectangle (0.04,3.15);
-    \fill[cream] (0,3.2) circle [radius=0.11];
-    \fill[cream] (1.75,1.8) rectangle (3.4,2.55);
-    \draw[black, line width=1.2pt] (1.75,1.8) rectangle (3.4,2.55);
-    \node[black, font=\small\bfseries] at (2.575,2.175) {$x : A$};
-  \end{scope}
+  \node[halfgray, anchor=base east,
+        font=\Large\scshape]
+    at ($(current page.north east)+(-4.5,-17.4)$)
+    {\spacedlowsmallcaps{F\,$\cdot$\,I\,$\cdot$\,E\,$\cdot$\,C}};
 
-  %% --- Robot 3 (destra): x ⊢ B x --- signboard sulla mano sinistra ---
-  \begin{scope}[shift={($(current page.north west)+(17.5,-12.5)$)}, scale=0.72]
-    \fill[black] (-0.45,-1.6) rectangle (-0.12,-0.3);
-    \fill[black] (0.12,-1.6) rectangle (0.45,-0.3);
-    \fill[halfgray] (-0.65,-1.8) rectangle (0.05,-1.55);
-    \fill[halfgray] (-0.05,-1.8) rectangle (0.65,-1.55);
-    \fill[black] (-0.7,-0.3) rectangle (0.7,1.7);
-    \fill[halfgray] (-0.7,0.2) rectangle (0.7,0.4);
-    \fill[halfgray] (-0.7,1.0) rectangle (0.7,1.2);
-    \fill[cream] (0,0.7) circle [radius=0.14];
-    \fill[black] (-2.0,1.25) rectangle (-0.7,1.45);
-    \fill[black] (0.7,1.25) rectangle (2.0,1.45);
-    \fill[halfgray] (-2.2,1.0) rectangle (-2.0,1.7);
-    \fill[halfgray] (2.0,1.0) rectangle (2.2,1.7);
-    \fill[black] (-0.1,1.7) rectangle (0.1,1.95);
-    \fill[halfgray] (-0.5,1.95) rectangle (0.5,2.8);
-    \fill[cream] (-0.32,2.32) rectangle (-0.12,2.5);
-    \fill[cream] (0.12,2.32) rectangle (0.32,2.5);
-    \fill[black] (-0.22,2.08) rectangle (0.22,2.15);
-    \fill[black] (-0.04,2.8) rectangle (0.04,3.15);
-    \fill[cream] (0,3.2) circle [radius=0.11];
-    %% signboard sulla mano SINISTRA (asimmetria)
-    \fill[cream] (-3.4,1.8) rectangle (-1.75,2.55);
-    \draw[black, line width=1.2pt] (-3.4,1.8) rectangle (-1.75,2.55);
-    \node[black, font=\small\bfseries] at (-2.575,2.175) {$x \vdash B\,x$};
-  \end{scope}
+  \draw[halfgray, line width=0.4pt]
+    ($(current page.north east)+(-9.0,-18.0)$) --
+    ($(current page.north east)+(-4.5,-18.0)$);
 
   %% =========================================================
-  %% LA MACCHINA (la barra come locomotiva Depero)
+  %% Blocco FOOTER --- flush left, terzo basso.
+  %% Peso visivo: basso. Tre righe + filo corto.
   %% =========================================================
 
-  %% Corpo della locomotiva (boiler orizzontale)
-  \fill[black]
-    ($(current page.north west)+(2,-17.2)$) rectangle
-    ($(current page.north west)+(19,-18.4)$);
+  %% Filo corto sopra il footer
+  \draw[halfgray, line width=0.4pt]
+    ($(current page.south west)+(4.5,7.6)$) --
+    ($(current page.south west)+(7.5,7.6)$);
 
-  %% Fasce vinaccia decorative (i pistoni del boiler)
-  \fill[halfgray]
-    ($(current page.north west)+(5,-17.25)$) rectangle
-    ($(current page.north west)+(5.5,-18.35)$);
-  \fill[halfgray]
-    ($(current page.north west)+(15.5,-17.25)$) rectangle
-    ($(current page.north west)+(16,-18.35)$);
-  \fill[cream]
-    ($(current page.north west)+(10.5,-17.8)$) circle [radius=0.25cm];
+  %% Autore
+  \node[black, anchor=base west,
+        font=\large]
+    at ($(current page.south west)+(4.5,6.8)$)
+    {Aaron Stump};
 
-  %% Cowcatcher davanti (triangolo a sinistra)
-  \fill[halfgray]
-    ($(current page.north west)+(2,-17.2)$) --
-    ($(current page.north west)+(2,-18.4)$) --
-    ($(current page.north west)+(1.0,-19.0)$) -- cycle;
-
-  %% Smokestack sopra
-  \fill[black]
-    ($(current page.north west)+(8.5,-15.5)$) rectangle
-    ($(current page.north west)+(9.5,-17.2)$);
-  \fill[halfgray]
-    ($(current page.north west)+(8.4,-15.4)$) rectangle
-    ($(current page.north west)+(9.6,-15.5)$);
-
-  %% Ruote sotto la locomotiva (cerchi neri con mozzo vinaccia)
-  \foreach \xc in {4.5, 10.5, 16.5} {
-    \fill[black]
-      ($(current page.north west)+(\xc,-19.0)$) circle [radius=0.55cm];
-    \fill[halfgray]
-      ($(current page.north west)+(\xc,-19.0)$) circle [radius=0.18cm];
-    %% piston rod tra ruota e corpo
-    \fill[halfgray]
-      ($(current page.north west)+(\xc-0.05,-18.5)$) rectangle
-      ($(current page.north west)+(\xc+0.05,-18.85)$);
-  }
-
-  %% =========================================================
-  %% CONCLUSIONE come VAPORE emesso dal cammino della locomotiva
-  %% =========================================================
-
-  %% Nuvolette di vapore dal smokestack (cerchi cream sovrapposti)
-  \fill[cream]
-    ($(current page.north west)+(8.0,-15.0)$) circle [radius=0.55cm];
-  \fill[cream]
-    ($(current page.north west)+(8.9,-14.5)$) circle [radius=0.70cm];
-  \fill[cream]
-    ($(current page.north west)+(10.2,-14.0)$) circle [radius=0.85cm];
-  \fill[cream]
-    ($(current page.north west)+(11.8,-13.7)$) circle [radius=0.7cm];
-
-  %% La conclusione "stampata" nel vapore
-  \node[black, font=\Large\bfseries\sffamily, anchor=west]
-    at ($(current page.north west)+(7.5,-14.0)$)
-    {$(x : A) \to B\,x$};
-
-  %% Echi (locomotiva che si allontana verso destra)
-  \foreach \dx/\dy/\op in {%
-    1.2/0.5/0.50,
-    2.1/1.1/0.30,
-    2.9/1.8/0.15%
-  } {
-    \node[black, font=\Large\bfseries\sffamily, anchor=west, opacity=\op]
-      at ($(current page.north west)+(7.5+\dx,-14.0-\dy)$)
-      {$(x : A) \to B\,x$};
-  }
-
-  %% =========================================================
-  %% F · I · E · C sigillo + bullone decorativo (sulla banda nera)
-  %% =========================================================
-  \node[halfgray, font=\fontsize{22}{24}\selectfont\bfseries\scshape, anchor=west]
-    at ($(current page.south west)+(1.5,4.0)$)
-    {F \;$\cdot$\; I \;$\cdot$\; E \;$\cdot$\; C};
-
-  %% Bullone Depero in basso-destra
-  \fill[halfgray]
-    ($(current page.south east)+(-1.8,4.3)$) circle [radius=0.4cm];
-  \fill[cream]
-    ($(current page.south east)+(-1.8,4.3)$) circle [radius=0.13cm];
-  %% Tacche sul bullone
-  \foreach \a in {0,60,120,180,240,300} {
-    \draw[cream, line width=1pt]
-      ($(current page.south east)+(-1.8,4.3)$) -- ++(\a:0.35cm);
-  }
-
-  %% =========================================================
-  %% FOOTER (sulla banda nera in basso)
-  %% =========================================================
-  \node[cream, font=\itshape\large, anchor=west]
-    at ($(current page.south west)+(1.5,2.8)$)
+  %% Compendio info, italic
+  \node[black, anchor=base west,
+        font=\normalsize\itshape]
+    at ($(current page.south west)+(4.5,6.0)$)
     {compendio a \emph{Verified Functional Programming in Agda}};
-  \node[cream!75, font=\normalsize, anchor=west]
-    at ($(current page.south west)+(1.5,2.0)$)
-    {Aaron Stump \;\textbullet\; Iowa Agda Library};
-  \node[halfgray, font=\scriptsize\bfseries\scshape, anchor=west]
-    at ($(current page.south west)+(1.5,1.2)$)
-    {omaggio: F.~Depero, ``Anihccam 3000'' (1924) \;$\cdot$\; ``La Rissa o Discussione del 3000'' (1926)};
-  \node[terra, font=\small\bfseries\scshape, anchor=west]
-    at ($(current page.south west)+(1.5,0.55)$)
-    {\the\year};
+
+  %% Affiliazione
+  \node[black, anchor=base west,
+        font=\normalsize]
+    at ($(current page.south west)+(4.5,5.2)$)
+    {Iowa Agda Library};
+
+  %% =========================================================
+  %% Anno --- flush right basso. Contrappeso a F·I·E·C.
+  %% =========================================================
+
+  \node[halfgray, anchor=base east,
+        font=\large\bfseries\scshape]
+    at ($(current page.south east)+(-4.5,3.0)$)
+    {MMXXVI};
 
 \end{tikzpicture}
 \end{titlepage}
