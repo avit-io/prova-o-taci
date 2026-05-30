@@ -56,9 +56,9 @@
 \toprule
 \textit{Cosa} & \textit{Dove vive} & \textit{Si dimostra?} \\
 \midrule
-$\tto, \ff, \zero, \suc\,n, \refl, \nil, \cons$ & linguaggio & s\`i, sono termini (introdotti dalle regole I) \\
-$\mathbb{B}, \mathbb{N}, \Pi, \Sigma, \_\identita\_, \mathrm{Vec}\,A\,n, \bot$ & linguaggio & s\`i, sono tipi (introdotti dalle regole F) \\
-$\indB, \indN, \indS, \Jelim$, applicazione di $\Pi$ & metalinguaggio & no, sono regole (E) \\
+$\tto, \ff, \zero, \suc\,n, \refl, \nil, \cons, \mathsf{inj}_1, \mathsf{inj}_2, \mathsf{fz}, \mathsf{fs}$ & linguaggio & s\`i, sono termini (introdotti dalle regole I) \\
+$\mathbb{B}, \mathbb{N}, \Pi, \Sigma, A \uplus B, \_\identita\_, \mathrm{Fin}\,n, \mathrm{Vec}\,A\,n, \bot$ & linguaggio & s\`i, sono tipi (introdotti dalle regole F) \\
+$\indB, \indN, \indS, \mathsf{ind}\text{-}\uplus, \Jelim$, applicazione di $\Pi$ & metalinguaggio & no, sono regole (E) \\
 Regole di computazione (Cero~\ref{cero:comp}) & metalinguaggio & no, sono definitorie (C) \\
 $\definitorio$ definitorio (giudizio) & metalinguaggio & no, \`e un'affermazione \\
 $\identita$ proposizionale (tipo $\_\identita\_$) & linguaggio & s\`i, si abita con $\refl$ \\

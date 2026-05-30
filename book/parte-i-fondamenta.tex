@@ -27,7 +27,7 @@ Questa distinzione \`e l'asse di tutto il libro. Ogni volta che il terreno smett
 
 \bigskip
 
-\noindent\textbf{Cosa non sono i ceri.} Non sono assiomi nel senso di Hilbert (proposizioni del linguaggio scelte come punto di partenza per derivare altre proposizioni del linguaggio): vivono nel metalinguaggio, o sono scelte di design. Non sono congetture (non si tratta di affermazioni che potrebbero un giorno rivelarsi false). Non sono postulati arbitrari: sono i punti in cui la materia del sistema chiede di essere fissata, e ogni fissaggio \`e una scelta motivata ma non costretta.
+\noindent\textbf{Cosa non sono i ceri.} Non sono assiomi nel senso di Hilbert (proposizioni del linguaggio scelte come punto di partenza per derivare altre proposizioni del linguaggio): appartengono al metalinguaggio, o sono scelte di design. Non sono congetture (non si tratta di affermazioni che potrebbero un giorno rivelarsi false). Non sono postulati arbitrari: sono i punti in cui la materia del sistema chiede di essere fissata, e ogni fissaggio \`e una scelta motivata ma non costretta.
 
 \bigskip
 
@@ -138,29 +138,29 @@ che \`e esattamente quello che volevo. \checkmark
 
 \noindent\textbf{Esempio negativo.} \emph{Non} posso usare questa regola per derivare $x : A$ nel contesto $\cdot,\, A : \Type$, perch\'e $x$ non \`e nel contesto. Le ipotesi non si materializzano dal nulla: per essere disponibili devono essere state assunte.
 
-\section*{Convenzione tipografica per il resto del libro}
+\section*{Convenzione $\Gamma$ implicito --- come si applica}
 
-Da \S\ref{cap:fiec} in poi, scriviamo le regole \emph{senza contesto in vista} quando \`e lo stesso ovunque. Si sottintende un $\Gamma$ implicito. Esempio: la regola di introduzione di $\mathbb{B}$ (\S\ref{cap:bool})
+La convenzione \`e gi\`a stata dichiarata nel patto di lettura: $\Gamma$ implicito ovunque, esplicito solo quando una premessa lo \emph{estende}. Due esempi operativi.
+
+\medskip
+
+\noindent \emph{Senza $\vdash$, contesto invariato.} La regola di introduzione di $\mathbb{B}$ (\S\ref{cap:bool})
 \[
 \inferrule{ }{\tto : \mathbb{B}}
 \]
-sta in realt\`a per
-\[
-\inferrule{ }{\Gamma \vdash \tto : \mathbb{B}}
-\]
-per ogni $\Gamma$.
+sta per $\Gamma \vdash \tto : \mathbb{B}$ per ogni $\Gamma$.
 
-\bigskip
+\medskip
 
-\noindent Quando invece una premessa \emph{estende} il contesto rispetto alla conclusione, il $\vdash$ sopravvive --- ed \`e l\`i che sta succedendo il lavoro non banale. Caso paradigmatico, la $\Pi$-formazione (\S\ref{cap:pi}):
+\noindent \emph{Con $\vdash$, contesto esteso.} La $\Pi$-formazione (\S\ref{cap:pi}):
 \[
 \inferrule{A : \Type \\ x : A \vdash B\,x : \Type}{(x : A) \to B\,x : \Type}
 \]
-Per esteso, sotto $\Gamma$ generico:
+Per esteso:
 \[
 \inferrule{\Gamma \vdash A : \Type \\ \Gamma, x : A \vdash B\,x : \Type}{\Gamma \vdash (x : A) \to B\,x : \Type}
 \]
-\noindent\textbf{Lettura della premessa $\Gamma, x : A \vdash B\,x : \Type$.} \emph{Estendi $\Gamma$ con l'ipotesi $x : A$; in questo contesto esteso, $B\,x$ \`e un tipo.} Tutto qui.
+\noindent La premessa $\Gamma, x : A \vdash B\,x : \Type$ si legge: \emph{estendi $\Gamma$ con l'ipotesi $x : A$; in questo contesto esteso, $B\,x$ \`e un tipo.} Tutto qui.
 
 \section*{Test diretto}
 

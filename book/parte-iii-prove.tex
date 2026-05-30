@@ -8,9 +8,9 @@ Prima un preambolo (\S\ref{cap:prima}) per dichiarare cosa cambia
 entrando in Parte~III e poi in Parte~IV: i sorgenti Agda useranno
 pattern matching, e va esplicitato cosa \`e zucchero meccanico per gli
 eliminatori e cosa \`e elaborazione che eccede l'eliminatore puro. Poi
-la logica non importata ma riconosciuta dentro F-I-E-C, fino a
-osservare Curry-Howard come gesto finale (\S\ref{cap:logica}). Un kit
-di costruzioni canoniche --- i \emph{tipi notevoli}
+la logica non importata ma riconosciuta dentro le F-I-E-C gi\`a viste,
+fino a osservare Curry-Howard come gesto finale (\S\ref{cap:logica}).
+Un kit di costruzioni canoniche --- i \emph{tipi notevoli}
 (\S\ref{cap:notevoli}) --- che fa da palestra prima del compendio.
 L'esercizio di Stump sulla commutativit\`a di \texttt{\&\&} apre il
 compendio vero e proprio in Parte~IV (\S\ref{cap:stump-1}).\upshape
@@ -40,17 +40,15 @@ Nei casi pi\`u semplici --- case-split su costruttori di $\mathbb{B}$ e $\mathbb
 
 Nei casi pi\`u sofisticati --- matching su $\refl$ in modo essenziale (es.\ \texttt{sym refl = refl}) o matching su costruttori che vincolano gli indici di un tipo dipendente (es.\ \texttt{head (cons a as) = a} su \texttt{Vec A (suc n)}) --- il pattern matching di Agda fa qualcosa in pi\`u degli eliminatori puri. C'\`e un \emph{compilatore} di pattern matching in mezzo che istanzia variabili libere usando l'informazione che il matching porta. \textbf{Non entriamo nel meccanismo}: lo scope di questo libro \`e Little Typer + Stump, non l'implementazione di Agda. Ci limitiamo a marcare ogni clausola come \textbf{meccanica} o \textbf{elaborata}, e a notare \emph{cosa} il pattern matching sta facendo in pi\`u --- istanziando una variabile, escludendo un costruttore via indice, e cos\`i via.
 
-\section*{Patto di lettura per Parte~III e Parte~IV}
+\section*{Marcatura delle clausole Agda --- convenzione operativa}
+
+Estensione operativa del patto di lettura, per i sorgenti Agda di Parte~III e~IV.
 
 \noindent\textbf{(i)} Ogni clausola Agda che incontreremo verr\`a accompagnata, almeno la prima volta che il pattern compare, dalla sua traduzione esplicita in F-I-E-C (eliminatore + motivo + casi base/passo).
 
-\noindent\textbf{(ii)} Quando la traduzione \`e \emph{meccanica} (nessun matching essenziale su $\refl$, nessun vincolo non banale sugli indici) ce lo segneremo come ``traduzione meccanica''.
+\noindent\textbf{(ii)} Quando la traduzione \`e \emph{meccanica} (nessun matching essenziale su $\refl$, nessun vincolo non banale sugli indici) la segneremo come ``traduzione meccanica''.
 
 \noindent\textbf{(iii)} Quando \`e \emph{elaborata} lo dichiareremo e indicheremo cosa il pattern matching sta facendo in pi\`u, \emph{senza} entrare nel meccanismo di unificazione che Agda usa per realizzarlo.
-
-\bigskip
-
-\noindent Con questo patto in tasca, entriamo in Parte~III (logica e kit di costruzioni) e poi in Parte~IV (compendio di Stump) sapendo cosa stiamo importando e cosa no.
 
 % ---------------------------------------------------------------------
 \chapter{La logica che affiora}\label{cap:logica}
@@ -165,62 +163,16 @@ L'introduzione $(a, b) : \Sigma\,x \in A,\,B\,x$ richiede un \emph{testimone} $a
 In matematica classica si dimostra spesso ``esiste $x$ tale che $\ldots$'' assumendo per assurdo la negazione e derivando una contraddizione. La prova esiste, il testimone no. In MLTT questa strategia \emph{non funziona}: per abitare $\Sigma\,x \in A,\,B\,x$ devi produrre $(a, b)$. \`E lo stesso fenomeno che vedremo a fine capitolo per la doppia negazione e LEM.
 \end{oss}
 
-\section*{Disgiunzione: il coproduct $A \uplus B$}\label{sec:coproduct}
+\section*{Disgiunzione: $A \uplus B$}\label{sec:coproduct}
 
-Qui c'\`e una connettiva che ci manca. Non l'abbiamo introdotta in Parte~II perch\'e non serviva per la traversata dei sei tipi fondativi. La introduciamo adesso, perch\'e la lettura logica la chiama: \emph{disgiunzione costruttiva}.
-
-\medskip
-
-\noindent F-I-E-C completa del coproduct (o \emph{somma disgiunta}):
-
-\paragraph{F --- Formazione.}
-\[
-\inferrule{A : \Type \\ B : \Type}{A \uplus B : \Type}
-\]
-
-\paragraph{I --- Introduzione.} (Due costruttori.)
-\[
-\inferrule{a : A}{\mathsf{inj}_1\,a : A \uplus B}
-\qquad
-\inferrule{b : B}{\mathsf{inj}_2\,b : A \uplus B}
-\]
-
-\paragraph{E --- Eliminazione.}
-\[
-\inferrule{
-e : A \uplus B \\
-C : (A \uplus B) \to \Type \\
-f : (a : A) \to C\,(\mathsf{inj}_1\,a) \\
-g : (b : B) \to C\,(\mathsf{inj}_2\,b)
-}{
-\mathsf{ind}\text{-}\uplus(e, C, f, g) : C\,e
-}
-\]
-
-\paragraph{C --- Computazione.}
-\begin{align*}
-\mathsf{ind}\text{-}\uplus(\mathsf{inj}_1\,a, C, f, g) &\definitorio f\,a \\
-\mathsf{ind}\text{-}\uplus(\mathsf{inj}_2\,b, C, f, g) &\definitorio g\,b
-\end{align*}
-
-Stesso schema visto in Parte~II: due costruttori, nessuna ricorsione (perch\'e n\'e $\mathsf{inj}_1$ n\'e $\mathsf{inj}_2$ contengono istanze di $A \uplus B$), eliminazione per casi.
-
-In Agda:
-
-\begin{agda}
-data _⊎_ (A B : Set) : Set where
-  inj₁ : A → A ⊎ B
-  inj₂ : B → A ⊎ B
-\end{agda}
-
-\noindent\textbf{Lettura logica.} $A \uplus B$ \`e la proposizione $A \vee B$.
+$A \uplus B$ \`e stato introdotto in Parte~II (\S\ref{cap:coproduct}) con la sua F-I-E-C. La lettura logica \`e immediata: $A \uplus B$ \`e la proposizione $A \vee B$.
 
 \begin{itemize}
-\item Introduzioni: regole $\vee$-introduzione 1 e 2.
-\item Eliminazione: regola di \emph{ragionamento per casi} ($\vee$-eliminazione). Per concludere $C$ da $A \vee B$, mostra come concludere $C$ assumendo $A$, e come concludere $C$ assumendo $B$.
+\item Introduzioni $\mathsf{inj}_1$, $\mathsf{inj}_2$: regole $\vee$-introduzione 1 e 2.
+\item Eliminazione $\mathsf{ind}\text{-}\uplus$: regola di \emph{ragionamento per casi} ($\vee$-eliminazione). Per concludere $C$ da $A \vee B$, mostra come concludere $C$ assumendo $A$, e come concludere $C$ assumendo $B$.
 \end{itemize}
 
-\textbf{Costruttivit\`a della disgiunzione.} Una prova di $A \uplus B$ ti dice \emph{quale dei due} vale. Non c'\`e modo di abitarlo senza decidere fra $\mathsf{inj}_1$ e $\mathsf{inj}_2$. \`E lo stesso fenomeno dell'esistenziale: la disgiunzione \`e \emph{informativa}.
+\textbf{Costruttivit\`a della disgiunzione.} Una prova di $A \uplus B$ dice \emph{quale dei due} vale: non c'\`e modo di abitarlo senza decidere fra $\mathsf{inj}_1$ e $\mathsf{inj}_2$. Stesso fenomeno dell'esistenziale --- la disgiunzione \`e \emph{informativa}.
 
 \section*{Uguaglianza}
 
@@ -334,9 +286,7 @@ tt || b = tt
 ff || b = b
 \end{agda}
 
-\begin{oss}[Cucitura con \S\ref{cap:and-comm}]
-La definizione di \texttt{\_\&\&\_} appena vista \`e \textbf{esattamente} la stessa che useremo nel capitolo successivo per dimostrare \texttt{\&\&-comm}. Le ``regole di computazione di \texttt{\&\&}'' di cui parler\`a \S\ref{cap:and-comm} sono i due passi $\beta$ di $\indB$ applicato a $\tto$ e $\ff$.
-\end{oss}
+\noindent La definizione di \texttt{\_\&\&\_} qui sopra \`e quella che riprenderemo in \S\ref{cap:and-comm}: le ``regole di computazione di \texttt{\&\&}'' di quel capitolo sono i due passi $\beta$ di $\indB$ applicato a $\tto$ e $\ff$.
 
 \subsection*{$\mathsf{if\_then\_else\_}$}
 

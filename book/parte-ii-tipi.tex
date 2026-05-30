@@ -3,18 +3,21 @@
 % =====================================================================
 \part{I tipi}
 
-\noindent\itshape Otto capitoli: sette di tipi F-I-E-C puri, un quadro
+\noindent\itshape Dieci capitoli: sei di tipi F-I-E-C puri, un esempio
+dipendente piccolo, due capitoli di chiarimento su $\Pi$, un quadro
 d'insieme finale. $\mathbb{B}$ (\S\ref{cap:bool}) per vedere lo schema nel
 caso pi\`u puro, senza ricorsione. $\mathbb{N}$ (\S\ref{cap:nat}) per il salto
-all'induzione vera. $\Pi$ (\S\ref{cap:pi}) per la decisione fondativa di MLTT,
+all'induzione vera. $\Pi$ (\S\ref{cap:pi}) per la scelta che definisce MLTT,
 e $\Pi$ in azione (\S\ref{cap:pi-azione}) per le due passate che la sintassi
 nasconde. $\forall$ (\S\ref{cap:forall}) come zucchero. $\Sigma$
-(\S\ref{cap:sigma}) come duale. Il tipo identit\`a $\_\identita\_$
+(\S\ref{cap:sigma}) come duale di $\Pi$; $A \uplus B$ (\S\ref{cap:coproduct})
+come altro connettivo binario non dipendente. Il tipo identit\`a $\_\identita\_$
 (\S\ref{cap:identita}) come sezione cardine --- l\`i si chiude la distinzione
-fra le due uguaglianze. Un quadro d'insieme (\S\ref{cap:quadro-ii}) chiude
-la traversata. $\mathrm{Vec}$, il tipo dipendente canonico, \emph{non} sta
-qui: appartiene al compendio di Stump in Parte~IV (\S\ref{cap:stump-4}),
-dove ogni costruzione dipendente ha il suo capitolo dedicato.\upshape
+fra le due uguaglianze. $\mathrm{Fin}\,n$ (\S\ref{cap:fin}) come primo esempio
+dipendente concreto, in piccolo. Un quadro d'insieme (\S\ref{cap:quadro-ii})
+chiude la traversata. $\mathrm{Vec}$, il tipo dipendente canonico, \emph{non}
+sta qui: appartiene al compendio di Stump in Parte~IV (\S\ref{cap:stump-4}),
+dove ogni costruzione dipendente non banale ha il suo capitolo dedicato.\upshape
 
 \bigskip
 
@@ -73,9 +76,9 @@ Tutti gli eliminatori che seguono hanno la stessa anatomia: motivo + un caso per
 
 Quando l'argomento \`e un costruttore concreto, l'eliminatore riduce al ramo corrispondente. Nient'altro.
 
-\begin{oss}[Punto da fissare]
-Confronta con quanto vedremo per $\mathbb{N}$ in \S\ref{cap:nat}: l\`i $c_t, c_f$ saranno sostituiti da un caso base e un \emph{passo} che riceve un'ipotesi induttiva. Qui no, perch\'e $\tto$ e $\ff$ non contengono altre $\mathbb{B}$. Eliminare = sempre case-split su tutti i costruttori. Indurre = case-split + ricorrere quando il costruttore contiene istanze del tipo stesso. $\mathbb{B}$ ha la prima cosa, non la seconda.
-\end{oss}
+\medskip
+
+\noindent\textbf{Confronto in avanti con $\mathbb{N}$.} In \S\ref{cap:nat} $c_t, c_f$ diventano un caso base e un \emph{passo} che riceve un'ipotesi induttiva. Qui no, perch\'e $\tto$ e $\ff$ non contengono altre $\mathbb{B}$. Eliminare = case-split su tutti i costruttori; indurre = case-split + ricorrere quando il costruttore contiene istanze del tipo stesso. $\mathbb{B}$ ha la prima cosa, non la seconda.
 
 % ---------------------------------------------------------------------
 \chapter{$\mathbb{N}$ --- l'eliminazione diventa induzione}\label{cap:nat}
@@ -177,10 +180,10 @@ Le funzioni. Generalizzate al punto in cui il \emph{tipo di ritorno} pu\`o dipen
 
 $x : A \vdash B\,x : \Type$ significa: \emph{nel contesto in cui ho un $x$ di tipo $A$, $B\,x$ \`e un tipo}. $x$ \`e libera fuori; la regola la chiude dentro il tipo (Cero~\ref{cero:contesti} al lavoro).
 
-Qui c'\`e la \textbf{decisione fondativa} di tutta MLTT:
+Qui c'\`e il punto in cui MLTT si separa da tutti gli altri sistemi:
 
 \begin{cero}[Un termine pu\`o apparire dentro un tipo]\label{cero:dipendenza}
-Questa \`e \textsc{la} decisione che definisce MLTT. Prima, hai i tipi semplici, dove $B$ non sa niente di $x$. Dopo, hai i tipi dipendenti.
+\textsc{La} scelta che definisce MLTT. Prima, hai i tipi semplici, dove $B$ non sa niente di $x$. Dopo, hai i tipi dipendenti.
 
 Non \`e giustificata da niente di precedente. \`E una scelta su \emph{cosa vuoi che il sistema sia}. Potresti scegliere diversamente --- tipi semplici, sistema F, tipi lineari --- e avresti un sistema \textbf{diverso, non sbagliato}. Questo cero distingue MLTT da tutto il resto.
 \end{cero}
@@ -244,17 +247,13 @@ Quando il typechecker incontra \verb|(elim-Pair Nat Atom Bool p f)| fa \textbf{d
 
 \textbf{Prima fissi i tipi, poi fai il resto.} L'illusione \emph{non} \`e che i tipi fingano di essere valori --- lo sono. L'illusione \`e che una sola sintassi \verb|(lambda (A D X) (lambda (p f) ...))| nasconde che le due $\lambda$ giocano ruoli temporalmente diversi.
 
-\begin{oss}[Segnale fisico]
-$A, D, X$ \emph{non compaiono nel corpo}. Un argomento che il calcolo non usa, ma che il checker pretende, \`e per definizione della passata-tipi.
-\end{oss}
+\medskip
 
-\begin{oss}[Conferma teorica --- \emph{type erasure}]
-Proprio perch\'e la passata 2 non guarda $A, D, X$, un compilatore pu\`o cancellarli dopo il type checking. Se le passate fossero la stessa cosa, non si potrebbe. Il fatto che si possa \`e la prova che sono separate. (Dove le passate si \emph{toccano} \`e \texttt{Vec A n} (\S\ref{cap:vec}): l\`i un valore \texttt{n} risale dentro un tipo. Si intrecciano, non collassano.)
-\end{oss}
+\noindent\textbf{Due segnali della separazione.} (i) \emph{Sintattico}: $A, D, X$ non compaiono nel corpo. Un argomento che il calcolo non usa, ma che il checker pretende, \`e per definizione della passata-tipi. (ii) \emph{Teorico}: la passata 2 non guarda $A, D, X$, quindi un compilatore pu\`o cancellarli dopo il type checking (\emph{type erasure}). Se le due passate fossero la stessa cosa, non si potrebbe. Il punto in cui invece si \emph{toccano} --- senza collassare --- \`e \texttt{Vec A n} (\S\ref{cap:vec}): l\`i un valore \texttt{n} risale dentro un tipo.
 
 \bigskip
 
-\noindent\textbf{Sintesi.} Quando diciamo che \emph{i tipi sono di prima classe}, intendiamo: sono termini della \textbf{passata 1} --- vengono manipolati dal type-checker come qualsiasi altro termine, possono essere passati a funzioni, possono dipendere da valori. Ma non sono valori della \textbf{passata 2}: dopo il type checking $A, D, X$ sono cancellati (\emph{type erasure}) e non costano nulla a runtime. \textbf{Di prima classe a compile time, trasparenti a runtime}: \`e l'asimmetria chiave fra MLTT e i sistemi pi\`u semplici come Hindley-Milner, dove i tipi sono sempre e solo annotazioni esterne al calcolo.
+\noindent\textbf{Sintesi.} Quando diciamo che \emph{i tipi sono di prima classe}, intendiamo: sono termini della \textbf{passata 1} --- vengono manipolati dal type-checker come qualsiasi altro termine, possono essere passati a funzioni, possono dipendere da valori. Ma non sono valori della \textbf{passata 2}: dopo il type checking $A, D, X$ sono cancellati e non costano nulla a runtime. \textbf{Di prima classe a compile time, trasparenti a runtime}: \`e l'asimmetria chiave fra MLTT e i sistemi pi\`u semplici come Hindley-Milner, dove i tipi sono sempre e solo annotazioni esterne al calcolo.
 
 \section*{\texttt{elim-Pair} in Agda}
 
@@ -377,7 +376,60 @@ categoriale             & $\Pi$ (funzioni indicizzate) & $\Sigma$ (coppie indici
 \end{center}
 
 % MODIFICATO: la confusione "Σ si chiama somma in CT" spostata in nota a pie pagina
-\noindent $\Sigma$ generalizza il prodotto \emph{aritmetico} ma si chiama \emph{somma categoriale}\footnote{In teoria delle categorie ``somma'' (o \emph{coprodotto}) \`e il duale di ``prodotto''. Il coprodotto binario \`e $A + B$, e la sua versione indicizzata \`e $\coprod_{x \in A} B\,x$, che \emph{\`e} $\Sigma\,x\!\in\!A,\,B\,x$. Quindi $\Sigma$ \`e ``somma'' nel senso categoriale di coprodotto indicizzato, anche se insiemisticamente i suoi abitanti sono coppie e ``sembra'' un prodotto. Doppia tradizione terminologica, da non confondere.}. Incidente storico, da ignorare. In pratica: $\Pi$ = funzioni dipendenti, $\Sigma$ = coppie dipendenti.
+\noindent $\Sigma$ generalizza il prodotto \emph{aritmetico} ma si chiama \emph{somma categoriale}\footnote{In teoria delle categorie ``somma'' (o \emph{coprodotto}) \`e il duale di ``prodotto''. Il coprodotto binario \`e $A + B$, e la sua versione indicizzata \`e $\coprod_{x \in A} B\,x$, che \emph{\`e} $\Sigma\,x\!\in\!A,\,B\,x$. Quindi $\Sigma$ \`e ``somma'' nel senso categoriale di coprodotto indicizzato, anche se insiemisticamente i suoi abitanti sono coppie e ``sembra'' un prodotto. Doppia tradizione terminologica, da non confondere. Il \emph{coprodotto binario non indicizzato} $A \uplus B$ lo introduciamo nel prossimo capitolo.}. Incidente storico, da ignorare. In pratica: $\Pi$ = funzioni dipendenti, $\Sigma$ = coppie dipendenti.
+
+% ---------------------------------------------------------------------
+\chapter{$A \uplus B$ --- la disgiunzione}\label{cap:coproduct}
+
+Due costruttori, scelta secca. Una prova di $A \uplus B$ dice \emph{quale dei due} vale: la sua lettura logica, che riprenderemo in \S\ref{cap:logica}, \`e la disgiunzione costruttiva. Lo introduciamo qui, dopo $\Sigma$, perch\'e \`e l'altro connettivo binario non dipendente --- e perch\'e la sua F-I-E-C \`e parallela a $\Sigma$ pi\`u che a $\Pi$.
+
+\section*{F --- Formazione}
+\[
+\inferrule{A : \Type \\ B : \Type}{A \uplus B : \Type}
+\]
+Premesse indipendenti. Nessun binder fra $A$ e $B$: a differenza di $\Sigma$ il secondo lato non vede nulla del primo, perch\'e i due costruttori non vivono nello stesso termine.
+
+\section*{I --- Introduzione}
+Due costruttori, simmetrici:
+\[
+\inferrule{a : A}{\mathsf{inj}_1\,a : A \uplus B}
+\qquad
+\inferrule{b : B}{\mathsf{inj}_2\,b : A \uplus B}
+\]
+
+Per abitare $A \uplus B$ si sceglie: $\mathsf{inj}_1$ se si parte da $A$, $\mathsf{inj}_2$ se si parte da $B$. L'informazione di \emph{quale lato} \`e parte del termine costruito --- non si pu\`o ``avere $A \uplus B$ senza sapere quale''. \`E lo stesso fenomeno costruttivo che vedremo dietro la disgiunzione logica in \S\ref{cap:logica}.
+
+\section*{E --- Eliminazione}
+\[
+\inferrule{
+e : A \uplus B \\
+C : (A \uplus B) \to \Type \\
+f : (a : A) \to C\,(\mathsf{inj}_1\,a) \\
+g : (b : B) \to C\,(\mathsf{inj}_2\,b)
+}{
+\mathsf{ind}\text{-}\uplus(e, C, f, g) : C\,e
+}
+\]
+
+Schema noto: motivo $C$ + un caso per costruttore. \textbf{Nessuna ricorsione}, perch\'e n\'e $\mathsf{inj}_1$ n\'e $\mathsf{inj}_2$ contengono istanze di $A \uplus B$. Confronto con $\indS$ (\S\ref{cap:sigma}): l\`i un solo costruttore con due dati \emph{insieme}; qui due costruttori con un dato \emph{a scelta}. Le due eliminazioni sono duali.
+
+\section*{C --- Computazione}
+\begin{align*}
+\mathsf{ind}\text{-}\uplus(\mathsf{inj}_1\,a, C, f, g) &\definitorio f\,a \\
+\mathsf{ind}\text{-}\uplus(\mathsf{inj}_2\,b, C, f, g) &\definitorio g\,b
+\end{align*}
+
+L'eliminatore consuma il costruttore e seleziona il ramo. Stesso schema di $\indB$ e $\indS$: nessun lavoro residuo dopo aver scoperto quale costruttore c'\`e.
+
+\section*{In Agda}
+
+\begin{agda}
+data _⊎_ (A B : Set) : Set where
+  inj₁ : A → A ⊎ B
+  inj₂ : B → A ⊎ B
+\end{agda}
+
+\noindent\textbf{Da fissare.} Tre nomi per la stessa cosa: \emph{coproduct} (terminologia categoriale, il duale di $\times$), \emph{somma disgiunta} (lettura insiemistica), \emph{disgiunzione} (lettura logica, \S\ref{cap:logica}). Non sono tre tipi: tre nomi per la regola F-I-E-C qui sopra.
 
 % ---------------------------------------------------------------------
 \chapter{$\_\identita\_$ --- il tipo identit\`a}\label{cap:identita}
@@ -559,15 +611,58 @@ Completiamo la tabella lampo di \S\ref{cap:test}:
 $\definitorio$ in $(\lambda x.\,b)\,a \definitorio b\,a$ (regola di computazione) & meta & uguaglianza definitoria, asserzione \\
 $\identita$ in $x \identita y : \Type$ (Agda: \texttt{\_$\equiv$\_}) & linguaggio & tipo identit\`a, si abita con $\refl$ \\
 $\refl$ & linguaggio & termine, abita il tipo identit\`a \\
-$\indB$, $\indN$, $\indS$, $\Jelim$ & meta & eliminatori = regole di inferenza \\
+$\indB$, $\indN$, $\indS$, $\mathsf{ind}\text{-}\uplus$, $\Jelim$ & meta & eliminatori = regole di inferenza \\
 \bottomrule
 \end{tabular}
 \end{center}
 
 % ---------------------------------------------------------------------
+\chapter{$\mathrm{Fin}\,n$ --- un primo tipo dipendente in piccolo}\label{cap:fin}
+
+Un esempio breve, prima del quadro. $\mathrm{Fin}\,n$ \`e il tipo dei naturali strettamente minori di $n$: per ogni $n$, un tipo diverso. \`E il primo posto in cui un \emph{valore} ($n : \mathbb{N}$) compare dentro un \emph{tipo} ($\mathrm{Fin}\,n$) e ne determina la popolazione --- Cero~\ref{cero:dipendenza} in atto su un numero, non su una variabile di tipo.
+
+\section*{F --- Formazione}
+\[
+\inferrule{n : \mathbb{N}}{\mathrm{Fin}\,n : \Type}
+\]
+
+$\mathrm{Fin}\,0$, $\mathrm{Fin}\,1$, $\mathrm{Fin}\,3$ sono tipi diversi: il typechecker conosce la taglia a compile time.
+
+\section*{I --- Introduzione}
+\[
+\inferrule{n : \mathbb{N}}{\mathsf{fz} : \mathrm{Fin}\,(\suc\,n)}
+\qquad
+\inferrule{i : \mathrm{Fin}\,n}{\mathsf{fs}\,i : \mathrm{Fin}\,(\suc\,n)}
+\]
+
+Entrambi i costruttori concludono in $\mathrm{Fin}\,(\suc\,n)$: nessuno produce un $\mathrm{Fin}\,0$. Conseguenza: $\mathrm{Fin}\,0$ \`e abitato da \emph{zero} termini --- senza essere $\bot$, e senza una regola dedicata. Lo si scopre tentando di costruirne uno: nessuno dei due costruttori \`e applicabile, perch\'e nessuno ha $\zero$ come indice di conclusione.
+
+\medskip
+
+\noindent Viceversa, $\mathrm{Fin}\,3$ ha esattamente tre abitanti: $\mathsf{fz}$, $\mathsf{fs}\,\mathsf{fz}$, $\mathsf{fs}\,(\mathsf{fs}\,\mathsf{fz})$. La taglia del tipo si legge nell'indice.
+
+\section*{In Agda}
+\begin{agda}
+data Fin : ℕ → Set where
+  fz : ∀ {n} → Fin (suc n)
+  fs : ∀ {n} → Fin n → Fin (suc n)
+\end{agda}
+
+Le graffe in \texttt{∀ \{n\}} sono il riconoscimento sintattico di \S\ref{cap:pi-azione}: $n$ vive nella passata 1 ed \`e inferito dal tipo del risultato di ciascun costruttore.
+
+\bigskip
+
+\noindent\textbf{Cosa mostra in piccolo.}
+\begin{itemize}
+\item \emph{Un valore entra dentro un tipo.} Cero~\ref{cero:dipendenza} in forma concreta, su un numero.
+\item \emph{La popolazione dipende dall'indice.} $\mathrm{Fin}\,0$ \`e vuoto \emph{per costruzione} dei costruttori, non per regola dedicata.
+\item \emph{Costruttori che vincolano l'indice.} \`E lo stesso meccanismo che $\mathrm{Vec}$ porter\`a su valori non numerici in Parte~IV (\S\ref{cap:vec}). E--C si scrivono sullo schema di $\indN$ (caso $\mathsf{fz}$, caso $\mathsf{fs}$ con ipotesi induttiva); non servono qui, dove l'esempio sta tutto in F--I.
+\end{itemize}
+
+% ---------------------------------------------------------------------
 \chapter{Quadro d'insieme della Parte~II}\label{cap:quadro-ii}
 
-\noindent {\spacedlowsmallcaps{Cinque tipi, una tabella}}. I cinque tipi MLTT puri introdotti finora, allineati sulle stesse colonne. Stessa anatomia F-I-E-C; ci\`o che cambia \`e la presenza (o l'assenza) di ricorsione, e da cosa dipende il motivo $C$.
+\noindent {\spacedlowsmallcaps{Sei tipi pi\`u un esempio, una tabella}}. I sei tipi MLTT puri introdotti finora, allineati sulle stesse colonne, pi\`u $\mathrm{Fin}\,n$ come esempio dipendente. Stessa anatomia F-I-E-C; ci\`o che cambia \`e la presenza di ricorsione, da cosa dipende il motivo $C$, e se l'indice del tipo \`e un valore.
 
 \bigskip
 
@@ -580,9 +675,12 @@ $\indB$, $\indN$, $\indS$, $\Jelim$ & meta & eliminatori = regole di inferenza \
 \midrule
 $\mathbb{B}$ & s\`i & no & $b : \mathbb{B}$ & case-split puro; pi\`u piccolo induttivo possibile \\
 $\mathbb{N}$ & s\`i & s\`i & $n : \mathbb{N}$ & induzione e ricorsione primitiva \\
-$\Pi$        & s\`i & no & --- (non induttivo) & funzioni dipendenti; decisione fondativa MLTT \\
+$\Pi$        & s\`i & no & --- (non induttivo) & funzioni dipendenti; scelta che definisce MLTT \\
 $\Sigma$     & s\`i & no & $p : \Sigma\,x\!\in\!A,\,B\,x$ & coppie dipendenti; duale di $\Pi$ \\
+$A \uplus B$ & s\`i & no & $e : A \uplus B$ & disgiunzione costruttiva; due costruttori a scelta \\
 $\_\identita\_$ & s\`i & no & $y : A$ \emph{e} $p : x \identita y$ & uguaglianza interna; ponte meta--linguaggio \\
+\midrule
+$\mathrm{Fin}\,n$ & s\`i & s\`i & $i : \mathrm{Fin}\,n$ (con $n$ indice) & prototipo dipendente in piccolo (\S\ref{cap:fin}) \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -591,9 +689,9 @@ $\_\identita\_$ & s\`i & no & $y : A$ \emph{e} $p : x \identita y$ & uguaglianza
 
 \noindent\textbf{Letture trasversali.}
 \begin{itemize}
-\item \emph{Ricorsione = costruttore che cita il tipo stesso.} $\mathbb{B}$ e $\Sigma$ non hanno tale costruttore; $\mathbb{N}$ ($\suc$) s\`i. $\Pi$ e $\_\identita\_$ non sono induttivi in senso stretto.
-\item \emph{Motivo a una variabile vs.\ a due.} $\indB$, $\indN$, $\indS$ hanno motivi su una variabile (il valore eliminato). $\Jelim$ ne ha due, perch\'e il tipo identit\`a \`e indicizzato dall'altro estremo \emph{e} dalla prova stessa.
-\item \emph{Dipendenza Cero~\ref{cero:dipendenza}.} $\Pi$ la introduce; $\Sigma$ la eredita; $\_\identita\_$ la sfrutta in modo essenziale (un \emph{valore} entra in un \emph{tipo}). $\mathbb{B}$ e $\mathbb{N}$ no, di per s\'e: la usano solo quando si scelgono motivi non costanti.
+\item \emph{Ricorsione = costruttore che cita il tipo stesso.} $\mathbb{B}$, $\Sigma$, $A \uplus B$ non hanno tale costruttore; $\mathbb{N}$ ($\suc$) e $\mathrm{Fin}$ ($\mathsf{fs}$) s\`i. $\Pi$ e $\_\identita\_$ non sono induttivi in senso stretto.
+\item \emph{Motivo a una variabile vs.\ a due.} $\indB$, $\indN$, $\indS$, $\mathsf{ind}\text{-}\uplus$ hanno motivi su una variabile (il valore eliminato). $\Jelim$ ne ha due, perch\'e il tipo identit\`a \`e indicizzato dall'altro estremo \emph{e} dalla prova stessa.
+\item \emph{Dipendenza Cero~\ref{cero:dipendenza}.} $\Pi$ la introduce; $\Sigma$ la eredita; $\_\identita\_$ e $\mathrm{Fin}\,n$ la sfruttano in modo essenziale (un \emph{valore} entra in un \emph{tipo}). $\mathbb{B}$, $\mathbb{N}$, $A \uplus B$ no, di per s\'e: la usano solo quando si scelgono motivi non costanti.
 \end{itemize}
 
 \bigskip

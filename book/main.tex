@@ -324,29 +324,30 @@
 \addcontentsline{toc}{chapter}{Nota al lettore}
 
 \begin{center}
-{\large\bfseries\scshape\color{halfgray}
-Nessuna magia.\\[2pt]
-Nessun trucco.\\[2pt]
-Il tipo esiste o non esiste.\\[2pt]
-La prova regge o crolla.\\[2pt]
-Chi non dimostra, tace.}
+{\itshape\color{halfgray}
+Un tipo esiste se le sue regole lo dichiarano; una prova vale se i suoi passi reggono.\\[2pt]
+Dove non si dimostra, conviene tacere --- da qui il titolo.}
 \end{center}
 
 \bigskip\bigskip
 
 Quattro cose, prima di cominciare.
 
-\paragraph{Origine.} Queste note nascono per accompagnare la lettura di \emph{Verified Functional Programming in Agda} di Aaron Stump, leggendo gli esercizi come applicazioni della Martin-L\"of Type Theory pura --- cio\`e nello schema delle quattro regole F-I-E-C (Formazione, Introduzione, Eliminazione, Computazione) che sotto Agda c'\`e sempre, anche quando la sintassi la nasconde dietro lo zucchero.
+\paragraph{Origine.} Queste note nascono per accompagnare la lettura di \emph{Verified Functional Programming in Agda} di Aaron Stump, leggendo gli esercizi come applicazioni di Martin-L\"of Type Theory pura --- cio\`e nello schema F-I-E-C (Formazione, Introduzione, Eliminazione, Computazione) che sotto Agda c'\`e sempre, anche quando lo zucchero sintattico lo nasconde.
 
-\paragraph{Tesi.} Tutto il gioco di MLTT \`e in quattro regole, applicate uniformemente a ogni tipo. Capire ciascun tipo significa scriverne le quattro regole e vedere come gli abitanti del linguaggio (termini, prove) vengono dalle regole di introduzione, e come gli usi (eliminazioni, riduzioni) vengono da quelle di eliminazione e computazione. Non c'\`e altro.
+\paragraph{Tesi.} Tutto MLTT sta in quattro regole, applicate uniformemente a ogni tipo. Capire un tipo significa scriverne F-I-E-C e vedere come gli abitanti vengono dalle regole I, e come gli usi vengono da E e C. Non c'\`e altro.
 
-\paragraph{Assunzioni.} Sono dichiarate ed esplicite. Le ho chiamate \emph{ceri} --- come i ceri votivi che si accendono perch\'e qualcosa regga senza averne la dimostrazione interna --- e ne incontreremo quattro nel corpo del testo. Ognuno \`e un punto in cui il sistema poggia su qualcosa che non si pu\`o derivare dall'interno: vivono nel metalinguaggio o sono scelte fondative. Confondere un cero con un teorema, o uno zucchero sintattico con una regola primitiva, \`e la fonte principale di confusione in MLTT. Renderli espliciti \`e met\`a del lavoro.
+\paragraph{Assunzioni.} Sono dichiarate ed esplicite. Le chiamiamo \emph{ceri} --- come i ceri votivi che si accendono perch\'e qualcosa regga senza dimostrazione interna --- e ne incontreremo quattro. Ognuno \`e un punto in cui il sistema poggia su qualcosa di non derivabile dall'interno: appartiene al metalinguaggio, oppure \`e una scelta di design. Confondere un cero con un teorema, o uno zucchero sintattico con una regola primitiva, \`e la fonte principale di confusione in MLTT; tenerli espliciti \`e met\`a del lavoro.
 
-\paragraph{Forma.} Dove la prosa basta, c'\`e prosa. Dove la prosa rende sfuocato qualcosa che chiede precisione, entrano le regole di inferenza in forma classica (premesse, barra, conclusione), o un frammento Agda. Nessun salto: ogni sezione usa solo cose introdotte in sezioni precedenti, e se ci si perde su un punto basta tornare indietro fino a trovarne il fondamento.
+\paragraph{Forma.} Dove la prosa basta, c'\`e prosa. Dove la prosa rende sfuocato qualcosa che chiede precisione, entrano le regole di inferenza in forma classica (premesse, barra, conclusione), o un frammento Agda. Nessun salto: ogni sezione usa solo cose introdotte in sezioni precedenti, e se ci si perde basta tornare indietro fino a trovarne il fondamento.
 
 \bigskip
 
-\noindent\textbf{Patto di lettura.} Niente salti in avanti. La Parte~I fissa il vocabolario (giudizi, metalinguaggio, grammatica di contesti e $\vdash$, schema F-I-E-C). La Parte~II applica F-I-E-C ai cinque tipi MLTT puri: $\mathbb{B}$, $\mathbb{N}$, $\Pi$, $\Sigma$, il tipo identit\`a $\_\identita\_$. La Parte~III estrae da queste regole la logica intuizionista che vi affiora dietro (Curry-Howard) e un kit di costruzioni derivate (\emph{tipi notevoli}). La Parte~IV \`e il compendio capitolo per capitolo di \emph{Verified Functional Programming in Agda}: vi atterrano fra l'altro l'esercizio paradigmatico di commutativit\`a di \texttt{\&\&} (Stump cap.~1) e il tipo dipendente $\mathrm{Vec}$ (Stump cap.~4). Ceri e decisioni di design sono raccolti nell'appendice (\S\ref{cap:ceri}).
+\noindent\textbf{Patto di lettura.} Niente salti in avanti. La Parte~I fissa il vocabolario (giudizi, metalinguaggio, grammatica di contesti e $\vdash$, schema F-I-E-C). La Parte~II applica F-I-E-C ai sei tipi MLTT puri --- $\mathbb{B}$, $\mathbb{N}$, $\Pi$, $\Sigma$, $A \uplus B$, il tipo identit\`a $\_\identita\_$ --- pi\`u un esempio dipendente piccolo ($\mathrm{Fin}\,n$). La Parte~III estrae da queste regole la logica intuizionista che vi affiora dietro (Curry-Howard) e un kit di costruzioni derivate (\emph{tipi notevoli}). La Parte~IV \`e il compendio capitolo per capitolo di \emph{Verified Functional Programming in Agda}: vi atterrano fra l'altro l'esercizio paradigmatico di commutativit\`a di \texttt{\&\&} (Stump cap.~1) e il tipo dipendente $\mathrm{Vec}$ (Stump cap.~4). Ceri e decisioni di design sono raccolti nell'appendice (\S\ref{cap:ceri}).
+
+\medskip
+
+\noindent\textbf{Convenzione sul contesto.} Da \S\ref{cap:fiec} in poi le regole sono scritte \emph{senza} contesto in vista: si sottintende un $\Gamma$ implicito (per esteso, ogni giudizio \`e $\Gamma \vdash \dots$ per ogni $\Gamma$). Il $\vdash$ ricompare solo quando una premessa \emph{estende} il contesto rispetto alla conclusione --- caso paradigmatico, la $\Pi$-formazione (\S\ref{cap:pi}). Lo si dichiara una volta qui, e una sola; il dettaglio operativo \`e in \S\ref{cap:contesti}.
 
 \bigskip
 
