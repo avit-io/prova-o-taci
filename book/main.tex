@@ -230,52 +230,123 @@
 \pagestyle{plain}
 
 % ----------------- COPERTINA -----------------
-% Una sola titlepage per tutto il libro. Bianco assoluto, sans-serif.
-% Titolo impilato in tre righe a sinistra; sotto un filo a tutta pagina
-% e i metadati in due righe brevi. Anno arabo in basso a destra come
-% contrappeso. Nessun colore d'accento, nessun ornamento.
+% Stile Depero: lettere costruite a mano in TikZ da primitive geometriche
+% (rettangoli, triangoli, parallelogrammi). Niente font, niente curve,
+% niente blocchi-lego con dentro un sans generico.
+% Tre righe centrate: PROVA / O / TACI. PROVA e TACI in nero, O in vinaccia
+% come unico accento cromatico. Cream il fondo. Tutto qui.
+%
+% Grid del glifo: 4 (largh) x 6 (alt). Stem = 1.2 (30% di largh).
+% Spaziatura tra lettere = 1 unità. Macro \dep<X>{<colore>} disegna il glifo
+% con origine (0,0) bottom-left.
+
+\newcommand{\depP}[1]{%
+  \fill[#1] (0,0) rectangle (1.2,6);
+  \fill[#1] (0,4.8) rectangle (4,6);
+  \fill[#1] (0,3.6) rectangle (4,4.8);
+  \fill[#1] (2.8,3.6) rectangle (4,6);
+}
+\newcommand{\depR}[1]{%
+  \depP{#1}
+  %% gamba diagonale (parallelogramma) dal fondo del bowl al basso-destra
+  \fill[#1] (1.2,3.6) -- (2.4,3.6) -- (4,0) -- (2.8,0) -- cycle;
+}
+\newcommand{\depO}[1]{%
+  %% rettangolo cavo, niente curve
+  \fill[#1, even odd rule]
+    (0,0) rectangle (4,6)
+    (1.2,1.2) rectangle (2.8,4.8);
+}
+\newcommand{\depV}[1]{%
+  %% due parallelogrammi che convergono al basso
+  \fill[#1] (0,6) -- (1.2,6) -- (2.6,0) -- (1.4,0) -- cycle;
+  \fill[#1] (2.8,6) -- (4,6) -- (2.6,0) -- (1.4,0) -- cycle;
+}
+\newcommand{\depA}[1]{%
+  %% V capovolta + traversa
+  \fill[#1] (0,0) -- (1.2,0) -- (2.6,6) -- (1.4,6) -- cycle;
+  \fill[#1] (2.8,0) -- (4,0) -- (2.6,6) -- (1.4,6) -- cycle;
+  \fill[#1] (0.8,2.4) rectangle (3.2,3.0);
+}
+\newcommand{\depT}[1]{%
+  \fill[#1] (0,4.8) rectangle (4,6);
+  \fill[#1] (1.4,0) rectangle (2.6,4.8);
+}
+\newcommand{\depC}[1]{%
+  %% C a stencil: stem sx + barra alto + barra basso, piccoli ritorni a dx
+  \fill[#1] (0,0) rectangle (1.2,6);
+  \fill[#1] (0,4.8) rectangle (4,6);
+  \fill[#1] (0,0) rectangle (4,1.2);
+  \fill[#1] (2.8,4.2) rectangle (4,4.8);
+  \fill[#1] (2.8,1.2) rectangle (4,1.8);
+}
+\newcommand{\depI}[1]{%
+  %% I con serif costruttivisti sopra e sotto
+  \fill[#1] (1.4,0) rectangle (2.6,6);
+  \fill[#1] (0,4.8) rectangle (4,6);
+  \fill[#1] (0,0) rectangle (4,1.2);
+}
 
 \begin{titlepage}
 \thispagestyle{empty}
 \begin{tikzpicture}[remember picture, overlay]
 
-  %% Sfondo bianco assoluto.
-  \fill[white] (current page.north west) rectangle (current page.south east);
+  %% Sfondo cream Depero.
+  \fill[cream] (current page.north west) rectangle (current page.south east);
 
-  %% Titolo. Tre righe impilate, bold sans, lowercase, flush left a x=3.
-  %% Baseline a 9.5 / 12.5 / 15.5 cm dall'alto: blocco di ~6 cm centrato
-  %% sul terzo alto della pagina.
-  \node[black, anchor=base west,
-        font=\fontsize{84}{84}\selectfont\sffamily\bfseries]
-    at ($(current page.north west)+(3.0,-9.5)$) {prova};
-  \node[black, anchor=base west,
-        font=\fontsize{84}{84}\selectfont\sffamily\bfseries]
-    at ($(current page.north west)+(3.0,-12.5)$) {o};
-  \node[black, anchor=base west,
-        font=\fontsize{84}{84}\selectfont\sffamily\bfseries]
-    at ($(current page.north west)+(3.0,-15.5)$) {taci};
+  %% =========================================================
+  %% PROVA --- riga 1. Cinque lettere, centrate sull'asse pagina.
+  %% Larghezza totale: 5*4 + 4*1 = 24 unità. Scala 0.6 cm/unità
+  %% → 14.4 cm di blocco. Pagina = 21 cm, margini ~3.3 cm per lato.
+  %% Origine al bottom-left della prima lettera (P).
+  %% =========================================================
+  \begin{scope}[shift={($(current page.north west)+(3.3,-10.0)$)}]
+    \begin{scope}[scale=0.6]
+      \begin{scope}[shift={( 0,0)}] \depP{black} \end{scope}
+      \begin{scope}[shift={( 5,0)}] \depR{black} \end{scope}
+      \begin{scope}[shift={(10,0)}] \depO{black} \end{scope}
+      \begin{scope}[shift={(15,0)}] \depV{black} \end{scope}
+      \begin{scope}[shift={(20,0)}] \depA{black} \end{scope}
+    \end{scope}
+  \end{scope}
 
-  %% Filo a tutta pagina, sotto il titolo. Separa il blocco-titolo
-  %% dai metadati. Sottile: niente gesti.
-  \draw[black, line width=0.4pt]
-    ($(current page.north west)+(3.0,-17.0)$) --
-    ($(current page.north east)+(-3.0,-17.0)$);
+  %% =========================================================
+  %% O --- riga 2 (centro). Una lettera sola, in vinaccia.
+  %% Largh = 4 unità * 0.6 = 2.4 cm. Centrata: x = (21-2.4)/2 = 9.3.
+  %% L'unico accento cromatico della copertina --- la disgiunzione che brucia.
+  %% =========================================================
+  \begin{scope}[shift={($(current page.north west)+(9.3,-14.5)$)}]
+    \begin{scope}[scale=0.6]
+      \depO{halfgray}
+    \end{scope}
+  \end{scope}
 
-  %% Metadati. Due righe sans, lowercase, vicine al filo.
-  \node[black, anchor=base west,
-        font=\normalsize\sffamily]
-    at ($(current page.north west)+(3.0,-17.7)$)
-    {appunti di Martin-L\"of Type Theory};
+  %% =========================================================
+  %% TACI --- riga 3. Quattro lettere centrate.
+  %% Larghezza: 4*4 + 3*1 = 19 unità * 0.6 = 11.4 cm.
+  %% Origine: x = (21-11.4)/2 = 4.8.
+  %% =========================================================
+  \begin{scope}[shift={($(current page.north west)+(4.8,-19.0)$)}]
+    \begin{scope}[scale=0.6]
+      \begin{scope}[shift={( 0,0)}] \depT{black} \end{scope}
+      \begin{scope}[shift={( 5,0)}] \depA{black} \end{scope}
+      \begin{scope}[shift={(10,0)}] \depC{black} \end{scope}
+      \begin{scope}[shift={(15,0)}] \depI{black} \end{scope}
+    \end{scope}
+  \end{scope}
 
+  %% =========================================================
+  %% FOOTER --- una sola riga, asciutta. Sottotitolo a sinistra,
+  %% anno a destra. Stesse Y-coordinate per tenere la baseline.
+  %% =========================================================
   \node[black, anchor=base west,
         font=\footnotesize\sffamily]
-    at ($(current page.north west)+(3.0,-18.5)$)
-    {compendio a Verified Functional Programming in Agda};
+    at ($(current page.south west)+(3.3,2.0)$)
+    {appunti di Martin-L\"of Type Theory \ \textbar\ \ compendio a Verified Functional Programming in Agda};
 
-  %% Anno. Numeri arabi, flush right in basso. Contrappeso al titolo.
   \node[black, anchor=base east,
-        font=\normalsize\sffamily]
-    at ($(current page.south east)+(-3.0,2.5)$)
+        font=\footnotesize\sffamily]
+    at ($(current page.south east)+(-3.3,2.0)$)
     {2026};
 
 \end{tikzpicture}
