@@ -2,7 +2,7 @@
   description = "Verified Functional Programming in Agda – studio personale";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.2511.911303";
     ial = {
       url = "github:cedille/ial";
       flake = false;

@@ -229,6 +229,185 @@
 \pagenumbering{roman}
 \pagestyle{plain}
 
+% ----------------- COPERTINA -----------------
+% L'IDEA: la copertina E' una regola di inferenza.
+% Premesse F, I, E, C in alto. Barra inferenziale che taglia la pagina.
+% Conclusione: il titolo, sotto. Il libro deriva il proprio nome.
+% Top-down: dall'alto le quattro regole, in basso quello che ne segue.
+\begin{titlepage}
+\thispagestyle{empty}
+\begin{tikzpicture}[remember picture, overlay]
+
+  %% Sfondo cream pulito. Niente decorazione.
+  \fill[cream] (current page.north west) rectangle (current page.south east);
+
+  %% =========================================================
+  %% PREMESSE --- in alto, quattro giudizi affiancati.
+  %% Ciascuno: una lettera grande in vinaccia + il giudizio formale
+  %% sotto, in mono. Sono i quattro pilastri F-I-E-C.
+  %% =========================================================
+
+  %% F --- formazione
+  \node[halfgray, anchor=base,
+        font=\fontsize{56}{60}\selectfont\sffamily\bfseries]
+    at ($(current page.north west)+(3.5,-6.0)$) {F};
+  \node[black, anchor=base,
+        font=\small\ttfamily]
+    at ($(current page.north west)+(3.5,-7.0)$) {$A : \mathsf{Type}$};
+
+  %% I --- introduzione
+  \node[halfgray, anchor=base,
+        font=\fontsize{56}{60}\selectfont\sffamily\bfseries]
+    at ($(current page.north west)+(7.5,-6.0)$) {I};
+  \node[black, anchor=base,
+        font=\small\ttfamily]
+    at ($(current page.north west)+(7.5,-7.0)$) {$a : A$};
+
+  %% E --- eliminazione
+  \node[halfgray, anchor=base,
+        font=\fontsize{56}{60}\selectfont\sffamily\bfseries]
+    at ($(current page.north west)+(12.0,-6.0)$) {E};
+  \node[black, anchor=base,
+        font=\small\ttfamily]
+    at ($(current page.north west)+(12.0,-7.0)$) {$a : A \vdash b : B$};
+
+  %% C --- computazione
+  \node[halfgray, anchor=base,
+        font=\fontsize{56}{60}\selectfont\sffamily\bfseries]
+    at ($(current page.north west)+(17.0,-6.0)$) {C};
+  \node[black, anchor=base,
+        font=\small\ttfamily]
+    at ($(current page.north west)+(17.0,-7.0)$) {$b \equiv_{\beta} b'$};
+
+  %% =========================================================
+  %% BARRA INFERENZIALE --- IL GESTO della copertina.
+  %% Spessa, nera, attraversa l'intera pagina da margine a margine.
+  %% Questa barra dice: sopra ci sono le premesse, sotto la conclusione.
+  %% =========================================================
+  \fill[black]
+    ($(current page.north west)+(1.5,-9.4)$) rectangle
+    ($(current page.north east)+(-1.5,-10.1)$);
+
+  %% Etichetta a destra della barra, in vinaccia: "FIEC" come nome della
+  %% regola d'inferenza (come si fa nelle derivazioni formali).
+  \node[halfgray, anchor=west,
+        font=\small\sffamily\bfseries]
+    at ($(current page.north east)+(-1.3,-9.75)$) {};
+  \node[halfgray, anchor=east,
+        font=\footnotesize\sffamily\itshape]
+    at ($(current page.north west)+(20.0,-10.6)$)
+    {(\textsc{fiec})};
+
+  %% =========================================================
+  %% CONCLUSIONE --- il titolo. Tre parole su tre righe,
+  %% allineate a sinistra, sotto la barra. PROVA in nero pieno,
+  %% O in italic vinaccia (la disgiunzione che brucia),
+  %% TACI in nero su fondo. Una sola colonna, perentoria.
+  %% =========================================================
+  \node[black, anchor=base west,
+        font=\fontsize{96}{100}\selectfont\sffamily\bfseries]
+    at ($(current page.north west)+(2.0,-15.2)$)
+    {PROVA};
+
+  \node[halfgray, anchor=base west,
+        font=\fontsize{96}{100}\selectfont\sffamily\bfseries\itshape]
+    at ($(current page.north west)+(2.0,-18.6)$)
+    {O};
+
+  \node[black, anchor=base west,
+        font=\fontsize{96}{100}\selectfont\sffamily\bfseries]
+    at ($(current page.north west)+(2.0,-22.0)$)
+    {TACI};
+
+  %% Sottile filo vinaccia che corre lungo il fianco sinistro
+  %% del titolo --- segna "questa colonna E' la conclusione".
+  \fill[halfgray]
+    ($(current page.north west)+(1.6,-22.4)$) rectangle
+    ($(current page.north west)+(1.8,-12.5)$);
+
+  %% =========================================================
+  %% FOOTER --- piede di pagina, sottile, metadata.
+  %% =========================================================
+
+  %% Linea sottile orizzontale, asciutta
+  \fill[black]
+    ($(current page.south west)+(2.0,3.6)$) rectangle
+    ($(current page.south east)+(-2.0,3.65)$);
+
+  %% Sottotitolo a sinistra
+  \node[black, anchor=base west,
+        font=\normalsize\sffamily\bfseries]
+    at ($(current page.south west)+(2.0,2.6)$)
+    {\spacedlowsmallcaps{appunti di Martin-L\"of Type Theory}};
+
+  %% Compendio a Stump
+  \node[terra, anchor=base west,
+        font=\footnotesize\sffamily]
+    at ($(current page.south west)+(2.0,1.8)$)
+    {\spacedlowsmallcaps{compendio a Verified Functional Programming in Agda}};
+
+  %% Anno a destra
+  \node[halfgray, anchor=base east,
+        font=\large\sffamily\bfseries]
+    at ($(current page.south east)+(-2.0,2.6)$)
+    {MMXXVI};
+
+\end{tikzpicture}
+\end{titlepage}
+\clearpage
+
+% ----------------- MANIFESTO (omaggio a Marinetti) -----------------
+% Pagina autonoma. Numerata 1..9. Forma anaforica, perentoria.
+% Contenuto: MLTT come matematica del processo.
+\thispagestyle{empty}
+\vspace*{2cm}
+\begin{center}
+{\sffamily\bfseries\fontsize{30}{34}\selectfont\color{halfgray}
+\spacedlowsmallcaps{Manifesto}}\\[6pt]
+{\itshape\small della matematica del processo}
+\end{center}
+\vspace{1.2cm}
+
+\begingroup
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.55\baselineskip}
+\leftskip=2em \rightskip=2em
+
+{\color{halfgray}\sffamily\bfseries 1.}\quad
+Noi dichiariamo che un tipo \emph{esiste} solo se le sue regole lo dicono. Niente esiste fuori da come si forma, si introduce, si elimina, si computa.
+
+{\color{halfgray}\sffamily\bfseries 2.}\quad
+Noi rifiutiamo il terzo escluso come premessa universale. La verit\`a non \`e un giudizio che precede la prova: la prova \`e la verit\`a, e dove la prova manca conviene tacere.
+
+{\color{halfgray}\sffamily\bfseries 3.}\quad
+Noi affermiamo il \emph{processo} contro la stasi. Una funzione non \`e un grafo immobile: \`e una computazione che riduce, normalizza, produce un valore canonico in un numero finito di passi.
+
+{\color{halfgray}\sffamily\bfseries 4.}\quad
+Noi proclamiamo che si pu\`o partire dall'alto. Si sceglie il livello di astrazione del processo; le cose elementari si fanno \emph{accadere}, e il \emph{pattern matching} le riconosce nel momento in cui accadono.
+
+{\color{halfgray}\sffamily\bfseries 5.}\quad
+Noi vogliamo quattro regole sole: \textbf{Formazione, Introduzione, Eliminazione, Computazione}. Le applichiamo uniformi a ogni tipo. Tutto il resto \`e zucchero, e lo zucchero non \`e una regola.
+
+{\color{halfgray}\sffamily\bfseries 6.}\quad
+Noi diciamo \emph{ceri} le assunzioni che reggono il sistema senza prova interna. Le contiamo. Le teniamo in vista. Confondere un cero con un teorema \`e la prima fonte di confusione, e noi la combattiamo.
+
+{\color{halfgray}\sffamily\bfseries 7.}\quad
+Noi opponiamo la \emph{geometria del derivare} alla retorica del dimostrato. Una regola \`e premesse sopra una barra, una conclusione sotto. Tutto qui. Tutto necessario.
+
+{\color{halfgray}\sffamily\bfseries 8.}\quad
+Noi sosteniamo che un programma \emph{\`e} una prova, e una prova \emph{\`e} un programma. Curry-Howard non \`e analogia: \`e identit\`a. La logica affiora dalla struttura dei tipi --- non viene importata.
+
+{\color{halfgray}\sffamily\bfseries 9.}\quad
+Noi vogliamo costruire, non descrivere. Dove la classica racconta cosa \emph{c'\`e}, noi diciamo cosa si \emph{fa}. La matematica del processo si scrive col verbo all'imperativo.
+
+\endgroup
+
+\vfill
+\begin{center}
+{\sffamily\bfseries\color{halfgray}\spacedlowsmallcaps{Prova o taci}}
+\end{center}
+\clearpage
+
 % ----------------- frontespizio (tipografico, asimmetrico) -----------------
 \begin{titlepage}
 \thispagestyle{empty}
@@ -253,30 +432,55 @@
     ($(current page.north west)+(4.5,-9.7)$) --
     ($(current page.north west)+(13.5,-9.7)$);
 
-  %% Sottotitolo: italic, nero, sotto la rule
+  %% Sottotitolo: italic, nero, sotto la rule.
+  %% Tre righe: una piccola di servizio, due grandi che dominano il terzo alto.
   \node[black, anchor=base west,
-        font=\Large\itshape]
-    at ($(current page.north west)+(4.5,-10.5)$)
-    {appunti su Martin-L\"of Type Theory};
+        font=\large\itshape]
+    at ($(current page.north west)+(4.5,-10.4)$)
+    {appunti su};
+
+  \node[black, anchor=base west,
+        font=\fontsize{26}{30}\selectfont\itshape]
+    at ($(current page.north west)+(4.5,-11.6)$)
+    {Martin-L\"of};
+
+  \node[black, anchor=base west,
+        font=\fontsize{26}{30}\selectfont\itshape]
+    at ($(current page.north west)+(4.5,-13.0)$)
+    {Type Theory};
 
   %% =========================================================
   %% Emblema F·I·E·C --- flush right, centro verticale.
-  %% Peso visivo: medio. Pivot della composizione.
-  %% Due fili sottili sopra e sotto, come bracket tipografico.
+  %% Pivot della composizione: colonna verticale dei quattro
+  %% nomi espansi, lettera iniziale grande in vinaccia, resto
+  %% in italic nero. Due fili sottili come bracket tipografico.
   %% =========================================================
 
   \draw[halfgray, line width=0.4pt]
-    ($(current page.north east)+(-9.0,-16.5)$) --
-    ($(current page.north east)+(-4.5,-16.5)$);
+    ($(current page.north east)+(-9.0,-15.4)$) --
+    ($(current page.north east)+(-4.5,-15.4)$);
 
-  \node[halfgray, anchor=base east,
-        font=\Large\scshape]
-    at ($(current page.north east)+(-4.5,-17.4)$)
-    {\spacedlowsmallcaps{F\,$\cdot$\,I\,$\cdot$\,E\,$\cdot$\,C}};
+  %% Per allineare le lettere F·I·E·C in colonna a destra, usiamo
+  %% un tabular con prima colonna right-aligned (lettera) e
+  %% seconda colonna left-aligned (suffisso italic), ancorando
+  %% l'intero blocco al margine destro.
+  \node[anchor=north east]
+    at ($(current page.north east)+(-4.5,-15.9)$)
+    {\renewcommand{\arraystretch}{1.35}%
+     \begin{tabular}{@{}r@{\,}l@{}}
+       {\color{halfgray}\fontsize{22}{26}\selectfont\scshape F} &
+         {\fontsize{14}{18}\selectfont\itshape ormazione}\\
+       {\color{halfgray}\fontsize{22}{26}\selectfont\scshape I} &
+         {\fontsize{14}{18}\selectfont\itshape ntroduzione}\\
+       {\color{halfgray}\fontsize{22}{26}\selectfont\scshape E} &
+         {\fontsize{14}{18}\selectfont\itshape liminazione}\\
+       {\color{halfgray}\fontsize{22}{26}\selectfont\scshape C} &
+         {\fontsize{14}{18}\selectfont\itshape omputazione}\\
+     \end{tabular}};
 
   \draw[halfgray, line width=0.4pt]
-    ($(current page.north east)+(-9.0,-18.0)$) --
-    ($(current page.north east)+(-4.5,-18.0)$);
+    ($(current page.north east)+(-9.0,-20.6)$) --
+    ($(current page.north east)+(-4.5,-20.6)$);
 
   %% =========================================================
   %% Blocco FOOTER --- flush left, terzo basso.

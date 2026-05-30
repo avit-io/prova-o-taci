@@ -660,11 +660,11 @@ La taglia del tipo si legge nell'indice.
 \mathsf{fs} : (n : \mathbb{N}) \to \mathrm{Fin}\,n \to \mathrm{Fin}\,(\suc\,n)
 \]
 
-\noindent Le due viste sono equivalenti: il nostro schema $\mathsf{fz}\,n : \mathrm{Fin}\,(\suc\,n)$ \`e ci\`o che si deriva dalla Π-eliminazione di $\mathsf{fz} : (n : \mathbb{N}) \to \mathrm{Fin}\,(\suc\,n)$ applicato a un $n$ generico. Differiscono solo in \emph{dove} tieni il ``per ogni'': meta nello schema, oggetto nel Π di Agda.
+\noindent Le due viste sono equivalenti: il nostro schema $\mathsf{fz}\,n : \mathrm{Fin}\,(\suc\,n)$ \`e ci\`o che si deriva dalla $\Pi$-eliminazione di $\mathsf{fz} : (n : \mathbb{N}) \to \mathrm{Fin}\,(\suc\,n)$ applicato a un $n$ generico. Differiscono solo in \emph{dove} tieni il ``per ogni'': meta nello schema, oggetto nel $\Pi$ di Agda.
 
 \medskip
 
-\noindent La sintassi \texttt{data ... where} riflette esattamente la scelta Π-internalizzata:
+\noindent La sintassi \texttt{data ... where} riflette esattamente la scelta $\Pi$-internalizzata:
 
 \begin{agda}
 data Fin : ℕ → Set where
@@ -673,11 +673,11 @@ data Fin : ℕ → Set where
 \end{agda}
 
 \begin{itemize}
-\item \texttt{fz : ∀ \{n\} → Fin (suc n)} \emph{\`e} il Π $(n : \mathbb{N}) \to \mathrm{Fin}\,(\suc\,n)$ della costante $\mathsf{fz}$, con $n$ implicito. Il \texttt{∀} \`e zucchero per $\Pi$ (\S\ref{cap:forall}); le graffe \texttt{\{n\}} segnalano che $n$ vive nella passata 1 (\S\ref{cap:pi-azione}) ed \`e inferito dal tipo target.
+\item \texttt{fz : $\forall$ \{n\} $\to$ Fin (suc n)} \emph{\`e} il $\Pi$ $(n : \mathbb{N}) \to \mathrm{Fin}\,(\suc\,n)$ della costante $\mathsf{fz}$, con $n$ implicito. Il \texttt{$\forall$} \`e zucchero per $\Pi$ (\S\ref{cap:forall}); le graffe \texttt{\{n\}} segnalano che $n$ vive nella passata 1 (\S\ref{cap:pi-azione}) ed \`e inferito dal tipo target.
 \item Quando in codice si scrive ``\texttt{fz : Fin 3}'' Agda elabora $\mathsf{fz}\,\{2\}$: guarda il target \texttt{Fin 3}, unifica $\suc\,n \definitorio 3$, deduce $n = 2$, riempie l'implicito. La cosa che noi chiamiamo $\mathsf{fz}\,2$ nello schema, Agda la chiama \texttt{fz} con $\{n=2\}$ nascosto.
 \end{itemize}
 
-\noindent\textbf{Da fissare.} Lo schema di inferenza tiene il ``per ogni $n$'' nel metalinguaggio --- coerente con il resto del libro (vedi $\suc$, $\cons$). Agda lo \emph{internalizza} come Π di prima classe sul costruttore. Stessa matematica, due punti di vista; la sintassi \texttt{∀ \{n\}} \`e il segnale che Agda ha scelto la seconda strada.
+\noindent\textbf{Da fissare.} Lo schema di inferenza tiene il ``per ogni $n$'' nel metalinguaggio --- coerente con il resto del libro (vedi $\suc$, $\cons$). Agda lo \emph{internalizza} come $\Pi$ di prima classe sul costruttore. Stessa matematica, due punti di vista; la sintassi \texttt{$\forall$ \{n\}} \`e il segnale che Agda ha scelto la seconda strada.
 
 \bigskip
 
