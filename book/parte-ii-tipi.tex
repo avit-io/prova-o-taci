@@ -629,17 +629,27 @@ Un esempio breve, prima del quadro. $\mathrm{Fin}\,n$ \`e il tipo dei naturali s
 $\mathrm{Fin}\,0$, $\mathrm{Fin}\,1$, $\mathrm{Fin}\,3$ sono tipi diversi: il typechecker conosce la taglia a compile time.
 
 \section*{I --- Introduzione}
+
+\noindent Una premessa di forma, prima delle regole. \textbf{I costruttori di una famiglia indicizzata sono formalmente di tipo $\Pi$}: prendono l'indice come argomento e producono un abitante della famiglia in quel punto. Per $\mathrm{Fin}$ ci sono due costruttori, e ciascuno \`e una \emph{costante del linguaggio con un tipo $\Pi$}:
 \[
-\inferrule{n : \mathbb{N}}{\mathsf{fz} : \mathrm{Fin}\,(\suc\,n)}
+\inferrule{ }{\mathsf{fz} : (n : \mathbb{N}) \to \mathrm{Fin}\,(\suc\,n)}
 \qquad
-\inferrule{i : \mathrm{Fin}\,n}{\mathsf{fs}\,i : \mathrm{Fin}\,(\suc\,n)}
+\inferrule{ }{\mathsf{fs} : (n : \mathbb{N}) \to \mathrm{Fin}\,n \to \mathrm{Fin}\,(\suc\,n)}
 \]
 
-Entrambi i costruttori concludono in $\mathrm{Fin}\,(\suc\,n)$: nessuno produce un $\mathrm{Fin}\,0$. Conseguenza: $\mathrm{Fin}\,0$ \`e abitato da \emph{zero} termini --- senza essere $\bot$, e senza una regola dedicata. Lo si scopre tentando di costruirne uno: nessuno dei due costruttori \`e applicabile, perch\'e nessuno ha $\zero$ come indice di conclusione.
+\noindent Niente abuso: $\mathsf{fz}$ non \`e una costante che ``vive in tutti i $\mathrm{Fin}\,(\suc\,n)$'' --- \`e una funzione di tipo $\Pi$ che, applicata a un $n$, produce un abitante di $\mathrm{Fin}\,(\suc\,n)$. Quando in pratica si scrive $\mathsf{fz} : \mathrm{Fin}\,3$ si sta usando $\mathsf{fz}\,2$, e il typechecker accetta perch\'e $\mathrm{Fin}\,(\suc\,2) \definitorio \mathrm{Fin}\,3$.
 
 \medskip
 
-\noindent Viceversa, $\mathrm{Fin}\,3$ ha esattamente tre abitanti: $\mathsf{fz}$, $\mathsf{fs}\,\mathsf{fz}$, $\mathsf{fs}\,(\mathsf{fs}\,\mathsf{fz})$. La taglia del tipo si legge nell'indice.
+\noindent Entrambi i costruttori concludono in $\mathrm{Fin}\,(\suc\,n)$: nessuno ha $\mathrm{Fin}\,\zero$ come tipo di ritorno. Conseguenza: $\mathrm{Fin}\,0$ \`e abitato da \emph{zero} termini, senza essere $\bot$ e senza una regola dedicata. Per costruirne uno servirebbe applicare $\mathsf{fz}\,n$ o $\mathsf{fs}\,n\,i$ con il tipo di ritorno definitoriamente uguale a $\mathrm{Fin}\,0$, cio\`e $\suc\,n \definitorio 0$: impossibile per ogni $n$.
+
+\medskip
+
+\noindent Viceversa, $\mathrm{Fin}\,3$ ha esattamente tre abitanti, scritti in forma pienamente applicata:
+\[
+\mathsf{fz}\,2, \qquad \mathsf{fs}\,2\,(\mathsf{fz}\,1), \qquad \mathsf{fs}\,2\,(\mathsf{fs}\,1\,(\mathsf{fz}\,0)).
+\]
+La taglia del tipo si legge nell'indice.
 
 \section*{In Agda}
 \begin{agda}
@@ -648,7 +658,13 @@ data Fin : ℕ → Set where
   fs : ∀ {n} → Fin n → Fin (suc n)
 \end{agda}
 
-Le graffe in \texttt{∀ \{n\}} sono il riconoscimento sintattico di \S\ref{cap:pi-azione}: $n$ vive nella passata 1 ed \`e inferito dal tipo del risultato di ciascun costruttore.
+\noindent\textbf{Lettura della sintassi \texttt{data\,...\,where}.} Agda elenca i costruttori \emph{con il loro tipo $\Pi$ scritto per esteso} --- la sintassi non introduce una regola nuova rispetto a quanto visto in \S\ref{cap:pi}--\S\ref{cap:pi-azione}. Tradotti pezzo per pezzo:
+\begin{itemize}
+\item \texttt{fz : ∀ \{n\} → Fin (suc n)} \`e esattamente $(n : \mathbb{N}) \to \mathrm{Fin}\,(\suc\,n)$. Il \texttt{∀} \`e zucchero per $\Pi$ (\S\ref{cap:forall}); le graffe \texttt{\{n\}} segnalano che $n$ vive nella passata 1 (\S\ref{cap:pi-azione}) e viene inferito dal tipo target. Senza graffe avremmo \texttt{fz : (n : ℕ) → Fin (suc n)} e in codice andrebbe scritto \texttt{fz 2} a mano.
+\item Quindi nel codice ``\texttt{fz : Fin 3}'' \`e l'elaborazione di \texttt{fz \{2\}}: Agda guarda il target \texttt{Fin 3}, unifica $\suc\,n \definitorio 3$, deduce $n = 2$ e riempie l'argomento implicito.
+\end{itemize}
+
+\noindent In altre parole: la sintassi \texttt{data ... where} non aggiunge primitive al linguaggio, dichiara solo che \texttt{fz} e \texttt{fs} sono \emph{termini} di certi tipi $\Pi$, e che la formazione di $\mathrm{Fin}\,n$ \`e quella della regola F sopra.
 
 \bigskip
 
