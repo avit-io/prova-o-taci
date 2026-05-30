@@ -630,18 +630,18 @@ $\mathrm{Fin}\,0$, $\mathrm{Fin}\,1$, $\mathrm{Fin}\,3$ sono tipi diversi: il ty
 
 \section*{I --- Introduzione}
 
-\noindent Una premessa di forma, prima delle regole. \textbf{I costruttori di una famiglia indicizzata sono formalmente di tipo $\Pi$}: prendono l'indice come argomento e producono un abitante della famiglia in quel punto. Per $\mathrm{Fin}$ ci sono due costruttori, e ciascuno \`e una \emph{costante del linguaggio con un tipo $\Pi$}:
+\noindent Due regole, nello stile schema-in-forma-applicata gi\`a usato per $\suc$ in \S\ref{cap:nat}: il ``per ogni $n$'' vive nel metalinguaggio (\`e la quantificazione implicita sulle variabili libere delle premesse), e il termine del linguaggio compare in conclusione gi\`a applicato a $n$.
 \[
-\inferrule{ }{\mathsf{fz} : (n : \mathbb{N}) \to \mathrm{Fin}\,(\suc\,n)}
+\inferrule{n : \mathbb{N}}{\mathsf{fz}\,n : \mathrm{Fin}\,(\suc\,n)}
 \qquad
-\inferrule{ }{\mathsf{fs} : (n : \mathbb{N}) \to \mathrm{Fin}\,n \to \mathrm{Fin}\,(\suc\,n)}
+\inferrule{n : \mathbb{N} \\ i : \mathrm{Fin}\,n}{\mathsf{fs}\,n\,i : \mathrm{Fin}\,(\suc\,n)}
 \]
 
-\noindent Niente abuso: $\mathsf{fz}$ non \`e una costante che ``vive in tutti i $\mathrm{Fin}\,(\suc\,n)$'' --- \`e una funzione di tipo $\Pi$ che, applicata a un $n$, produce un abitante di $\mathrm{Fin}\,(\suc\,n)$. Quando in pratica si scrive $\mathsf{fz} : \mathrm{Fin}\,3$ si sta usando $\mathsf{fz}\,2$, e il typechecker accetta perch\'e $\mathrm{Fin}\,(\suc\,2) \definitorio \mathrm{Fin}\,3$.
+\noindent Esattamente come $\inferrule{n : \mathbb{N}}{\suc\,n : \mathbb{N}}$ \`e uno schema (meta) il cui termine-conclusione $\suc\,n$ vive nel linguaggio --- senza che $\suc$ ``da solo'' sia trattato come una costante a parte. Anche qui $\mathsf{fz}\,n$ e $\mathsf{fs}\,n\,i$ vivono nel linguaggio; ``$\mathsf{fz}$'' isolato non figura nella regola.
 
 \medskip
 
-\noindent Entrambi i costruttori concludono in $\mathrm{Fin}\,(\suc\,n)$: nessuno ha $\mathrm{Fin}\,\zero$ come tipo di ritorno. Conseguenza: $\mathrm{Fin}\,0$ \`e abitato da \emph{zero} termini, senza essere $\bot$ e senza una regola dedicata. Per costruirne uno servirebbe applicare $\mathsf{fz}\,n$ o $\mathsf{fs}\,n\,i$ con il tipo di ritorno definitoriamente uguale a $\mathrm{Fin}\,0$, cio\`e $\suc\,n \definitorio 0$: impossibile per ogni $n$.
+\noindent Entrambi i costruttori concludono in $\mathrm{Fin}\,(\suc\,n)$: nessuno ha $\mathrm{Fin}\,\zero$ come tipo di ritorno. Conseguenza: $\mathrm{Fin}\,0$ \`e abitato da \emph{zero} termini, senza essere $\bot$ e senza una regola dedicata. Per costruirne uno servirebbe applicare uno degli schemi con $\suc\,n \definitorio 0$ come tipo di ritorno: impossibile per ogni $n$.
 
 \medskip
 
@@ -651,20 +651,33 @@ $\mathrm{Fin}\,0$, $\mathrm{Fin}\,1$, $\mathrm{Fin}\,3$ sono tipi diversi: il ty
 \]
 La taglia del tipo si legge nell'indice.
 
-\section*{In Agda}
+\section*{In Agda --- l'altra strada: internalizzare il ``per ogni''}
+
+\noindent Agda fa una scelta diversa, e vale la pena renderla esplicita. Invece di lasciare il ``per ogni $n$'' al metalinguaggio (come nelle regole sopra), lo \textbf{internalizza} dichiarando ciascun costruttore come una \emph{costante del linguaggio di tipo $\Pi$}:
+\[
+\mathsf{fz} : (n : \mathbb{N}) \to \mathrm{Fin}\,(\suc\,n)
+\qquad
+\mathsf{fs} : (n : \mathbb{N}) \to \mathrm{Fin}\,n \to \mathrm{Fin}\,(\suc\,n)
+\]
+
+\noindent Le due viste sono equivalenti: il nostro schema $\mathsf{fz}\,n : \mathrm{Fin}\,(\suc\,n)$ \`e ci\`o che si deriva dalla Π-eliminazione di $\mathsf{fz} : (n : \mathbb{N}) \to \mathrm{Fin}\,(\suc\,n)$ applicato a un $n$ generico. Differiscono solo in \emph{dove} tieni il ``per ogni'': meta nello schema, oggetto nel Π di Agda.
+
+\medskip
+
+\noindent La sintassi \texttt{data ... where} riflette esattamente la scelta Π-internalizzata:
+
 \begin{agda}
 data Fin : ℕ → Set where
   fz : ∀ {n} → Fin (suc n)
   fs : ∀ {n} → Fin n → Fin (suc n)
 \end{agda}
 
-\noindent\textbf{Lettura della sintassi \texttt{data\,...\,where}.} Agda elenca i costruttori \emph{con il loro tipo $\Pi$ scritto per esteso} --- la sintassi non introduce una regola nuova rispetto a quanto visto in \S\ref{cap:pi}--\S\ref{cap:pi-azione}. Tradotti pezzo per pezzo:
 \begin{itemize}
-\item \texttt{fz : ∀ \{n\} → Fin (suc n)} \`e esattamente $(n : \mathbb{N}) \to \mathrm{Fin}\,(\suc\,n)$. Il \texttt{∀} \`e zucchero per $\Pi$ (\S\ref{cap:forall}); le graffe \texttt{\{n\}} segnalano che $n$ vive nella passata 1 (\S\ref{cap:pi-azione}) e viene inferito dal tipo target. Senza graffe avremmo \texttt{fz : (n : ℕ) → Fin (suc n)} e in codice andrebbe scritto \texttt{fz 2} a mano.
-\item Quindi nel codice ``\texttt{fz : Fin 3}'' \`e l'elaborazione di \texttt{fz \{2\}}: Agda guarda il target \texttt{Fin 3}, unifica $\suc\,n \definitorio 3$, deduce $n = 2$ e riempie l'argomento implicito.
+\item \texttt{fz : ∀ \{n\} → Fin (suc n)} \emph{\`e} il Π $(n : \mathbb{N}) \to \mathrm{Fin}\,(\suc\,n)$ della costante $\mathsf{fz}$, con $n$ implicito. Il \texttt{∀} \`e zucchero per $\Pi$ (\S\ref{cap:forall}); le graffe \texttt{\{n\}} segnalano che $n$ vive nella passata 1 (\S\ref{cap:pi-azione}) ed \`e inferito dal tipo target.
+\item Quando in codice si scrive ``\texttt{fz : Fin 3}'' Agda elabora $\mathsf{fz}\,\{2\}$: guarda il target \texttt{Fin 3}, unifica $\suc\,n \definitorio 3$, deduce $n = 2$, riempie l'implicito. La cosa che noi chiamiamo $\mathsf{fz}\,2$ nello schema, Agda la chiama \texttt{fz} con $\{n=2\}$ nascosto.
 \end{itemize}
 
-\noindent In altre parole: la sintassi \texttt{data ... where} non aggiunge primitive al linguaggio, dichiara solo che \texttt{fz} e \texttt{fs} sono \emph{termini} di certi tipi $\Pi$, e che la formazione di $\mathrm{Fin}\,n$ \`e quella della regola F sopra.
+\noindent\textbf{Da fissare.} Lo schema di inferenza tiene il ``per ogni $n$'' nel metalinguaggio --- coerente con il resto del libro (vedi $\suc$, $\cons$). Agda lo \emph{internalizza} come Π di prima classe sul costruttore. Stessa matematica, due punti di vista; la sintassi \texttt{∀ \{n\}} \`e il segnale che Agda ha scelto la seconda strada.
 
 \bigskip
 
