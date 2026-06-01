@@ -2,61 +2,29 @@
   description = "Verified Functional Programming in Agda – studio personale";
 
   inputs = {
-    nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.2511.911303";
+    piforge.url  = "github:avit-io/piforge";
+    nixpkgs.follows = "piforge/nixpkgs";
     ial = {
-      url = "github:cedille/ial";
+      url   = "github:cedille/ial";
       flake = false;
     };
   };
 
-  outputs =
-    { nixpkgs, ial, ... }:
+  outputs = { self, nixpkgs, piforge, ial, ... }:
     let
-      systems = [
-        "x86_64-linux"
-        "aarch64-linux"
-        "x86_64-darwin"
-        "aarch64-darwin"
-      ];
+      systems       = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
       forAllSystems = nixpkgs.lib.genAttrs systems;
     in
     {
       devShells = forAllSystems (system:
-        let
-          pkgs = import nixpkgs { inherit system; };
-          hp = pkgs.haskell.lib;
-
-          cornelis-src = pkgs.fetchFromGitHub {
-            owner = "agda";
-            repo = "cornelis";
-            rev = "8401538b8d5056571827679658331136c38f11be";
-            sha256 = "sha256-Z/2hBW/bRb8wtJqBUT8tqgoXg4XqGNvp8L6xw+zHDaU=";
-          };
-
-          cornelis = (hp.doJailbreak (pkgs.haskellPackages.callCabal2nix "cornelis" cornelis-src { })).overrideAttrs (_: {
-            doCheck = false;
-          });
-
-          agda-wrapped = pkgs.writeShellScriptBin "agda" ''
-            [ -z "$AGDA_DIR" ] && AGDA_DIR="$PWD/.agda-local-work"
-            exec ${pkgs.agda}/bin/agda --library-file="$AGDA_DIR/libraries" "$@"
-          '';
-        in
-        {
-          default = pkgs.mkShell {
-            buildInputs = [
-              agda-wrapped
-              cornelis
-              pkgs.zlib
-              pkgs.libffi
-              pkgs.ncurses
-              pkgs.texlive.combined.scheme-full
-              pkgs.ghostscript
-              pkgs.python3
-              pkgs.perl
-            ];
-
-            shellHook = ''
+        let pkgs = nixpkgs.legacyPackages.${system};
+        in {
+          default = piforge.lib.agda.mkShell {
+            inherit pkgs;
+            version             = "v27";
+            useRuntimeLibraries = true;
+            extraPackages       = piforge.lib.latex.packagesFor { inherit pkgs; };
+            shellHook           = ''
               mkdir -p .agda-local-work
               export AGDA_DIR="$PWD/.agda-local-work"
 
@@ -69,7 +37,7 @@
               LIB_NAME=$(grep "^name:" "$AGDA_LIB_FILE" | awk '{print $2}')
 
               echo "$AGDA_LIB_FILE" > "$AGDA_DIR/libraries"
-              echo "$LIB_NAME" > "$AGDA_DIR/defaults"
+              echo "$LIB_NAME"      > "$AGDA_DIR/defaults"
             '';
           };
         });

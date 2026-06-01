@@ -513,20 +513,30 @@ _ = refl
 
 \paragraph{E --- Eliminazione.}
 
+\noindent\textbf{A che serve $\Jelim$.} $\refl$ \emph{costruisce} prove di uguaglianza: quando i due lati riducono alla stessa forma normale, lo si scrive e il typechecker accetta (Regola~\ref{reg:ponte}). Costruire per\`o non basta. Quando una prova $p : x \identita y$ arriva da altrove --- per esempio da $\indN$ su un naturale --- serve una regola che dica \emph{cosa \`e lecito farne}. \`E $\Jelim$. Senza, il tipo identit\`a sarebbe un contenitore: lo si riempie con $\refl$, ma non lo si usa.
+
+\medskip
+
+\noindent\textbf{$\Jelim$ \`e una decisione di design.} Il potere che $\Jelim$ concede al tipo identit\`a \`e la sostituibilit\`a alla Leibniz: se $x \identita y$, allora $y$ \`e interscambiabile con $x$ in qualunque propriet\`a. Non \`e un teorema dimostrato dall'esterno: \`e la scelta dell'eliminatore. Una regola di eliminazione diversa darebbe un sistema diverso. $\Jelim$ si sceglie una volta, e tutto il calcolo sull'uguaglianza ne discende.
+
+\medskip
+
 L'eliminatore $\Jelim$ --- \emph{path induction}, o \emph{induzione sui cammini} --- \`e il principio strutturale del tipo identit\`a.
 
 \[
 \inferrule{A : \Type \\ x : A \\ y : A \\ p : x \identita y \\
-C : (y : A) \to (x \identita y) \to \Type \\
+C : (z : A) \to (x \identita z) \to \Type \\
 c : C\,x\,\refl}{\Jelim(p, C, c) : C\,y\,p}
 \]
+
+\noindent\textbf{Nota sui nomi.} Nel motivo uso $z$ (non $y$) per la variabile legata. La $y$ libera nelle premesse \`e l'estremo destro \emph{fisso} su cui $\Jelim$ verr\`a applicato; la $z$ legata in $C$ \`e una variabile \emph{muta} che il motivo usa per parlare di un estremo generico. Sono due cose diverse: tenere nomi distinti evita confusioni nelle righe sotto.
 
 \noindent Sei premesse e una conclusione. Riga per riga.
 
 \begin{itemize}
 \item \textbf{$A : \Type$, $x : A$.} Il tipo ambiente e l'\emph{estremo sinistro}, fissato. La $x$ \`e libera nel motivo $C$ e nel caso base $c$: la regola la tratta come parametro globale, non come una delle cose su cui ricorrere.
 \item \textbf{$y : A$, $p : x \identita y$.} L'\emph{estremo destro} e il \emph{cammino} $p$ che lo collega a $x$. Sono i due dati su cui $\Jelim$ ``elimina''.
-\item \textbf{Motivo $C : (y : A) \to (x \identita y) \to \Type$.} Una funzione di \emph{due} argomenti: l'estremo destro $y$ e la prova $p$ che $x \identita y$. \`E la prima volta che vediamo un motivo a due variabili --- gli eliminatori precedenti ($\indB$, $\indN$, $\indS$) ne avevano uno solo, il valore eliminato. Il tipo identit\`a ne richiede due perch\'e \`e indicizzato da una coppia di termini pi\`u la prova stessa: il motivo deve sapere parlare di entrambi.
+\item \textbf{Motivo $C : (z : A) \to (x \identita z) \to \Type$.} Una funzione di \emph{due} argomenti: un estremo destro $z$ e una prova che $x \identita z$. \`E la prima volta che vediamo un motivo a due variabili --- gli eliminatori precedenti ($\indB$, $\indN$, $\indS$) ne avevano uno solo, il valore eliminato. Il tipo identit\`a ne richiede due perch\'e \`e indicizzato da una coppia di termini pi\`u la prova stessa: il motivo deve sapere parlare di entrambi.
 \item \textbf{Caso base $c : C\,x\,\refl$.} L'unico caso canonico: il cammino \`e $\refl$. Il tipo di $\refl$ (regola I) \`e $x \identita x$, quindi il secondo estremo \`e forzato a coincidere con $x$. Il motivo si specializza a $C\,x\,\refl$, e questo \`e il tipo che il caso base deve abitare.
 \end{itemize}
 
@@ -544,28 +554,65 @@ Quando il cammino \`e canonico ($p \definitorio \refl$, dunque $y \definitorio x
 
 \medskip
 
-\noindent\textbf{La specializzazione nel caso base non \`e uno slogan.} Si rilegge il motivo: $C : (y : A) \to (x \identita y) \to \Type$ tiene $x$ fissa (parametro esterno alla regola) e lega $y$ e $p$ internamente. Il caso base chiede $C\,x\,\refl$, cio\`e il motivo con $y := x$ e $p := \refl$. La specializzazione non \`e una scelta ad hoc dell'eliminatore: \`e imposta dalla tipizzazione. $\refl$ ha tipo $x \identita x$ per regola I, quindi per applicare $C$ a $\refl$ il secondo argomento di $C$ deve essere $x$, non un $y$ generico. Lo slogan ``nel caso base $y$ diventa $x$'' \`e esattamente questo: una conseguenza della tipizzazione, non una sostituzione informale.
+\noindent\textbf{La specializzazione nel caso base non \`e uno slogan.} Si rilegge il motivo: $C : (z : A) \to (x \identita z) \to \Type$ tiene $x$ fissa (parametro esterno alla regola) e lega $z$ e $p$ internamente. Il caso base chiede $C\,x\,\refl$, cio\`e il motivo con $z := x$ e $p := \refl$. La specializzazione non \`e una scelta ad hoc dell'eliminatore: \`e imposta dalla tipizzazione. $\refl$ ha tipo $x \identita x$ per regola I, quindi per applicare $C$ a $\refl$ il secondo argomento di $C$ deve essere $x$, non un $z$ generico. Lo slogan ``nel caso base, l'estremo destro del motivo diventa $x$'' \`e esattamente questo: una conseguenza della tipizzazione, non una sostituzione informale.
 
-% NUOVO: subst come corollario immediato di J --- J in azione
-\subsection*{$\Jelim$ in azione --- $\mathrm{subst}$ come corollario immediato}
+\subsection*{$\Jelim$ in azione --- i tre corollari canonici}
 
-Il principio della \emph{path induction} \`e formidabile ma astratto. Il suo primo corollario \`e una funzione che usiamo continuamente: \textbf{trasporto} di una propriet\`a lungo un'uguaglianza.
+Il principio della \emph{path induction} \`e formidabile ma astratto. I suoi corollari immediati sono le funzioni che si usano continuamente: simmetria, transitivit\`a, trasporto. Tutte e tre sono $\Jelim$ con motivi diversi --- non nuove regole, ma istanze della stessa.
+
+\paragraph{$\mathrm{sym}$ --- simmetria.} Da $p : x \identita y$, vogliamo $y \identita x$.
+\begin{itemize}
+\item \emph{Motivo}: $C\,z\,\_ \,\definitorio\, z \identita x$. Ignora la prova, dipende solo dall'estremo.
+\item \emph{Caso base}: $C\,x\,\refl \,\definitorio\, x \identita x$, abitato da $\refl$.
+\item \emph{Risultato}: $\Jelim(p, C, \refl) : y \identita x$.
+\end{itemize}
+\begin{agda}
+sym : {A : Set} {x y : A} → x ≡ y → y ≡ x
+sym {x = x} p = J p (λ z _ → z ≡ x) refl
+\end{agda}
+
+\paragraph{$\mathrm{trans}$ --- transitivit\`a.} Da $p : x \identita y$ e $q : y \identita z$, vogliamo $x \identita z$. Eliminiamo $q$ con $\Jelim$ (l'estremo che si muove \`e $z$, e il motivo dipende da quello).
+\begin{itemize}
+\item \emph{Motivo}: $C\,w\,\_ \,\definitorio\, x \identita w$. Dipende solo dall'estremo.
+\item \emph{Caso base}: $C\,y\,\refl \,\definitorio\, x \identita y$, abitato da $p$.
+\item \emph{Risultato}: $\Jelim(q, C, p) : x \identita z$.
+\end{itemize}
+\begin{agda}
+trans : {A : Set} {x y z : A} → x ≡ y → y ≡ z → x ≡ z
+trans {x = x} p q = J q (λ w _ → x ≡ w) p
+\end{agda}
+
+\paragraph{$\mathrm{subst}$ --- trasporto.} Data una famiglia $P : A \to \Type$, $p : x \identita y$ e un abitante di $P\,x$, vogliamo un abitante di $P\,y$.
 \[
 \mathrm{subst} : \{A : \Type\}\,(P : A \to \Type)\,\{x\,y : A\} \to x \identita y \to P\,x \to P\,y
 \]
-Letta a voce: ``se $x \identita y$ e ho un abitante di $P\,x$, ne ottengo uno di $P\,y$''. Si ottiene da $\Jelim$ scegliendo come motivo $C\,y\,p \definitorio P\,y$ (cio\`e: il motivo dipende solo dall'estremo, ignora la prova):
+\begin{itemize}
+\item \emph{Motivo}: $C\,z\,\_ \,\definitorio\, P\,z$. Dipende solo dall'estremo, ignora la prova.
+\item \emph{Caso base}: $C\,x\,\refl \,\definitorio\, P\,x$, abitato da $px$ stesso.
+\item \emph{Risultato}: $\Jelim(p, C, px) : P\,y$. Quando la prova \`e $\refl$, la computazione di $\Jelim$ restituisce esattamente $px$; quando \`e una prova qualunque, $\Jelim$ ``trasporta'' il dato lungo l'identit\`a.
+\end{itemize}
 \begin{agda}
 subst : {A : Set} (P : A → Set) {x y : A} → x ≡ y → P x → P y
-subst P p px = J p (λ y _ → P y) px
---                  ^^^^^^^^^^^
---                  motivo: "non mi importa della prova,
---                   voglio dire qualcosa su y"
+subst P p px = J p (λ z _ → P z) px
 \end{agda}
-\noindent Il caso base $C\,x\,\refl \definitorio P\,x$ \`e gi\`a dato (lo \`e \texttt{px}); la computazione di $\Jelim$ su $\refl$ restituisce esattamente quel \texttt{px}. Quando invece la prova non \`e $\refl$ ma una qualunque, $\Jelim$ ``trasporta'' il dato lungo l'identit\`a.
 
-\begin{oss}[Perch\'e questo importa]
-$\mathrm{subst}$ \`e ci\`o che permette il \emph{rewriting} nelle dimostrazioni in Agda (la parola chiave \texttt{rewrite} si elabora in chiamate a $\mathrm{subst}$). Senza $\Jelim$, non ci sarebbe nessun modo di ``usare'' una prova di uguaglianza per cambiare il tipo di un termine. $\Jelim$ \`e l'astratto; $\mathrm{subst}$ \`e il primo concreto.
+\begin{oss}[Nessuna nuova regola]
+$\mathrm{sym}$, $\mathrm{trans}$, $\mathrm{subst}$ non sono regole aggiuntive sul tipo identit\`a: sono $\Jelim$ con motivi diversi. Il tipo identit\`a, come ogni altro tipo, ha le sue quattro regole F-I-E-C e nient'altro. \`E in questo senso che, una volta dentro la lente di $\Jelim$, MLTT smette di sembrare misterioso: la peculiarit\`a del tipo identit\`a \`e solo che il motivo prende due argomenti (estremo destro pi\`u prova) anzich\'e uno, perch\'e il tipo \`e indicizzato da una coppia di termini pi\`u il cammino.
 \end{oss}
+
+\begin{oss}[Perch\'e $\mathrm{subst}$ importa in pratica]
+$\mathrm{subst}$ \`e ci\`o che permette il \emph{rewriting} nelle dimostrazioni in Agda (la parola chiave \texttt{rewrite} si elabora in chiamate a $\mathrm{subst}$). Senza $\Jelim$ non ci sarebbe nessun modo di ``usare'' una prova di uguaglianza per cambiare il tipo di un termine. $\Jelim$ \`e l'astratto; $\mathrm{subst}$ \`e il primo concreto.
+\end{oss}
+
+\medskip
+
+\noindent\textbf{Schema mentale.} Hai $p : x \identita y$ e vuoi qualcosa che dipende da $y$. Tre mosse, sempre le stesse:
+\begin{enumerate}
+\item Scegli il motivo: $C\,z\,\_ \,\definitorio\, T\,z$ (o $C\,z\,p$ se serve usare anche la prova).
+\item Dimostra il caso base $c : T\,x$ --- la stessa propriet\`a con $x$ al posto di $y$ e $\refl$ al posto di $p$.
+\item Applica $\Jelim$: $\Jelim(p, C, c) : T\,y$.
+\end{enumerate}
+\noindent Se il caso base si dimostra, $\Jelim$ lo porta lungo l'intero cammino.
 
 \section*{Ricapitolazione della distinzione}
 
