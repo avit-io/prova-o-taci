@@ -1,0 +1,122 @@
+% =====================================================================
+% APPENDICE — Univalenza, K, e perché non rilassare J a cuor leggero
+% =====================================================================
+% Lo switch \appendix vive in main.tex prima dell'\input di questo file.
+
+\chapter{Univalenza, K, e perch\'e non rilassare $\Jelim$ a cuor leggero}\label{cap:univalenza}
+
+\noindent {\spacedlowsmallcaps{Per chi si chiede cosa c'\`e sopra}}. Tutto il libro \`e vissuto in MLTT con $\Jelim$ come unico eliminatore dell'uguaglianza: induttivo, decidibile, e --- conviene dirlo --- compatibile con due direzioni di estensione opposte che ancora oggi sono materia di ricerca. Chiudere senza nominarle lascerebbe un buco. Aprirle nel corpo le farebbe deragliare. Stanno qui.
+
+\bigskip
+
+\noindent\textbf{Sintesi della postura.}
+\begin{itemize}
+\item Il libro adotta \texttt{--without-K} (default Agda recente). Non \`e attesa: \`e disciplina.
+\item $\Jelim$ resta induttivo (regole F-I-E-C, niente fuori dallo schema) e decidibile (il pattern matching su $\refl$ si elabora a $\Jelim$ via unificazione).
+\item Le due grandi vie d'uscita --- aggiungere K, oppure passare a teorie cubicali per ottenere univalenza --- toccano ciascuna una propriet\`a non banale. La sezione~\ref{sec:rilassare} le confronta esplicitamente.
+\end{itemize}
+
+\section*{Univalenza in due righe}
+
+L'\emph{assioma di univalenza} di Voevodsky afferma, per ogni $A, B : \Type$:
+\[
+(A \identita B) \;\simeq\; (A \simeq B)
+\]
+\noindent dove $A \simeq B$ \`e il tipo delle equivalenze (funzioni invertibili in senso coerente) fra $A$ e $B$. Detto a parole: \emph{essere isomorfi} (in modo strutturalmente preservante) \emph{\`e} essere identici. Le auto-equivalenze di $A$ diventano abitanti distinti di $A \identita A$.
+
+Esempio guida: $\mathbb{B}$ ha due auto-equivalenze, l'identit\`a e la negazione. Sotto univalenza, $\mathbb{B} \identita \mathbb{B}$ ha (almeno) due abitanti distinti. Sotto MLTT con $\Jelim$ puro, $\mathbb{B} \identita \mathbb{B}$ \`e abitato da $\refl$, e la teoria non costringe a dire nient'altro: non afferma che le due strade collassino, n\'e che siano distinte.
+
+\section*{Cos'\`e K, e perch\'e contraddice univalenza}
+
+L'\emph{assioma K} (o \emph{uniqueness of identity proofs}, UIP) afferma, per ogni $x : A$ e ogni $p : x \identita x$:
+\[
+p \identita \refl
+\]
+\noindent Cio\`e: ogni prova di identit\`a a un punto \emph{\`e} $\refl$. Conseguenza immediata: $x \identita y$ ha al pi\`u un abitante (\emph{set-level}).
+
+Univalenza dice il contrario, esibendo --- come sopra --- almeno due abitanti distinti di $\mathbb{B} \identita \mathbb{B}$. K e univalenza non possono coesistere: scegliere K chiude univalenza per sempre, scegliere univalenza preclude K. Questa \`e una scelta unidirezionale, e si fa una volta sola.
+
+\medskip
+
+\noindent\textbf{$\Jelim$ \`e neutro su entrambe.} Il punto cruciale, di cui questo libro ha bisogno: $\Jelim$ \emph{non} implica K, ma \emph{non lo esclude} nemmeno. K si pu\`o aggiungere come postulato sopra $\Jelim$; univalenza pure (a un costo che vedremo). $\Jelim$ \`e il pavimento; sopra ci si pu\`o costruire in entrambi i sensi --- ma non in entrambi insieme. \`E questa \emph{neutralit\`a} che il libro vuole preservare.
+
+\section*{La postura igienica: \texttt{--without-K}}
+
+L'opzione \texttt{--without-K} di Agda non \`e una scelta sperimentale: \`e --- dal 2014 in poi, e ufficialmente di default in vari preset moderni --- la disciplina che impedisce al pattern matching di Agda di smuggle-in K. In pratica: Agda accetta solo i pattern matching che si traducono in chiamate a $\Jelim$ via unificazione. Niente di pi\`u, niente di meno.
+
+\medskip
+
+\noindent Tre cose che \texttt{--without-K} preserva, e che il libro usa silenziosamente:
+
+\begin{enumerate}
+\item \textbf{Induttivit\`a di $\Jelim$.} Ogni uso di una prova di uguaglianza riduce, in ultima istanza, al comportamento sul caso base $\refl$ (\S\ref{cap:identita}, regola C). Niente entra dall'esterno. \`E lo stesso schema F-I-E-C degli altri tipi.
+
+\item \textbf{Decidibilit\`a del type-checking.} Il pattern matching su $\refl$ si elabora a $\Jelim$ via un algoritmo di unificazione effettivo (\S\ref{cap:prima}, Parte~III). Il typechecker termina con un s\`i o un no. Senza, non lo garantiremmo.
+
+\item \textbf{Compatibilit\`a con la via omotopica.} Chi un domani vorr\`a aggiungere univalenza --- in cubical, o in un'estensione futura --- pu\`o farlo senza riscrivere il codice scritto sotto $\Jelim$. Aggiungere K lo precluderebbe.
+\end{enumerate}
+
+\section*{Cosa si rilassa quando si rilassa $\Jelim$}\label{sec:rilassare}
+
+$\Jelim$, cos\`i come sta in \S\ref{cap:identita}, ha tre propriet\`a che \`e facile dare per scontate finch\'e si hanno. Ognuna delle vie d'uscita da MLTT pura ne tocca almeno una. La tabella sotto rende conto.
+
+\bigskip
+
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{p{4.4cm}p{2.3cm}p{2.3cm}p{4.0cm}}
+\toprule
+\textit{Strada} & \textit{Induttivo} & \textit{Decidibile} & \textit{Costo principale} \\
+\midrule
+MLTT con $\Jelim$ (\texttt{--without-K}) --- \textbf{questo libro} & s\`i & s\`i & nessuna univalenza interna, nessuna UIP \\
+MLTT + K (\texttt{--with-K}) & s\`i$^\dagger$ & s\`i & chiude univalenza per sempre \\
+MLTT + univalenza come postulato & no$^\ddagger$ & s\`i & $\mathsf{transport}$ non riduce: si dimostra, non si computa \\
+Cubical type theory (\texttt{--cubical}) & riformulato$^\S$ & s\`i & si esce dallo schema F-I-E-C; nessuna teoria cubicale \`e ancora canonica \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip
+
+{\small
+$^\dagger$ K \`e induttivo come $\Jelim$, ma la sua aggiunta rende il sistema set-level: tutto ci\`o che vive sopra eredita UIP.\\
+$^\ddagger$ Postulare univalenza significa abitare $A \identita B$ con un termine privo di regola di computazione: $\mathsf{transport}$ lungo quella prova si blocca anzich\'e ridurre.\\
+$^\S$ Le teorie cubicali sostituiscono lo schema F-I-E-C con un sistema esteso (intervallo $\mathbb{I}$, operazioni $\mathsf{transp}$ e $\mathsf{hcomp}$, regole di confine) in cui l'univalenza diventa un \emph{teorema} con regole di computazione genuine. Quale formulazione canonizzare --- CCHM, De Morgan, cartesiana, varianti pi\`u recenti --- \`e tuttora materia di ricerca.}
+
+\bigskip
+
+\noindent Letta riga per riga, la tabella dice una cosa sola: \textbf{non esiste un upgrade indolore}. Ogni strada paga qualcosa, e quel qualcosa non \`e sempre visibile dall'esterno. Aggiungere K sembra innocuo (``ma tanto a un punto le prove di uguaglianza sono comunque tutte $\refl$''), e in effetti tante librerie classiche assumono UIP senza dirlo; il costo \`e che la porta verso ogni interpretazione omotopica si chiude in modo irreversibile. Postulare univalenza sembra innocuo (``\`e solo un assioma in pi\`u''), e in effetti permette di scrivere prove non scrivibili senza; il costo \`e che il calcolo si blocca, e con esso buona parte della promessa computazionale di MLTT. Passare a cubical sembra il vero salto avanti, ed \`e quello che pi\`u promette per il futuro; il costo \`e che si esce dallo schema unitario F-I-E-C su cui il libro \`e costruito, e si entra in una teoria la cui forma canonica non \`e ancora decisa.
+
+\medskip
+
+\noindent Da qui la tesi che questo libro porta a cuore: \emph{$\Jelim$ induttivo e decidibile come in MLTT classica \`e qualcosa che non va rilassato a cuor leggero}. Non perch\'e le alternative siano sbagliate --- alcune sono fra i programmi di ricerca pi\`u vivi della teoria dei tipi contemporanea --- ma perch\'e ciascuna chiede di pagare un prezzo che va contato a freddo, non importato per inerzia da una libreria o da un costume di scrittura.
+
+\section*{Cubical: una direzione, non un punto d'arrivo}
+
+Qualche parola in pi\`u sull'opzione che pi\`u promette. Le teorie cubicali --- nate dal lavoro di Bezem, Coquand, Huber (CCHM), e poi estese e variate (De Morgan in Agda cubical, formulazione cartesiana, etc.) --- realizzano univalenza come teorema interno con regole di computazione effettive. \`E un risultato importante: la prima volta che ``isomorfismo $=$ identit\`a'' diventa una scrittura su cui si pu\`o calcolare, non solo postulare.
+
+Detto questo:
+
+\begin{itemize}
+\item Non c'\`e ancora \emph{una} teoria cubicale canonica. Coesistono varianti con scelte tecniche diverse (intervallo con o senza De~Morgan; politica di filling cartesiana o connection-based; statuto computazionale del higher inductive type universale).
+\item La normalizzazione forte e la canonicit\`a sono state dimostrate per alcune formulazioni e sono congettura --- o lavoro in corso --- per altre. La situazione \`e in evoluzione.
+\item L'algoritmica di typechecking, pur decidibile, \`e meno didattica dello schema F-I-E-C: ogni regola si appoggia a operazioni di filling e composizione che hanno radice geometrica.
+\end{itemize}
+
+\noindent Cubical \`e probabilmente la direzione giusta. ``Probabilmente'' e ``giusta'' sono entrambe parole onestamente difese da chi ci lavora, e questa appendice non aggiunge nulla a quel dibattito. La posizione del libro \`e a monte: chi vuole esplorare cubical lo fa --- in un altro progetto, con \texttt{--cubical}, e con la consapevolezza che sta entrando in una teoria diversa, non in un upgrade trasparente di quella di queste pagine.
+
+\section*{Conclusione operativa}
+
+In Agda, abbiamo gi\`a scelto, e la scelta \`e implicita in tutto il libro: \texttt{--without-K}. Tutti i frammenti tipano sotto questo regime. La conseguenza pratica \`e una sola: chi continua nel mondo $\Jelim$-puro pu\`o farlo senza preoccupazioni; chi un domani volesse provare l'univalenza per davvero pu\`o farlo, in cubical, senza dover smontare ci\`o che ha gi\`a costruito qui sotto.
+
+\medskip
+
+\noindent \`E la stessa logica dei ceri (\S\ref{cap:ceri}): tenere in vista ci\`o che si \`e deciso, e non confondere una postura igienica con una scelta tiepida. \texttt{--without-K} \emph{\`e} una scelta --- la pi\`u economica di tutte, perch\'e non chiude porte --- e va dichiarata come tale.
+
+\bigskip
+
+\begin{center}
+\itshape\color{halfgray}
+$\Jelim$ induttivo e decidibile non si rilassa a cuor leggero.\\
+Lo si guarda da fermi, con tutte le porte aperte, finch\'e non si \`e capito di quale parte di s\'e si \`e disposti a fare a meno.
+\end{center}
